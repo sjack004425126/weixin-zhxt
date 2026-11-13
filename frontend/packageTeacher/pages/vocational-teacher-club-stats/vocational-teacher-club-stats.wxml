@@ -1,0 +1,102 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="container">
+  <!-- 总览统计 -->
+  <view class="overview" wx:if="{{!loading}}">
+    <view class="overview-item">
+      <text class="overview-value">{{totalCourses}}</text>
+      <text class="overview-label">课程数</text>
+    </view>
+    <view class="overview-item">
+      <text class="overview-value highlight">{{totalSelected}}</text>
+      <text class="overview-label">已选人次</text>
+    </view>
+  </view>
+
+  <!-- Tab切换 -->
+  <van-tabs active="{{ activeTab }}" bind:change="onTabChange" color="#1890FF" line-width="60">
+    <van-tab title="按课程">
+      <van-loading wx:if="{{loading}}" size="24px" vertical custom-class="page-loading">加载中...</van-loading>
+      <view wx:elif="{{courseStats.length === 0}}" class="empty-state">
+        <van-empty description="暂无课程数据" />
+      </view>
+      <view wx:else class="stat-list">
+        <view class="stat-card" wx:for="{{courseStats}}" wx:key="id" bindtap="onCourseTap" data-id="{{item.id}}" data-name="{{item.course_name}}">
+          <view class="card-top">
+            <view class="card-title">{{item.course_name}}</view>
+            <van-tag type="primary" plain size="medium">{{item.category}}</van-tag>
+          </view>
+          <view class="card-meta">
+            <text>{{item.course_code}}</text>
+            <text wx:if="{{item.classroom}}">· {{item.classroom}}</text>
+          </view>
+          <view class="card-progress-row">
+            <text class="progress-text">{{item.current_students}} / {{item.max_students}}</text>
+            <view class="progress-bar">
+              <view class="progress-fill {{item.current_students >= item.max_students ? 'full' : ''}}" style="width: {{item.max_students > 0 ? (item.current_students / item.max_students * 100) : 0}}%"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </van-tab>
+
+    <van-tab title="按班级">
+      <van-loading wx:if="{{loading}}" size="24px" vertical custom-class="page-loading">加载中...</van-loading>
+      <view wx:elif="{{classStats.length === 0}}" class="empty-state">
+        <van-empty description="暂无班级数据" />
+      </view>
+      <view wx:else class="stat-list">
+        <view class="stat-card" wx:for="{{classStats}}" wx:key="id" bindtap="onClassTap" data-id="{{item.id}}" data-name="{{item.class_name}}">
+          <view class="card-top">
+            <view class="card-title">{{item.class_name}}</view>
+          </view>
+          <view class="card-numbers">
+            <view class="num-item">
+              <text class="num-value">{{item.total_students}}</text>
+              <text class="num-label">总人数</text>
+            </view>
+            <view class="num-item selected">
+              <text class="num-value">{{item.selected_count}}</text>
+              <text class="num-label">已选</text>
+            </view>
+            <view class="num-item unselected">
+              <text class="num-value">{{item.unselected_count}}</text>
+              <text class="num-label">未选</text>
+            </view>
+          </view>
+          <view class="card-progress-row">
+            <text class="progress-text">{{item.selected_count}} / {{item.total_students}}</text>
+            <view class="progress-bar">
+              <view class="progress-fill" style="width: {{item.total_students > 0 ? (item.selected_count / item.total_students * 100) : 0}}%"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </van-tab>
+  </van-tabs>
+</view>
+
+<!-- 详情弹窗 -->
+<van-popup show="{{showDetail}}" position="bottom" round closeable bind:close="onCloseDetail" custom-style="max-height: 75vh;">
+  <view class="detail-popup">
+    <view class="detail-title">{{detailTitle}}</view>
+    <van-loading wx:if="{{detailLoading}}" size="24px" vertical>加载中...</van-loading>
+    <view wx:elif="{{detailList.length === 0 && !detailLoading}}" class="detail-empty">
+      <van-empty description="暂无数据" />
+    </view>
+    <view wx:else class="detail-list">
+      <view class="detail-item" wx:for="{{detailList}}" wx:key="xh">
+        <view class="detail-left">
+          <text class="detail-name">{{item.xm}}</text>
+          <text class="detail-sub">{{item.class_name || item.xh}}</text>
+        </view>
+        <view class="detail-right">
+          <van-tag wx:if="{{item.course_name}}" type="success" size="medium">{{item.course_name}}</van-tag>
+          <van-tag wx:elif="{{item.select_time}}" type="primary" plain size="medium">{{item.select_time}}</van-tag>
+          <van-tag wx:elif="{{item.selected === false}}" type="danger" plain size="medium">未选</van-tag>
+        </view>
+      </view>
+    </view>
+    <view class="detail-count" wx:if="{{detailList.length > 0}}">共 {{detailList.length}} 人</view>
+  </view>
+</van-popup>

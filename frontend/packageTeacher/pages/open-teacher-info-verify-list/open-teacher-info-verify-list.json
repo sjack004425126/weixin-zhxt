@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "新生信息核对审核",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-dropdown-menu": "@vant/weapp/dropdown-menu/index",
+    "van-dropdown-item": "@vant/weapp/dropdown-item/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index"
+  }
+}

@@ -1,0 +1,440 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 顶部banner区域 -->
+  <view class="banner-section">
+    <view class="banner">
+      <image class="banner-img" src="{{images.banner}}" mode="aspectFill"/>
+      <view class="banner-overlay">
+        <view class="banner-content">
+          <view class="welcome-text">欢迎来到</view>
+          <view class="school-title">黔东南开放大学</view>
+          <view class="school-subtitle">黔东南中等职业技术学校</view>
+          <view class="banner-desc">开启智慧教育新篇章</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据统计条 -->
+    <view class="stats-bar" bindtap="onStatsTap">
+      <view class="stat-item">
+        <view class="stat-number">{{animatedYear}}</view>
+        <view class="stat-label">建校年份</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-number">{{animatedStudents}}<text class="stat-unit">+</text></view>
+        <view class="stat-label">每年招生人数</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-number">{{animatedTotal}}<text class="stat-unit">+</text></view>
+        <view class="stat-label">累计培养人才</view>
+      </view>
+    </view>
+
+    <!-- 浮动学校信息卡片 -->
+    <view class="school-info-card">
+      <view class="card-header">
+        <view class="logo-ring">
+          <view class="logo-ring-inner"></view>
+          <image class="school-logo" src="{{images.logo}}"/>
+        </view>
+        <view class="school-name-group">
+          <view class="school-name-cn">黔东南开放大学</view>
+          <view class="school-name-en">Qiandongnan Open University</view>
+        </view>
+      </view>
+      <view class="school-tags">
+        <view class="tag-item">
+          <view class="tag-icon-dot tag-dot-blue"></view>
+          <van-icon name="medal-o" size="26rpx" />
+          <text>开放教育</text>
+        </view>
+        <view class="tag-item">
+          <view class="tag-icon-dot tag-dot-green"></view>
+          <van-icon name="certificate" size="26rpx" />
+          <text>职业教育</text>
+        </view>
+        <view class="tag-item">
+          <view class="tag-icon-dot tag-dot-orange"></view>
+          <van-icon name="friends-o" size="26rpx" />
+          <text>社区教育</text>
+        </view>
+        <view class="tag-item">
+          <view class="tag-icon-dot tag-dot-purple"></view>
+          <van-icon name="star-o" size="26rpx" />
+          <text>新型高校</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 通知栏 -->
+  <view class="notice-section">
+    <van-notice-bar
+      left-icon="volume-o"
+      text="{{notices[0].title}}"
+      scrollable
+      color="#1890FF"
+      background="#E6F7FF"
+      bindtap="goToEnroll"
+    />
+  </view>
+
+  <!-- ===== 重要通知特色卡片 (Claymorphism 微风格) ===== -->
+  <view wx:if="{{showImportantNotice}}" class="important-notice-section">
+    <view class="important-notice-card" bindtap="onTapImportantNotice">
+      <!-- 顶部渐变彩色条 -->
+      <view class="important-notice-band"></view>
+      <!-- 装饰性光晕 -->
+      <view class="important-notice-glow important-notice-glow-1"></view>
+      <view class="important-notice-glow important-notice-glow-2"></view>
+
+      <!-- 内容 -->
+      <view class="important-notice-body">
+        <!-- 头部：徽章 + 标题 + 关闭 -->
+        <view class="important-notice-head">
+          <view class="important-notice-badges">
+            <view class="important-notice-badge important-notice-badge-new">
+              <view class="important-notice-badge-dot"></view>
+              <text>NEW</text>
+            </view>
+            <view class="important-notice-badge important-notice-badge-tag">
+              <van-icon name="volume-o" size="20rpx" />
+              <text>重要通知</text>
+            </view>
+          </view>
+          <view class="important-notice-close" catchtap="onCloseImportantNotice">
+            <van-icon name="cross" size="20rpx" color="#94A3B8" />
+          </view>
+        </view>
+
+        <!-- 标题 -->
+        <view class="important-notice-title">新生录取通知书与开学时间通知</view>
+
+        <!-- 主体内容 -->
+        <view class="important-notice-content">
+          <view class="important-notice-line">
+            <view class="important-notice-bullet important-notice-bullet-orange"></view>
+            <view class="important-notice-text">中职新生完成报名缴费后，系统将<text class="important-notice-highlight" decode>自动生成录取通知书</text>，请关注报名状态。</view>
+          </view>
+          <view class="important-notice-line">
+            <view class="important-notice-bullet important-notice-bullet-blue"></view>
+            <view class="important-notice-text">完成报名缴费的新生正式开学时间为<text class="important-notice-highlight important-notice-date" decode>8月29日至30日</text>，请提前安排行程。</view>
+          </view>
+        </view>
+
+        <!-- 底部时间与操作 -->
+        <view class="important-notice-foot">
+          <view class="important-notice-time">
+            <van-icon name="clock-o" size="22rpx" color="#94A3B8" />
+            <text>{{importantNoticeDate}}</text>
+          </view>
+          <view class="important-notice-action">
+            <text>查看详情</text>
+            <van-icon name="arrow" size="22rpx" color="#1890FF" />
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷导航 -->
+  <view class="nav-section">
+    <view class="section-header">
+      <view class="section-title">
+        <van-icon name="apps-o" size="32rpx" />
+        <text>快捷服务</text>
+      </view>
+    </view>
+
+    <view class="nav-grid">
+      <view class="nav-item {{item.highlighted ? 'nav-item-highlighted' : ''}}" wx:for="{{navItems}}" wx:key="type" bindtap="onNavItemTap" data-type="{{item.type}}">
+        <view class="nav-icon-wrapper">
+          <view class="nav-icon {{item.highlighted ? 'nav-icon-highlighted' : ''}}">
+            <text>{{icons[item.type].icon}}</text>
+          </view>
+          <view class="icon-ripple"></view>
+        </view>
+        <text class="nav-text {{item.highlighted ? 'nav-text-highlighted' : ''}}">{{item.text}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核心功能区域 -->
+  <view class="features-section">
+    <view class="section-header">
+      <view class="section-title">
+        <van-icon name="star-o" size="32rpx" />
+        <text>核心功能</text>
+      </view>
+      <view class="section-subtitle">教育服务，精彩纷呈</view>
+    </view>
+
+    <view class="features-grid">
+      <!-- 中职新生报名 -->
+      <view class="feature-card feature-primary" bindtap="goToNewZZStudentSignUp">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="add-o" size="48rpx" color="#1890FF" />
+          </view>
+          <view class="feature-badge hot">热门</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">中职新生报名</view>
+          <view class="feature-desc">在线报名，便捷高效</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 中职新生缴费 -->
+      <view class="feature-card feature-secondary" bindtap="goToNewZZStudentPayment">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="balance-pay" size="48rpx" color="#52C41A" />
+          </view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">中职新生缴费</view>
+          <view class="feature-desc">安全支付，即时到账</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 开放新生报名 -->
+      <view class="feature-card feature-tertiary" bindtap="goToNewStudentSignUp">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="orders-o" size="48rpx" color="#FA8C16" />
+          </view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">开放新生报名</view>
+          <view class="feature-desc">开放教育，终身学习</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 开放新生缴费 -->
+      <view class="feature-card feature-quaternary" bindtap="goToNewStudentPayment">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="gold-coin-o" size="48rpx" color="#722ED1" />
+          </view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">开放新生缴费</view>
+          <view class="feature-desc">学费缴纳，轻松便民</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 3+4报名 -->
+      <view class="feature-card feature-enroll34" bindtap="goToThreePlusFourRegister">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="medal-o" size="48rpx" color="#722ED1" />
+          </view>
+          <view class="feature-badge hot">热门</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">3+4报名</view>
+          <view class="feature-desc">中本贯通，舞蹈表演</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 毕业生就业调查 -->
+      <view class="feature-card feature-survey" bindtap="goToGraduateEmploymentSurvey">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="todo-list-o" size="48rpx" color="#1a56db" />
+          </view>
+          <view class="feature-badge hot">新</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">毕业生就业调查</view>
+          <view class="feature-desc">毕业去向采集</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 成人教育报名 -->
+      <view class="feature-card feature-adult" bindtap="goToAdultExamEnroll">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="notes-o" size="48rpx" color="#EB2F96" />
+          </view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">成人教育预报名</view>
+          <view class="feature-desc">成人高等教育预报名</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 问卷调查 -->
+      <view class="feature-card feature-survey" bindtap="goToSurveyList">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="orders-o" size="48rpx" color="#2563EB" />
+          </view>
+          <view class="feature-badge hot">新</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">问卷调查</view>
+          <view class="feature-desc">问卷 · 报名 · 投票 · 测评</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 校园反馈 -->
+      <view class="feature-card feature-feedback" bindtap="goToFeedback">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="comment-o" size="48rpx" color="#10B981" />
+          </view>
+          <view class="feature-badge hot">新</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">维修及建议</view>
+          <view class="feature-desc">维修报修 · 意见建议</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 考试小程序 -->
+      <view class="feature-card feature-exame" bindtap="goToExameMini">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="edit" size="48rpx" color="#4A90E2" />
+          </view>
+          <view class="feature-badge hot">新</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">在线考试</view>
+          <view class="feature-desc">考试列表 · 在线答题 · 成绩查询</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 管理中心 -->
+      <view class="feature-card feature-monitor" bindtap="goToAdminNav">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="setting-o" size="48rpx" color="#595959" />
+          </view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">管理中心</view>
+          <view class="feature-desc">系统管理与数据维护</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+      <!-- 电表充值 -->
+      <view class="feature-card feature-meter" bindtap="goToMeterRecharge">
+        <view class="feature-header">
+          <view class="feature-icon feature-icon-van">
+            <van-icon name="fire" size="48rpx" color="#FAAD14" />
+          </view>
+          <view class="feature-badge hot">新</view>
+        </view>
+        <view class="feature-content">
+          <view class="feature-title">电表充值</view>
+          <view class="feature-desc">输入电表名，跳转充值</view>
+        </view>
+        <view class="feature-arrow">
+          <van-icon name="arrow" size="24rpx" />
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- 宣传视频区域 -->
+  <view class="video-section">
+    <view class="section-header">
+      <view class="section-title">
+        <van-icon name="video-o" size="32rpx" />
+        <text>办学宣传片</text>
+      </view>
+      <navigator url="/pages/kf-chat/kf-chat" class="section-more">
+        <text>查看更多</text>
+        <van-icon name="arrow" size="20rpx" />
+      </navigator>
+    </view>
+
+    <view class="video-card" bindtap="openVideo">
+      <view class="video-container">
+        <image class="video-cover" src="{{images.videoCover}}" mode="aspectFill"/>
+        <view class="video-overlay">
+          <view class="play-button">
+            <text class="play-glyph">▶</text>
+          </view>
+        </view>
+        <view class="video-info">
+          <view class="video-title">平凡中育非凡</view>
+          <view class="video-subtitle">黔东南开放大学宣传片</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新生报名图片弹窗 -->
+  <view wx:if="{{showSignUpImage}}" class="signup-image-mask">
+    <view class="signup-image-popup">
+      <view class="signup-image-close" bindtap="closeSignUpImage">✕</view>
+      <image 
+        src="{{signUpImageUrl}}" 
+        mode="widthFix" 
+        class="signup-image"
+        bindlongpress="onLongPressSignUpImage"
+      />
+      <view class="signup-image-tip">开放学生请微信扫码在线报名</view>
+    </view>
+  </view>
+
+  <!-- 可拖动的就业推荐浮动图标 -->
+  <movable-area class="register-float-area">
+    <movable-view
+      class="register-float-btn"
+      style="width:120rpx;height:120rpx;"
+      direction="all"
+      inertia
+      bindchange="handleRegisterBtnChange"
+      bindtouchend="handleRegisterBtnTouchEnd"
+      bindtap="handleRegisterBtnTap"
+      x="{{registerBtnX}}"
+      y="{{registerBtnY}}"
+    >
+      <view class="register-float-inner">
+        <text class="register-float-text">就业\n推荐</text>
+      </view>
+    </movable-view>
+  </movable-area>
+
+</view>

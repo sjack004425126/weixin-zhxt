@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "核对详情",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index"
+  }
+}

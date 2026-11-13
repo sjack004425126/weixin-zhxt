@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "新书领取登记",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#E6F7FF",
+  "usingComponents": {
+    "van-field": "@vant/weapp/field/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-datetime-picker": "@vant/weapp/datetime-picker/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "top-message": "/components/top-message/top-message"
+  }
+}

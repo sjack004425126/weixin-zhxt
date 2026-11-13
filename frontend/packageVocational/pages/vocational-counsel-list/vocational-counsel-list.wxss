@@ -1,0 +1,57 @@
+@import "../../../components/vant-icon/index.wxss";
+
+/* vi 类：直接用 text 渲染 vant-icon 字体（绕过 van-icon 组件 view+::before，见 INCIDENTS/001） */
+.vi{display:inline-block;vertical-align:middle;line-height:1;font-family:vant-icon,sans-serif;}
+
+page{background:#F1F5F9;}
+.container{min-height:100vh;padding:150rpx 24rpx 60rpx;}
+
+/* ============ 顶部栏 ============ */
+.page-header{padding:32rpx 0 24rpx;background:rgba(255,255,255,.95);position:fixed;top:0;left:0;right:0;z-index:1000;box-shadow:0 2rpx 8rpx rgba(0,0,0,.06);}
+.header-content{display:flex;align-items:center;gap:16rpx;padding:0 24rpx;}
+.header-icon{line-height:1;width:80rpx;height:80rpx;background:linear-gradient(135deg,#047857,#0D9488);border-radius:24rpx;display:flex;align-items:center;justify-content:center;color:#fff;font-size:40rpx;}
+.header-text{flex:1;}
+.header-title{font-size:34rpx;font-weight:700;color:#0F172A;}
+.header-subtitle{font-size:24rpx;color:#64748B;margin-top:4rpx;}
+.header-nav-action{width:64rpx;height:64rpx;background:#F1F5F9;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#047857;font-size:32rpx;}
+
+/* ============ 卡片 ============ */
+.card{background:#fff;border:1rpx solid #E2E8F0;border-radius:24rpx;padding:28rpx;margin-bottom:24rpx;box-shadow:0 1rpx 3rpx rgba(0,0,0,.04);}
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12rpx;}
+.card-title{font-size:30rpx;font-weight:700;color:#0F172A;}
+.status-chip{font-size:20rpx;padding:6rpx 16rpx;border-radius:10rpx;background:#D1FAE5;color:#065F46;}
+.card-sub{font-size:24rpx;color:#64748B;margin-bottom:20rpx;}
+
+.slot-list{border-top:1rpx solid #F1F5F9;padding-top:18rpx;}
+.slot-chip-row{display:flex;align-items:center;gap:14rpx;padding:12rpx 0;}
+.slot-chip-date{font-size:22rpx;color:#047857;font-weight:600;min-width:150rpx;}
+.slot-chip-time{font-size:26rpx;font-weight:700;color:#0F172A;font-family:Menlo,monospace;min-width:200rpx;}
+.slot-chip-meta{flex:1;font-size:22rpx;color:#94A3B8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.slot-chip-left{font-size:22rpx;}
+.slot-chip-left.ok{color:#047857;font-weight:600;}
+.slot-chip-left.full{color:#E11D48;}
+
+.mine{margin-top:18rpx;padding-top:18rpx;border-top:1rpx solid #F1F5F9;font-size:24rpx;color:#047857;font-weight:600;}
+
+/* ============ 历史预约记录 ============ */
+.card-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:20rpx;border-bottom:1rpx solid #F1F5F9;margin-bottom:20rpx;}
+.card-title-text{font-size:28rpx;font-weight:700;color:#0F172A;}
+.muted-tip{font-size:22rpx;color:#047857;font-weight:600;padding:8rpx 12rpx;}
+.muted-tip-static{font-size:22rpx;color:#94A3B8;}
+.toggle-btn{display:flex;align-items:center;gap:4rpx;padding:16rpx 4rpx 16rpx 24rpx;margin:-16rpx -4rpx -16rpx 0;}
+.toggle-hover{opacity:.6;}
+.toggle-arrow{font-size:30rpx;color:#047857;font-weight:700;line-height:1;transform:rotate(90deg);transition:transform .2s;}
+.toggle-arrow.up{transform:rotate(-90deg);}
+.empty{font-size:26rpx;color:#94A3B8;text-align:center;padding:40rpx 0;}
+.history-row{display:flex;align-items:center;justify-content:space-between;padding:20rpx 0;border-bottom:1rpx solid #F1F5F9;gap:16rpx;}
+.history-row:last-child{border-bottom:none;}
+.history-left{flex:1;min-width:0;}
+.history-code{font-size:28rpx;font-weight:800;color:#0F172A;font-family:Menlo,monospace;}
+.history-meta{font-size:22rpx;color:#94A3B8;margin-top:6rpx;}
+.history-status{font-size:22rpx;padding:6rpx 16rpx;border-radius:10rpx;flex-shrink:0;}
+.history-status.booked{background:#FEF3C7;color:#92400E;}
+.history-status.attended{background:#DCFCE7;color:#166534;}
+.history-status.cancelled{background:#FEE2E2;color:#B91C1C;}
+.history-tip{text-align:center;font-size:22rpx;color:#94A3B8;padding-top:20rpx;}
+
+.empty-card{background:#fff;border:1rpx solid #E2E8F0;border-radius:24rpx;padding:80rpx 28rpx;text-align:center;font-size:28rpx;color:#94A3B8;}

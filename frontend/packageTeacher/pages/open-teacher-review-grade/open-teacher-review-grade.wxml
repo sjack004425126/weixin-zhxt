@@ -1,0 +1,171 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 固定顶部导航 -->
+<view class="grade-header">
+  <view class="nav-row">
+    <view class="nav-btn {{currentQIndex === 0 ? 'disabled' : ''}}" bindtap="prevQuestion">
+      <van-icon name="arrow-left" size="28rpx" /><text>上一题</text>
+    </view>
+    <view class="nav-center">
+      <text class="nav-title">{{kcmc}}</text>
+      <text class="nav-sub">第 {{currentQIndex + 1}} 题 / 共 {{questionList.length}} 题（满分{{currentQuestion.fz}}分）</text>
+    </view>
+    <view class="nav-btn {{currentQIndex >= questionList.length - 1 ? 'disabled' : ''}}" bindtap="nextQuestion">
+      <text>下一题</text><van-icon name="arrow" size="28rpx" />
+    </view>
+  </view>
+</view>
+
+<!-- 内容区 -->
+<view class="grade-body">
+  <van-loading wx:if="{{loadingAnswers}}" size="24px" vertical custom-style="margin-top:120rpx;">加载中...</van-loading>
+
+  <view wx:elif="{{answerList.length === 0 && !loadingAnswers}}" class="empty-wrap">
+    <van-empty description="{{onlyPending ? '没有待评阅的答案' : '暂无答案'}}" />
+  </view>
+
+  <block wx:elif="{{currentAnswer}}">
+    <!-- 学生信息：学号 姓名 状态 分数 同一行 -->
+    <view class="student-card">
+      <text class="sc-name">{{currentAnswer.xm}}</text>
+      <text class="sc-xh">{{currentAnswer.xh}}</text>      
+      <view class="sc-status-tag {{currentAnswer.this_scored ? 'tag-scored' : 'tag-unscored'}}">
+        <text>{{currentAnswer.this_scored ? '已评阅' : '未评阅'}}</text>
+      </view>
+      <view class="sc-score {{currentAnswer.this_scored ? 'scored' : 'unscored'}}">
+        <text wx:if="{{currentAnswer.this_scored}}">{{currentAnswer.current_score}}<text class="sc-max">分/{{currentAnswer.fz}}</text></text>
+        <text wx:else class="sc-max">/{{currentAnswer.fz}}</text>
+      </view>
+    </view>
+
+    <!-- 答案内容 -->
+    <view class="answer-box">
+      <text class="answer-text" user-select>{{currentAnswer.answer || '（未作答）'}}</text>
+    </view>
+
+    <!-- 评分区 -->
+    <view class="score-area locked-area" wx:if="{{currentAnswer.is_locked}}">
+      <van-icon name="lock" size="28rpx" color="#52c41a" />
+      <text>已评 {{currentAnswer.current_score}} 分，答卷已锁定不可修改</text>
+    </view>
+
+    <view class="score-area" wx:else>
+      <view class="qs-label">快捷评分</view>
+      <!-- 多行展示，flex-wrap -->
+      <view class="qs-grid">
+        <view
+          class="qs-btn {{currentAnswer.current_score === score ? 'active' : ''}}"
+          wx:for="{{currentQuestion.quick_scores}}"
+          wx:key="*this"
+          wx:for-item="score"
+          bindtap="onQuickScore"
+          data-score="{{score}}"
+        >{{score}}</view>
+      </view>
+
+      <view class="custom-input-row">
+        <input
+          class="custom-input"
+          type="digit"
+          placeholder="自定义分数"
+          value="{{inputScore}}"
+          bindinput="onScoreInput"
+          confirm-type="done"
+          bindconfirm="onConfirmScore"
+        />
+        <text class="custom-max">/{{currentAnswer.fz}}</text>
+        <view class="confirm-btn {{submitting ? 'loading' : ''}}" bindtap="onConfirmScore">
+          <text wx:if="{{!submitting}}">确认</text>
+          <van-loading wx:else size="28rpx" color="white" />
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
+
+<!-- 底部工具栏 -->
+<view class="grade-footer" wx:if="{{answerList.length > 0}}">
+  <view class="footer-btn" bindtap="toggleAnswerCard">
+    <van-icon name="apps-o" size="36rpx" />
+    <text>答题卡</text>
+  </view>
+  <view class="footer-btn" bindtap="prevAnswer" style="opacity:{{currentAIndex === 0 ? 0.4 : 1}}">
+    <van-icon name="arrow-left" size="36rpx" />
+    <text>上一人</text>
+  </view>
+  <view class="footer-center">
+    <text class="footer-progress">{{currentAIndex + 1}}/{{answerList.length}}</text>
+  </view>
+  <view class="footer-btn" bindtap="nextAnswer" style="opacity:{{currentAIndex >= answerList.length - 1 ? 0.4 : 1}}">
+    <van-icon name="arrow" size="36rpx" />
+    <text>下一人</text>
+  </view>
+  <view class="footer-btn" bindtap="nextUnscoredAnswer">
+    <van-icon name="search" size="36rpx" />
+    <text>下一待评</text>
+  </view>
+  <view class="footer-btn" bindtap="toggleQuestionPopup">
+    <van-icon name="description" size="36rpx" />
+    <text>查看题目</text>
+  </view>
+</view>
+
+<!-- 答题卡弹出层（遮罩） -->
+<view class="popup-mask" wx:if="{{showAnswerCard}}" bindtap="toggleAnswerCard">
+  <view class="popup-box" catchtap="stopProp">
+    <view class="popup-header">
+      <text class="popup-title">答题卡</text>
+      <view class="popup-close" bindtap="toggleAnswerCard"><van-icon name="cross" size="32rpx" /></view>
+    </view>
+    <view class="ac-grid">
+      <view
+        class="ac-item {{item.this_scored ? 'done' : 'todo'}} {{aIdx === currentAIndex ? 'current' : ''}}"
+        wx:for="{{answerList}}"
+        wx:key="record_id"
+        wx:for-index="aIdx"
+        bindtap="goToAnswer"
+        data-idx="{{aIdx}}"
+      >
+        <text class="ac-num">{{aIdx + 1}}</text>
+        <text class="ac-score-sm" wx:if="{{item.this_scored}}">{{item.current_score}}分</text>
+        <text class="ac-score-sm todo-text" wx:else>未评</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 查看题目弹出层 -->
+<van-popup
+  show="{{showQuestionPopup}}"
+  position="bottom"
+  round
+  closeable
+  bind:close="toggleQuestionPopup"
+  custom-style="max-height: 75vh; padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));"
+>
+  <view class="q-popup-title">题目信息</view>
+  <view class="q-popup-meta">满分 {{currentQuestion.fz}} 分 · 题目ID: {{currentQuestion.tm_id}}</view>
+
+  <van-loading wx:if="{{!questionDetail}}" size="24px" vertical custom-style="margin: 40rpx 0;">加载中...</van-loading>
+
+  <block wx:elif="{{questionDetail}}">
+    <!-- 题干 -->
+    <view class="q-section-label">题干</view>
+    <view class="q-tg-box">
+      <mp-html content="{{questionDetail.tg}}" wx:if="{{questionDetail.tg}}" />
+      <text wx:else class="q-empty">（暂无题干）</text>
+    </view>
+
+    <!-- 参考答案 -->
+    <view class="q-section-label" style="margin-top:24rpx;">参考答案</view>
+    <view class="q-da-box">
+      <mp-html content="{{questionDetail.da}}" wx:if="{{questionDetail.da}}" />
+      <text wx:else class="q-empty">（暂无参考答案）</text>
+    </view>
+  </block>
+
+  <view class="q-popup-tip" wx:else>
+    <van-icon name="warning-o" size="24rpx" color="#faad14" />
+    <text>未找到题目信息（ID: {{currentQuestion.tm_id}}）</text>
+  </view>
+</van-popup>

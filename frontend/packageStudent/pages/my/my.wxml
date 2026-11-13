@@ -1,0 +1,224 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 头像提示条 + 处理中遮罩 -->
+  <include src="/utils/avatar-components.wxml" />
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <view class="avatar-container">
+        <view class="avatar-wrapper" bindtap="onAvatarTap">
+          <image class="avatar" src="{{avatarUrl || defaultAvatar}}" binderror="onAvatarError"></image>
+          <view class="avatar-badge" wx:if="{{!hasAvatar}}">!</view>
+        </view>
+      </view>
+      <view class="info-wrap">
+        <view class="name-row">
+          <text class="name">{{userInfo.xs_xm || '未登录'}}</text>
+          <view class="status-tags">
+            <view class="status-tag in-school">{{userInfo.status || '在籍'}}</view>
+            <view class="status-tag semester" wx:if="{{userInfo.current_term}}">
+              第 {{userInfo.current_term}} 学期
+            </view>
+          </view>
+        </view>
+        <view class="user-detail">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#999;"></text>
+          <text>{{userInfo.xs_xh || '未登录'}}</text>
+        </view>
+        <view class="user-detail">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#999;"></text>
+          <text>{{userInfo.xs_dh || '未登录'}}</text>
+        </view>
+        <view class="user-detail">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#999;"></text>
+          <text>{{userInfo.class_name || '未登录'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加 fee-toast 组件 -->
+  <fee-toast id="fee-toast" />
+
+  <!-- 功能列表 -->
+  <view class="function-list">
+    <!-- 个人信息 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">个人信息</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="新生信息核对"
+          icon="edit"
+          is-link
+          data-url="/packageStudent/pages/info-verify/info-verify"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 学习相关 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">课程相关</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell title="教学计划课程" icon="orders-o" is-link data-url="/packageStudent/pages/my-courses/my-courses" bindtap="navigateTo" />
+
+        
+        <van-cell title="本学期要学习课程" icon="records" is-link data-url="/packageStudent/pages/semester-courses/semester-courses" bindtap="navigateTo" />
+
+        <van-cell title="上学期考试成绩" icon="records" is-link data-url="/packageStudent/pages/score/score" bindtap="navigateTo" />
+        <van-cell title="形势与政策成绩" icon="newspaper-o" is-link data-url="/packageStudent/pages/politics-score/politics-score" bindtap="navigateTo" />
+        <van-cell 
+          title="考试通知单" 
+          icon="description" 
+          is-link 
+          bind:click="navigateToExamNotice"
+        />
+      </van-cell-group>
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">考试相关</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell title="自测考试" icon="orders-o" is-link data-url="/packageStudent/pages/exame-list/exame-list" bindtap="navigateTo" />
+
+      </van-cell-group>
+    </view>
+
+
+    <!-- 缴费相关 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">费用相关</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell 
+          title="我的学费" 
+          icon="balance-o" 
+          is-link 
+          bind:click="navigateTo" 
+          data-url="/packageStudent/pages/tuition/tuition"
+        />
+        <van-cell 
+          title="学费缴费" 
+          icon="orders-o"
+          is-link 
+          data-url="/packageStudent/pages/payment-records/payment-records"
+          bind:click="navigateTo"
+        />
+        <van-cell 
+          title="补考管理" 
+          icon="todo-list-o"
+          is-link 
+          bind:click="navigateTo"
+          data-url="/packageStudent/pages/payment-bukao/payment-bukao"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 教材相关 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">教材相关</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="新书领取登记"
+          icon="logistics"
+          is-link
+          data-url="/packageStudent/pages/book-pickup/book-pickup"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 毕业相关 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">毕业相关</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="毕业生登记表" 
+          icon="records" 
+          is-link 
+          bind:click="navigateTo" 
+          data-url="/packageStudent/pages/graduate-form/graduate-form"
+        />
+        <van-cell 
+          title="毕业证状态" 
+          icon="certificate" 
+          is-link 
+          bind:click="navigateTo" 
+          data-url="/packageStudent/pages/diploma-status/diploma-status"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 学位英语 -->
+    <view class="section" wx:if="{{userInfo.xs_cc === '本科(专科起点)'}}">
+      <view class="section-title">
+        <text class="title-text">学位英语</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="报名缴费" 
+          icon="records" 
+          is-link 
+          bind:click="navigateTo" 
+          data-url="/packageStudent/pages/degree-english/degree-english"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 设置 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">设置</text>
+      </view>
+      <van-cell-group inset>
+        <block>
+          <van-cell 
+            title="退出登录" 
+            icon="close" 
+            is-link 
+            bind:click="handleLogout"
+            title-class="logout-text"
+          />
+        </block>
+        <block>
+          <van-cell 
+            title="系统版本：{{version}}" 
+            icon="" 
+            is-link
+          />
+        </block>
+      </van-cell-group>
+    </view>
+  </view>
+
+  <!-- 可拖动的在线客服浮动图标 -->
+  <movable-area class="customer-service-area">
+    <movable-view 
+      class="customer-service-btn" 
+      direction="all" 
+      inertia
+      bindchange="handleServiceBtnChange"
+      bindtouchend="handleServiceBtnTouchEnd"
+      bindtap="handleServiceBtnTap"
+      x="{{serviceBtnX}}"
+      y="{{serviceBtnY}}"
+    >
+      <view class="service-icon">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;color:#fff;"></text>
+      </view>
+      <text class="service-text">客服</text>
+    </movable-view>
+  </movable-area>
+</view>

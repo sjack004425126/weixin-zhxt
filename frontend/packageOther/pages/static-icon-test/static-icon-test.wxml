@@ -1,0 +1,175 @@
+<view class="container">
+  <view class="banner">
+    <view class="banner-title">iconfont 静态图标测试</view>
+    <view class="banner-sub">5 个图标 · 4 种使用方式</view>
+  </view>
+
+  <!-- ============ 方式一：class 类名方式（最常用） ============ -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">1</text>
+      <text>class 类名方式（推荐）</text>
+    </view>
+    <view class="section-desc">
+      写法：&lt;text class="icon-1"&gt;&lt;/text&gt; 或 &lt;i class="icon-1"&gt;&lt;/i&gt;
+    </view>
+    <view class="grid">
+      <view class="grid-item" wx:for="{{icons}}" wx:key="id">
+        <view class="icon-wrap">
+          <text class="my-iconfont icon-{{item.id}}"></text>
+        </view>
+        <view class="icon-name">{{item.class}}</view>
+        <view class="icon-guess">{{item.guess}}</view>
+        <view class="icon-action" bindtap="copyClass" data-cls="{{item.class}}">复制用法</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 方式二：unicode 字符方式 ============ -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">2</text>
+      <text>unicode 字符方式</text>
+    </view>
+    <view class="section-desc">
+      写法：&lt;text decode class="my-iconfont"&gt;&amp;#xea01;&lt;/text&gt;
+    </view>
+    <view class="grid">
+      <view class="grid-item" wx:for="{{icons}}" wx:key="id">
+        <view class="icon-wrap">
+          <text decode class="my-iconfont" space="nbsp">{{item.unicodeChar}}</text>
+        </view>
+        <view class="icon-name">{{item.unicode}}</view>
+        <view class="icon-guess">{{item.guess}}</view>
+        <view class="icon-action" bindtap="copyUnicode" data-code="{{item.unicode}}">复制 unicode</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 方式三：symbol + use（SVG 方式） ============ -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">3</text>
+      <text>symbol + use（SVG 方式）</text>
+    </view>
+    <view class="section-desc">
+      SVG 雪碧图，需要 symbol.html 里的 svg sprite 资源
+    </view>
+    <view class="grid">
+      <view class="grid-item">
+        <view class="icon-wrap">
+          <svg class="icon-svg" viewBox="0 0 100 100" aria-hidden="true">
+            <use xlink:href="#icon-1"></use>
+          </svg>
+        </view>
+        <view class="icon-name">icon-1</view>
+        <view class="icon-guess">未加载 symbol</view>
+      </view>
+      <view class="grid-item">
+        <view class="icon-wrap">
+          <svg class="icon-svg" viewBox="0 0 100 100" aria-hidden="true">
+            <use xlink:href="#icon-2"></use>
+          </svg>
+        </view>
+        <view class="icon-name">icon-2</view>
+        <view class="icon-guess">未加载 symbol</view>
+      </view>
+    </view>
+    <view class="section-warn">
+      小程序 svg+use 跨域可能受限，建议另存 svg 单文件或转 base64
+    </view>
+  </view>
+
+  <!-- ============ 方式四：动态样式（颜色/大小） ============ -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">4</text>
+      <text>动态样式（颜色 / 大小）</text>
+    </view>
+    <view class="section-desc">
+      字体的精髓：颜色、文字大小（font-size）随你控制
+    </view>
+
+    <view class="dynamic-demo">
+      <text class="my-iconfont icon-1" style="font-size:{{dynamicSize}}rpx;color:{{dynamicColor}}"></text>
+      <text class="my-iconfont icon-2" style="font-size:{{dynamicSize}}rpx;color:{{dynamicColor}}"></text>
+      <text class="my-iconfont icon-3" style="font-size:{{dynamicSize}}rpx;color:{{dynamicColor}}"></text>
+      <text class="my-iconfont icon-4" style="font-size:{{dynamicSize}}rpx;color:{{dynamicColor}}"></text>
+      <text class="my-iconfont icon-5" style="font-size:{{dynamicSize}}rpx;color:{{dynamicColor}}"></text>
+    </view>
+
+    <view class="control-row">
+      <view class="control-label">大小 {{dynamicSize}}rpx</view>
+      <slider
+        min="32" max="160" step="4"
+        value="{{dynamicSize}}"
+        bindchange="onSizeChange"
+        activeColor="#1890ff"
+        block-size="20"
+      />
+    </view>
+
+    <view class="control-row">
+      <view class="control-label">颜色</view>
+      <view class="color-list">
+        <view
+          class="color-dot {{dynamicColor === '#1890ff' ? 'active' : ''}}"
+          style="background:#1890ff" data-color="#1890ff"
+          bindtap="onColorChange"
+        ></view>
+        <view
+          class="color-dot {{dynamicColor === '#52c41a' ? 'active' : ''}}"
+          style="background:#52c41a" data-color="#52c41a"
+          bindtap="onColorChange"
+        ></view>
+        <view
+          class="color-dot {{dynamicColor === '#f5222d' ? 'active' : ''}}"
+          style="background:#f5222d" data-color="#f5222d"
+          bindtap="onColorChange"
+        ></view>
+        <view
+          class="color-dot {{dynamicColor === '#fa8c16' ? 'active' : ''}}"
+          style="background:#fa8c16" data-color="#fa8c16"
+          bindtap="onColorChange"
+        ></view>
+        <view
+          class="color-dot {{dynamicColor === '#722ed1' ? 'active' : ''}}"
+          style="background:#722ed1" data-color="#722ed1"
+          bindtap="onColorChange"
+        ></view>
+        <view
+          class="color-dot {{dynamicColor === '#333333' ? 'active' : ''}}"
+          style="background:#333333" data-color="#333333"
+          bindtap="onColorChange"
+        ></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 加载状态自检 ============ -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">✓</text>
+      <text>自检结果</text>
+    </view>
+    <view class="check-item">
+      <text class="check-label">① 字体加载</text>
+      <text class="check-status ok">见真机显示</text>
+    </view>
+    <view class="check-item">
+      <text class="check-label">② 5 个图标</text>
+      <text class="check-status ok">已配置</text>
+    </view>
+    <view class="check-item">
+      <text class="check-label">③ 字体文件</text>
+      <text class="check-status ok">/static/fonts/my-iconfont.woff2</text>
+    </view>
+    <view class="check-tips">
+      <view>• 若图标不显示：检查网络字体跨域 (小程序本地文件无此问题)</view>
+      <view>• 若显示方块：确认 font-family 名称 "my-iconfont" 一致</view>
+      <view>• 推荐方式：方式 1（class）+ 方式 4（动态样式）</view>
+    </view>
+  </view>
+
+  <view class="footer-tip">— 静态图标测试完毕 —</view>
+</view>

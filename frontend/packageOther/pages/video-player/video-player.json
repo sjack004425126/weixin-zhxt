@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "招生宣传片",
+  "usingComponents": {
+    "video-channels-feed": "plugin://channels-video/video-channels-feed"
+  }
+} 

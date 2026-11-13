@@ -1,0 +1,509 @@
+/* 关键：import vant-icon 组件样式（字体图标定义） */
+@import "../../../components/vant-icon/index.wxss";
+
+/* 使用全局主题配置 */
+
+.container {
+  min-height: 100vh;
+  background: var(--primary-light);
+  padding: var(--spacing-lg);
+}
+
+.user-card {
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  padding: 40rpx 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: var(--primary-gradient);
+}
+
+.user-info {
+  display: flex;
+  align-items: flex-start;
+}
+
+.avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 30rpx;
+  position: relative;
+}
+
+.avatar-wrapper {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  width: 120rpx !important;
+  height: 120rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.avatar-wrapper::after {
+  display: none !important;
+}
+
+.avatar-wrapper::before {
+  display: none !important;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+}
+
+.avatar-badge {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: #ff976a;
+  color: #fff;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  text-align: center;
+  border: 3rpx solid #fff;
+}
+
+.info-wrap {
+  flex: 1;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+.status-tags {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f5f5f5;
+  color: #999;
+}
+
+.status-tag.in-school {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--success-color);
+  border: 1rpx solid rgba(82, 196, 26, 0.2);
+}
+
+.status-tag.abnormal {
+  background: rgba(255, 77, 79, 0.1);
+  color: var(--error-color);
+  border: 1rpx solid rgba(255, 77, 79, 0.2);
+}
+
+.status-tag.semester {
+  background: var(--primary-gradient);
+  color: #fff;
+  font-weight: bold;
+  border: none;
+}
+
+.user-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 16rpx;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+}
+
+.user-detail van-icon {
+  margin-right: 12rpx;
+  color: var(--text-light);
+}
+
+/* 功能列表样式 */
+.function-list {
+  margin-top: 24rpx;
+}
+
+.section {
+  margin-bottom: 32rpx;
+}
+
+/* 学籍异常时菜单禁用样式 */
+.section-disabled .van-cell {
+  opacity: 0.5;
+  color: var(--text-light) !important;
+}
+.section-disabled .van-cell__title {
+  color: var(--text-light) !important;
+}
+.section-disabled .van-cell__left-icon-wrap .van-icon {
+  color: var(--text-light) !important;
+}
+
+.section-title {
+  margin-bottom: 20rpx;
+  padding: 0 20rpx;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  position: relative;
+  padding-left: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.title-text::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 32rpx;
+  background: var(--primary-gradient);
+  border-radius: 3rpx;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.3);
+}
+
+.logout-text {
+  color: var(--error-color) !important;
+}
+
+.logout-cell {
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.05) 0%, rgba(255, 120, 117, 0.05) 100%) !important;
+}
+
+.logout-cell .van-cell__left-icon-wrap .van-icon {
+  color: var(--error-color) !important;
+}
+
+/* 登录弹窗样式 */
+.login-content {
+  padding: 30rpx;
+}
+
+.login-btn-wrap {
+  margin-top: 30rpx;
+}
+
+.login-btn {
+  border-radius: 8rpx !important;
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 应用动画 */
+.user-card {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.section:nth-child(1) {
+  animation: slideInLeft 0.6s ease-out 0.2s both;
+}
+
+.section:nth-child(2) {
+  animation: slideInLeft 0.6s ease-out 0.3s both;
+}
+
+.section:nth-child(3) {
+  animation: slideInLeft 0.6s ease-out 0.4s both;
+}
+
+.section:nth-child(4) {
+  animation: slideInLeft 0.6s ease-out 0.5s both;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .container {
+    padding: 20rpx;
+  }
+
+  .user-card {
+    padding: 32rpx 24rpx;
+  }
+
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16rpx;
+  }
+
+  .user-details {
+    width: 100%;
+  }
+}
+
+/* Vant组件样式覆盖 */
+.van-cell__title {
+  color: var(--text-main) !important;
+  font-weight: 500 !important;
+}
+
+.van-cell__right-icon-wrap .van-icon {
+  color: var(--text-light) !important;
+}
+
+.van-cell:active {
+  background: var(--primary-light) !important;
+}
+
+/* 状态标签动画 */
+.status-tag {
+  transition: all 0.3s ease;
+}
+
+.status-tag:hover {
+  transform: translateY(-2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.2);
+}
+
+.van-cell-group {
+  margin: 0 16rpx !important;
+  border-radius: var(--border-radius-lg) !important;
+  overflow: hidden !important;
+  box-shadow: var(--card-shadow) !important;
+  border: 1rpx solid var(--border-color) !important;
+}
+
+.van-cell {
+  padding: 24rpx !important;
+  transition: all 0.3s ease !important;
+  border-bottom: 1rpx solid var(--border-color) !important;
+}
+
+.van-cell:last-child {
+  border-bottom: none !important;
+}
+
+.van-cell:hover {
+  background: var(--primary-light) !important;
+}
+
+/* 自定义单元格图标颜色 */
+.van-cell__left-icon-wrap .van-icon {
+  color: var(--primary-color) !important;
+  transition: all 0.3s ease !important;
+}
+
+.van-cell:hover .van-cell__left-icon-wrap .van-icon {
+  transform: scale(1.1) !important;
+}
+
+.auth-content {
+  padding: 30rpx;
+}
+
+.auth-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.auth-item {
+  display: flex;
+  align-items: center;
+  margin: 20rpx 0;
+  font-size: 28rpx;
+  color: var(--text-main);
+}
+
+.auth-item .van-icon {
+  margin-right: 10rpx;
+  color: var(--primary-color);
+}
+
+.phone {
+  font-size: 28rpx;
+  opacity: 0.9;
+  margin-top: 8rpx;
+}
+
+.phone-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20rpx 0;
+  font-size: 28rpx;
+  color: var(--text-main);
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.phone-btn::after {
+  display: none;
+}
+
+.phone-btn .van-icon {
+  margin-right: 10rpx;
+  color: var(--primary-color);
+}
+
+/* 登录弹窗样式 */
+.login-content {
+  padding: 30rpx 40rpx 50rpx;
+}
+
+/* 输入框样式 */
+.van-field {
+  margin-bottom: 20rpx !important;
+  padding: 20rpx 0 !important;
+  border-radius: 8rpx;
+  background-color: #f8f8f8 !important;
+}
+
+/* 输入框内部样式 */
+.van-field__input {
+  font-size: 28rpx !important;
+  color: var(--text-main) !important;
+}
+
+.van-field__label {
+  font-size: 28rpx !important;
+  color: var(--text-secondary) !important;
+  padding-left: 20rpx !important;
+}
+
+/* 登录按钮容器 */
+.login-btn-wrap {
+  margin-top: 50rpx;
+  padding: 0 30rpx;
+}
+
+/* 登录按钮样式 */
+.login-btn {
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+  font-size: 32rpx !important;
+  font-weight: bold !important;
+  border-radius: 44rpx !important;
+  box-shadow: 0 8rpx 16rpx rgba(24, 144, 255, 0.2) !important;
+  background: var(--primary-gradient) !important;
+}
+
+/* 弹窗标题样式 */
+.van-dialog__header {
+  font-weight: bold !important;
+  padding: 30rpx 0 !important;
+  font-size: 32rpx !important;
+}
+
+/* 整体弹窗样式 */
+.van-dialog {
+  border-radius: 12rpx !important;
+  overflow: hidden !important;
+}
+
+.van-cell__left-icon-wrap .van-icon-close {
+  color: #ff4d4f !important;
+}
+
+
+/* 在线客服浮动按钮 */
+.customer-service-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.customer-service-btn {
+  width: 130rpx;
+  height: 130rpx;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  box-shadow: 0 8rpx 24rpx rgba(235, 47, 150, 0.4);
+  transition: all 0.3s ease;
+}
+
+.customer-service-btn:active {
+  transform: scale(0.95);
+}
+
+.service-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4rpx;
+  font-size: 48rpx;
+  line-height: 1;
+}
+
+.service-text {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* vi 类：用于直接用 text 渲染 vant-icon 字体的 unicode 字符 */
+.vi {
+  font-family: vant-icon, sans-serif;
+  font-size: inherit;
+}

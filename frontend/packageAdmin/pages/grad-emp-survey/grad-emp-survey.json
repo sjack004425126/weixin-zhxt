@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "毕业生就业调查管理",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-tag": "@vant/weapp/tag/index"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "中职缴费",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "/components/vant-icon/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index"
+  }
+}

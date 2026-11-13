@@ -1,0 +1,63 @@
+<view class="page-container">
+  <!-- 未认证：显示认证页面 -->
+  <view class="auth-container" wx:if="{{!isAuthorized}}">
+    <view class="auth-bg">
+      <view class="auth-circle circle-1"></view>
+      <view class="auth-circle circle-2"></view>
+      <view class="auth-circle circle-3"></view>
+    </view>
+    <view class="auth-card">
+      <view class="auth-icon-wrapper">
+        <view class="auth-icon">🔐</view>
+      </view>
+      <view class="auth-title">管理中心</view>
+      <view class="auth-desc">请使用授权手机号登录</view>
+      <button class="auth-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
+        <text class="btn-icon">📱</text>
+        <text>手机号快捷登录</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 已认证：显示管理导航 -->
+  <view class="main-container" wx:if="{{isAuthorized}}">
+    <!-- 顶部背景 -->
+    <view class="header-bg">
+      <view class="header-content">
+        <view class="header-left">
+          <text class="header-title">管理中心</text>
+          <text class="header-subtitle">系统管理与数据维护</text>
+        </view>
+        <view class="logout-btn" bindtap="logout">
+          <text>退出</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能卡片 -->
+    <view class="nav-section">
+      <view class="section-title">功能模块</view>
+      <view class="nav-grid">
+        <view class="nav-card card-blue" bindtap="goToMonitor">
+          <view class="card-bg"></view>
+          <view class="nav-icon">📊</view>
+          <view class="nav-title">实时监控</view>
+          <view class="nav-desc">系统运行状态</view>
+        </view>
+
+        <view class="nav-card card-purple" bindtap="goToMajorManage">
+          <view class="card-bg"></view>
+          <view class="nav-icon">📚</view>
+          <view class="nav-title">专业费用管理</view>
+          <view class="nav-desc">学费书费设置</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部提示 -->
+    <view class="footer-section">
+      <view class="footer-line"></view>
+      <text class="footer-tip">更多管理功能即将上线</text>
+    </view>
+  </view>
+</view>

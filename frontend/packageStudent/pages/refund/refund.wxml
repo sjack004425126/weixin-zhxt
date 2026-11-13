@@ -1,0 +1,73 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 提示信息 -->
+  <view class="notice-card">
+    <view class="notice-title">退费说明</view>
+    <view class="notice-content">
+      <view class="notice-item">
+        <text class="dot">•</text>
+        <text>您当前多缴费用：{{amount/100}}元</text>
+      </view>
+      <view class="notice-item">
+        <text class="dot">•</text>
+        <text>书费将退还到当前微信号</text>
+      </view>
+      <view class="notice-item">
+        <text class="dot">•</text>
+        <text>您当前收款微信钱包认证的姓名必须和综合平台姓名一致才能退款成功</text>
+      </view>
+      <view class="notice-item">
+        <text class="dot">•</text>
+        <text>系统需要验证您入学时预留的手机号码，确保退费信息准确无误，如您已更换手机号码，请及时联系班主任修改再来退费</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-card">
+    <view class="form-item">
+      <text class="label">手机号码</text>
+      <input 
+        type="number" 
+        class="input" 
+        placeholder="请输入手机号码" 
+        maxlength="11"
+        bindinput="onPhoneInput"
+        value="{{phone}}"
+      />
+    </view>
+    <view class="form-item">
+      <text class="label">验证码</text>
+      <view class="verify-code-wrap">
+        <input 
+          type="number" 
+          class="input verify-code-input" 
+          placeholder="请输入验证码" 
+          maxlength="6"
+          bindinput="onCodeInput"
+          value="{{code}}"
+        />
+        <button 
+          class="send-code-btn {{canSendCode ? '' : 'disabled'}}" 
+          bindtap="sendCode" 
+          disabled="{{!canSendCode}}"
+        >
+          {{countdown > 0 ? countdown + 's' : '获取验证码'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="button-wrap">
+    <van-button 
+      type="primary" 
+      block 
+      color="linear-gradient(135deg, #E86433, #FFB067)"
+      custom-class="submit-button"
+      bind:click="submitRefund"
+      disabled="{{!canSubmit}}"
+    >提交申请</van-button>
+  </view>
+</view> 

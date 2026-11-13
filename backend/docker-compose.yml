@@ -1,22 +1,22 @@
 # ============================================================
-# zhpt —— 一键起服务（生产）
+# weixin-zhxt —— 一键起服务（生产）
 #
-#   cd /www/wwwroot/zhpt/backend
-#   docker compose up -d --build
-#   docker compose logs -f zhpt-backend
+#   cd /www/wwwroot/weixin-zhxt/backend
+#   docker-compose up -d --build
+#   docker-compose logs -f weixin-zhxt-backend
 #
 # ⚠️ 外部依赖（SQL Server / Redis / MinIO / 海康）都是**已有的外部服务**，
 #    地址写在 .env 里，compose 只编排应用自己。
 #    部署机必须能访问这些内网地址（172.16.100.101 / 172.16.100.102）。
 # ============================================================
 
-# 项目名：决定 compose 资源名前缀（网络 zhpt_default、容器等）。
+# 项目名：决定 compose 资源名前缀（网络 weixin-zhxt_default、容器等）。
 # ⚠️ 不写这一行的话，compose 默认拿**当前目录名**当项目名 ——
-#    部署到 /www/wwwroot/zhpt/backend 就会得到 "backend_default"。
-name: zhpt
+#    部署到 /www/wwwroot/weixin-zhxt/backend 就会得到 "backend_default"。
+name: weixin-zhxt
 
 services:
-  zhpt-backend:
+  weixin-zhxt-backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -35,7 +35,7 @@ services:
         APT_MIRROR: "mirrors.aliyun.com"
         PIP_INDEX_URL: "https://mirrors.aliyun.com/pypi/simple/"
         # ⚠️ 容器内 app 用户的 uid/gid 必须等于宿主机部署目录的属主 uid/gid
-        #    （/www/wwwroot/zhpt/backend 是 1001:1001，宝塔建的站点用户）。
+        #    （/www/wwwroot/weixin-zhxt/backend 属主是 ubuntu 1000:1000）。
         #    不匹配的话，bind mount 进来的 logs/ uploads/ data/ 写不进去，
         #    表现为 worker 启动即崩：
         #        PermissionError: [Errno 13] Permission denied: '/app/logs/xjxt.log'
@@ -43,8 +43,8 @@ services:
         #    兜底：容器入口脚本 docker-entrypoint.sh 会以 root 进入，
         #    把挂载目录属主修正成 APP_UID:APP_GID，再降权回 app。
         #    所以即使这里填错，容器也能起来（只是宿主机目录属主会被改）。
-        APP_UID: "1001"
-        APP_GID: "1001"
+        APP_UID: "1000"
+        APP_GID: "1000"
       # ⚠️ 构建期必须用 host 网络，否则 pip 解析不了域名 → 构建直接失败：
       #
       #    现象：docker build 报
@@ -62,8 +62,8 @@ services:
       #    构建阶段用 host 网络最简单、最可靠（构建不需要容器间互访）。
       #    运行阶段的 DNS 用下面的 `dns:` 段解决，两者各管各的。
       network: host
-    image: zhpt-backend:latest
-    container_name: zhpt-backend
+    image: weixin-zhxt-backend:latest
+    container_name: weixin-zhxt-backend
     restart: unless-stopped
 
     # ⚠️ 必须显式指定 DNS 解析器，否则容器内一切域名解析失败。

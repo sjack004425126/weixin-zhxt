@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "教学计划课程",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F5F7FA",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-icon": "/components/vant-icon/index"
+  }
+}

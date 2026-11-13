@@ -1,0 +1,108 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="container">
+
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <view class="search-bar-inner">
+      <text class="vi search-bar-icon" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#475569;"></text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="输入电表名称（如 A103）"
+        placeholder-class="search-input-placeholder"
+        value="{{houseName}}"
+        bindinput="onHouseNameInput"
+        confirm-type="search"
+        bindconfirm="onConfirm"
+      />
+      <view
+        wx:if="{{houseName}}"
+        class="search-clear"
+        hover-class="search-clear--hover"
+        bindtap="onClear"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#94A3B8;"></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 免责声明 -->
+  <view class="disclaimer-banner">
+    <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#F59E0B;"></text>
+    <text class="disclaimer-text">本小程序仅提供跳转充值入口，充值相关问题请联系充值平台官方客服解决。</text>
+  </view>
+
+  <!-- 初始态 -->
+  <view wx:if="{{!hasSearched && !searching}}" class="empty-section">
+    <view class="empty-icon-wrap">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:72rpx;color:#2563EB;"></text>
+    </view>
+    <view class="empty-title">输入电表名称开始充值</view>
+    <view class="empty-sub">支持前缀模糊匹配 · 查询后跳转充值小程序</view>
+  </view>
+
+  <!-- 搜索中 -->
+  <view wx:elif="{{searching && !meter}}" class="empty-section">
+    <van-loading type="circular" size="56rpx" color="#2563EB" />
+    <view class="empty-title" style="margin-top: 28rpx;">正在搜索「{{lastQuery}}」</view>
+  </view>
+
+  <!-- 未匹配 -->
+  <view wx:elif="{{hasSearched && !searching && !meter}}" class="empty-section">
+    <view class="empty-icon-wrap">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:72rpx;color:#F59E0B;"></text>
+    </view>
+    <view class="empty-title">未匹配到「{{lastQuery}}」</view>
+    <view class="empty-sub">请检查名称是否正确</view>
+  </view>
+
+  <!-- 命中：电表卡 + 跳转按钮 -->
+  <block wx:if="{{meter}}">
+    <view class="meter-card">
+      <!-- 顶部标题 -->
+      <view class="meter-card-head">
+        <view class="meter-card-title">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#2563EB;"></text>
+          <text class="meter-card-name">{{meter.house_name || meter.full_name || meter.sn}}</text>
+        </view>
+      </view>
+
+      <!-- 文字信息 -->
+      <view class="meter-card-body">
+        <view wx:if="{{meter.estate_name}}" class="info-row">
+          <text class="info-label">校区</text>
+          <text class="info-value">{{meter.estate_name}}</text>
+        </view>
+        <view wx:if="{{meter.price}}" class="info-row">
+          <text class="info-label">电价</text>
+          <text class="info-value">{{meter.price}} 元/度</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">编号</text>
+          <text class="info-value info-value--mono">{{meter.sn}}</text>
+        </view>
+        <view wx:if="{{meter.device_id}}" class="info-row">
+          <text class="info-label">device_id</text>
+          <text class="info-value info-value--mono">{{meter.device_id}}</text>
+        </view>
+      </view>
+
+      <!-- 跳转按钮 -->
+      <view class="jump-section">
+        <view
+          class="jump-btn {{jumping ? 'jump-btn--loading' : ''}}"
+          hover-class="{{jumping ? '' : 'jump-btn--hover'}}"
+          bindtap="{{jumping ? '' : 'onJumpToRecharge'}}"
+        >
+          <text>{{jumping ? '正在跳转…' : '跳转充值'}}</text>
+          <text wx:if="{{!jumping}}" class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#FFFFFF;margin-left:8rpx;"></text>
+          <van-loading wx:if="{{jumping}}" type="circular" size="36rpx" color="#FFFFFF" />
+        </view>
+        <view class="jump-hint">点击后跳转至充值小程序</view>
+      </view>
+    </view>
+  </block>
+
+</view>

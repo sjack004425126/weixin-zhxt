@@ -1,0 +1,223 @@
+<!-- pages/vocational-info-verify/vocational-info-verify.wxml -->
+<view class="page">
+  <include src="/utils/common-components.wxml" />
+
+  <!-- 状态横幅 -->
+  <view class="status-banner {{statusClass}}">
+    <view class="status-banner-row">
+      <view class="status-dot"></view>
+      <view class="status-banner-text">{{statusText}}</view>
+    </view>
+    <view class="status-banner-tip" wx:if="{{submittedAt}}">提交时间：{{submittedAt}}</view>
+  </view>
+
+  <!-- 顶部说明 -->
+  <view class="page-tip">
+    <view class="tip-icon">!</view>
+    <view class="tip-text" wx:if="{{status === 'pending'}}">请仔细核对以下信息。每条均可点击「有误」进入编辑，修改后会高亮显示变更项。</view>
+    <view class="tip-text" wx:else>
+      <text wx:if="{{status === 'verified'}}">您已确认信息无误，如有错误请联系管理员。</text>
+      <text wx:else>您本次提交修改了 {{changedCount}} 项，已写入档案。</text>
+    </view>
+  </view>
+
+  <!-- 信息核对列表 - 基本信息 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-text">基本信息</text>
+    </view>
+
+    <block wx:for="{{basicFields}}" wx:key="key">
+      <view class="field-card {{item.modified ? 'is-modified' : ''}}">
+        <view class="field-header">
+          <view class="field-label">
+            <text class="label-text">{{item.label}}</text>
+            <view class="status-dot {{item.modified ? 'dot-warn' : 'dot-ok'}}" title="{{item.modified ? '已修改' : '与原始一致'}}"></view>
+          </view>
+          <view
+            class="action-btn {{item.editing ? 'action-editing' : 'action-edit'}} {{status !== 'pending' ? 'btn-disabled' : ''}}"
+            data-key="{{item.key}}"
+            data-action="toggle"
+            bindtap="{{status !== 'pending' ? '_noop' : 'onActionTap'}}"
+          >{{item.editing ? '取消' : (item.modified ? '再编辑' : '有误')}}</view>
+        </view>
+
+        <view class="field-body">
+          <!-- 显示模式：字典字段（直接展示当前值，点击进入 picker） -->
+          <view
+            wx:if="{{!item.editing && item.hasOptions}}"
+            class="current-value-row picker-row"
+            data-key="{{item.key}}"
+            bindtap="{{status !== 'pending' ? '_noop' : 'onOpenPicker'}}"
+          >
+            <text class="current-value-text">{{item.displayText || '（空）'}}</text>
+            <view class="picker-arrow">›</view>
+          </view>
+
+          <!-- 显示模式：普通字段 -->
+          <view wx:if="{{!item.editing && !item.hasOptions}}" class="current-value-row">
+            <text class="current-value-text">{{item.displayText || '（空）'}}</text>
+          </view>
+
+          <!-- 编辑模式：字典字段 -->
+          <view wx:if="{{item.editing && item.hasOptions}}">
+            <view class="editing-tip">点击下方选择</view>
+            <view class="picker-row editing" data-key="{{item.key}}" bindtap="onOpenPicker">
+              <text class="current-value-text editing-text">{{item.displayText || '点击选择'}}</text>
+              <view class="picker-arrow">›</view>
+            </view>
+          </view>
+
+          <!-- 编辑模式：普通字段 -->
+          <view wx:if="{{item.editing && !item.hasOptions}}">
+            <van-field
+              label=""
+              value="{{item.value}}"
+              placeholder="请输入{{item.label}}"
+              border="{{false}}"
+              data-key="{{item.key}}"
+              bind:change="onFieldChange"
+              custom-class="inline-field"
+            />
+          </view>
+
+          <!-- 已修改：追加"原值 → 新值"对比 -->
+          <view wx:if="{{item.modified}}" class="diff-row">
+            <text class="diff-label">原值：</text>
+            <text class="diff-old strike">{{item.originalText || '（空）'}}</text>
+            <text class="diff-arrow">→</text>
+            <text class="diff-label">新值：</text>
+            <text class="diff-new">{{item.displayText || '（空）'}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 出生日期：只读 -->
+    <view class="field-card field-readonly">
+      <view class="field-header">
+        <view class="field-label">
+          <text class="label-text">出生日期</text>
+          <view class="status-dot dot-info" title="由身份证号推导"></view>
+        </view>
+        <text class="readonly-tag">由身份证号推导</text>
+      </view>
+      <view class="field-body">
+        <view class="current-value-row readonly">
+          <text class="current-value-text">{{birthDate || '（空）'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 信息核对列表 - 家庭信息 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-text">家庭联系信息</text>
+    </view>
+
+    <block wx:for="{{familyFields}}" wx:key="key">
+      <view class="field-card {{item.modified ? 'is-modified' : ''}}">
+        <view class="field-header">
+          <view class="field-label">
+            <text class="label-text">{{item.label}}</text>
+            <view class="status-dot {{item.modified ? 'dot-warn' : 'dot-ok'}}" title="{{item.modified ? '已修改' : '与原始一致'}}"></view>
+          </view>
+          <view
+            class="action-btn {{item.editing ? 'action-editing' : 'action-edit'}} {{status !== 'pending' ? 'btn-disabled' : ''}}"
+            data-key="{{item.key}}"
+            data-action="toggle"
+            bindtap="{{status !== 'pending' ? '_noop' : 'onActionTap'}}"
+          >{{item.editing ? '取消' : (item.modified ? '再编辑' : '有误')}}</view>
+        </view>
+
+        <view class="field-body">
+          <view
+            wx:if="{{!item.editing && item.hasOptions}}"
+            class="current-value-row picker-row"
+            data-key="{{item.key}}"
+            bindtap="{{status !== 'pending' ? '_noop' : 'onOpenPicker'}}"
+          >
+            <text class="current-value-text">{{item.displayText || '（空）'}}</text>
+            <view class="picker-arrow">›</view>
+          </view>
+
+          <view wx:if="{{!item.editing && !item.hasOptions}}" class="current-value-row">
+            <text class="current-value-text">{{item.displayText || '（空）'}}</text>
+          </view>
+
+          <view wx:if="{{item.editing && item.hasOptions}}">
+            <view class="editing-tip">点击下方选择</view>
+            <view class="picker-row editing" data-key="{{item.key}}" bindtap="onOpenPicker">
+              <text class="current-value-text editing-text">{{item.displayText || '点击选择'}}</text>
+              <view class="picker-arrow">›</view>
+            </view>
+          </view>
+
+          <view wx:if="{{item.editing && !item.hasOptions}}">
+            <van-field
+              label=""
+              value="{{item.value}}"
+              placeholder="请输入{{item.label}}"
+              border="{{false}}"
+              data-key="{{item.key}}"
+              bind:change="onFieldChange"
+              custom-class="inline-field"
+            />
+          </view>
+
+          <view wx:if="{{item.modified}}" class="diff-row">
+            <text class="diff-label">原值：</text>
+            <text class="diff-old strike">{{item.originalText || '（空）'}}</text>
+            <text class="diff-arrow">→</text>
+            <text class="diff-label">新值：</text>
+            <text class="diff-new">{{item.displayText || '（空）'}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 修改汇总 -->
+  <view class="summary" wx:if="{{changedCount > 0}}">
+    <view class="summary-text">
+      <text wx:if="{{status === 'pending'}}">您本次修改了 <text class="summary-count">{{changedCount}}</text> 项信息，提交后将写入档案</text>
+      <text wx:else>本次提交修改了 <text class="summary-count">{{changedCount}}</text> 项信息，已写入档案</text>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-bar">
+    <view
+      wx:if="{{status === 'pending'}}"
+      class="secondary-btn {{changedCount === 0 ? 'is-disabled' : ''}}"
+      bindtap="{{changedCount === 0 ? '_noop' : 'onCancelAll'}}"
+    >全部取消</view>
+    <view
+      class="primary-btn {{status !== 'pending' ? 'is-disabled' : (loading ? 'is-loading' : '')}}"
+      bindtap="{{status !== 'pending' ? '_noop' : 'onSubmit'}}"
+    >
+      <text class="primary-btn-text">
+        {{status !== 'pending' ? '已提交完成，无需操作' : (changedCount > 0 ? '提交修改并保存' : '确认无误，提交')}}
+      </text>
+    </view>
+  </view>
+
+  <!-- 全局唯一 picker 弹层 -->
+  <van-popup
+    show="{{pickerKey !== ''}}"
+    position="bottom"
+    round
+    bind:close="onPickerClose"
+  >
+    <van-picker
+      show-toolbar
+      title="选择{{pickerFieldLabel}}"
+      columns="{{pickerColumns}}"
+      default-index="{{pickerIndex}}"
+      bind:cancel="onPickerClose"
+      bind:change="onPickerChange"
+      bind:confirm="onPickerConfirm"
+    />
+  </van-popup>
+</view>

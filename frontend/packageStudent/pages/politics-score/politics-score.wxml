@@ -1,0 +1,104 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 顶部导航 -->
+<view class="nav-bar">
+  <view class="nav-inner">
+    <view class="nav-icon-wrap">
+      <van-icon name="flag-o" size="36rpx" color="#fff" />
+    </view>
+    <view class="nav-title-wrap">
+      <text class="nav-title">形势与政策</text>
+      <text class="nav-sub">Politics Score</text>
+    </view>
+    <view class="nav-home" bindtap="goHome">
+      <van-icon name="wap-home-o" size="36rpx" />
+    </view>
+  </view>
+</view>
+
+<view class="page-body">
+
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{!scoreInfo}}">
+    <van-loading size="48rpx" color="#1890FF" vertical>加载中...</van-loading>
+  </view>
+
+  <block wx:if="{{scoreInfo}}">
+
+    <!-- 学生信息卡 -->
+    <view class="stu-card">
+      <view class="stu-row">
+        <view class="stu-avatar">
+          <text class="stu-avatar-text">{{scoreInfo.student_info.name[0] || '学'}}</text>
+        </view>
+        <view class="stu-info">
+          <text class="stu-name">{{scoreInfo.student_info.name}}</text>
+          <text class="stu-detail">{{scoreInfo.student_info.student_no}}</text>
+        </view>
+        <view class="stu-status active">
+          {{scoreInfo.student_info.status}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 统计概览 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{scoreInfo.scores.length}}</text>
+        <text class="stat-label">考试次数</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num passed-num">{{scoreInfo.summary.pass_count}}</text>
+        <text class="stat-label">及格次数</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num {{scoreInfo.summary.registered_score >= 60 ? 'passed-num' : 'failed-num'}}">{{scoreInfo.summary.registered_score || '-'}}</text>
+        <text class="stat-label">国开登记</text>
+      </view>
+    </view>
+
+    <!-- 要求提示 -->
+    <view class="notice-bar">
+      <view class="notice-left">
+        <van-icon name="info-o" size="28rpx" color="#1890FF" />
+        <text class="notice-text">{{scoreInfo.notice.requirement}}</text>
+      </view>
+    </view>
+
+    <!-- 成绩列表 -->
+    <view class="section" wx:if="{{scoreInfo.scores.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot"></view>
+          <text class="section-title">历次成绩</text>
+          <text class="section-count">{{scoreInfo.scores.length}}次</text>
+        </view>
+      </view>
+
+      <view class="score-card" wx:for="{{scoreInfo.scores}}" wx:key="id">
+        <view class="card-accent {{item.score >= 60 ? 'accent-green' : 'accent-red'}}"></view>
+        <view class="card-body">
+          <view class="card-top">
+            <view class="card-name-wrap">
+              <text class="card-name">{{item.semesterText}}</text>
+              <view class="card-tags">
+                <text class="tag tag-batch">{{item.exam_batch}}</text>
+              </view>
+            </view>
+            <view class="score-badge {{item.score >= 60 ? 'pass-badge' : 'fail-badge'}}">
+              {{item.score}}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空成绩 -->
+    <view class="empty-wrap" wx:if="{{scoreInfo.scores.length === 0}}">
+      <van-empty description="暂无成绩数据" />
+    </view>
+
+  </block>
+</view>

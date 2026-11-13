@@ -1,0 +1,15 @@
+{
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-tag": "@vant/weapp/tag/index"
+  },
+  "navigationBarTitleText": "学生信息",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#FAFAFA"
+}

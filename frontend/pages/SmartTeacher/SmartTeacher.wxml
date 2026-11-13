@@ -1,0 +1,3 @@
+<view class="vr-container">
+  <web-view src="{{vrUrl}}"></web-view>
+</view>

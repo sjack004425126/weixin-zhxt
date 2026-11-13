@@ -1,0 +1,198 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 头像提示条 + 处理中遮罩 -->
+  <include src="/utils/avatar-components.wxml" />
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <view class="avatar-container">
+        <view class="avatar-wrapper" bindtap="onAvatarTap">
+          <image class="avatar" src="{{avatarUrl || defaultAvatar}}" binderror="onAvatarError"></image>
+          <view class="avatar-badge" wx:if="{{!hasAvatar}}">!</view>
+        </view>
+      </view>
+      <view class="info-wrap">
+        <view class="name-row">
+          <text class="name">{{userInfo.xs_xm || '未登录'}}</text>
+          <view class="status-tags">
+            <view class="status-tag in-school" wx:if="{{userInfo.xs_xjzt == 1}}">在籍</view>
+            <view class="status-tag abnormal" wx:elif="{{userInfo.xs_xjzt == 2}}">休学</view>
+            <view class="status-tag abnormal" wx:elif="{{userInfo.xs_xjzt == 3}}">毕业</view>
+            <view class="status-tag abnormal" wx:elif="{{userInfo.xs_xjzt == 4}}">退学</view>
+            <view class="status-tag abnormal" wx:elif="{{userInfo.xs_xjzt == 5}}">未注册</view>
+            <view class="status-tag abnormal" wx:elif="{{userInfo.xs_xjzt == 6}}">未返校</view>
+            <view class="status-tag abnormal" wx:elif="{{userInfo.xs_xjzt == 7}}">开除</view>
+            <view class="status-tag abnormal" wx:else>学籍异常</view>
+            <view class="status-tag semester" wx:if="{{userInfo.current_term}}">
+              第 {{userInfo.current_term}} 学期
+            </view>
+          </view>
+        </view>
+        <view class="user-detail">
+          <van-icon name="contact" size="28rpx" />
+          <text>{{userInfo.xs_xh || '未登录'}}</text>
+        </view>
+        <view class="user-detail">
+          <van-icon name="phone" size="28rpx" />
+          <text>{{userInfo.xs_dh || '未登录'}}</text>
+        </view>
+        <view class="user-detail">
+          <van-icon name="friends" size="28rpx" />
+          <text>{{userInfo.class_name || '未登录'}}</text>
+        </view>
+        <view class="user-detail" wx:if="{{dormInfo}}">
+          <van-icon name="wap-home-o" size="28rpx" />
+          <text>{{dormInfo}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加 fee-toast 组件 -->
+  <fee-toast id="fee-toast" />
+
+  <!-- 功能列表：学籍异常(xs_xjzt!=1)时除退出登录外均不可用 -->
+  <view class="function-list">
+
+    <!-- 缴费相关 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">缴费管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell 
+          title="我的学费" 
+          icon="balance-o" 
+          is-link 
+          bind:click="navigateTo" 
+          data-url="/packageVocational/pages/vocational-tuition/vocational-tuition"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 课程管理 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">课程管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="社团课"
+          icon="orders-o"
+          is-link
+          data-url="/packageVocational/pages/vocational-club-courses/vocational-club-courses"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 信息管理 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">信息管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="我的信息"
+          icon="orders-o"
+          is-link
+          data-url="/packageVocational/pages/vocational-info/vocational-info"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="走读证"
+          icon="idcard"
+          is-link
+          data-url="/packageVocational/pages/vocational-card/vocational-card"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 请假管理 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">请假管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="请销假"
+          icon="notes-o"
+          is-link
+          data-url="/packageAdmin/pages/leave-list/leave-list"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 留宿管理 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">留宿管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="留宿申请"
+          icon="hotel-o"
+          is-link
+          data-url="/packageVocational/pages/vocational-stay/vocational-stay"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 心理咨询 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">心理咨询</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="心理咨询预约"
+          icon="chat-o"
+          is-link
+          data-url="/packageVocational/pages/vocational-counsel-list/vocational-counsel-list"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 设置（退出登录不受学籍状态限制） -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">设置</text>
+      </view>
+      <van-cell-group inset>
+        <block>
+          <van-cell 
+            title="退出登录" 
+            icon="close" 
+            is-link 
+            bind:click="handleLogout"
+            title-class="logout-text"
+          />
+        </block>
+      </van-cell-group>
+    </view>
+  </view>
+
+  <!-- 可拖动的在线客服浮动图标 -->
+  <movable-area class="customer-service-area">
+    <movable-view 
+      class="customer-service-btn" 
+      direction="all" 
+      inertia
+      bindchange="handleServiceBtnChange"
+      bindtouchend="handleServiceBtnTouchEnd"
+      bindtap="handleServiceBtnTap"
+      x="{{serviceBtnX}}"
+      y="{{serviceBtnY}}"
+    >
+      <view class="service-icon">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;color:#fff;"></text>
+      </view>
+      <text class="service-text">客服</text>
+    </movable-view>
+  </movable-area>
+</view>

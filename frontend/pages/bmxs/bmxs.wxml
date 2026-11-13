@@ -1,0 +1,218 @@
+<view class="container">
+  <van-form bind:submit="onSubmit">
+    <!-- 基本信息 -->
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      <van-field
+        value="{{ bmxs.xm }}"
+        name="xm"
+        label="姓名"
+        placeholder="请输入姓名"
+        required
+        bind:change="onFieldChange"
+      />
+      <van-field
+        value="{{ bmxs.sfzh }}"
+        name="sfzh"
+        label="身份证号"
+        placeholder="请输入身份证号"
+        required
+        bind:change="onFieldChange"
+      />
+      <van-field
+        value="{{ bmxs.xb }}"
+        name="xb"
+        label="性别"
+        placeholder="请选择性别"
+        readonly
+        is-link
+        required
+        bind:tap="showGenderPicker"
+      />
+      <van-field
+        value="{{ bmxs.mz }}"
+        name="mz"
+        label="民族"
+        placeholder="请输入民族"
+        required
+        bind:change="onFieldChange"
+      />
+      <van-field
+        value="{{ bmxs.zzmm }}"
+        name="zzmm"
+        label="政治面貌"
+        placeholder="请选择政治面貌"
+        readonly
+        is-link
+        required
+        bind:tap="showZzmmPicker"
+      />
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="form-section">
+      <view class="section-title">联系方式</view>
+      <van-field
+        value="{{ bmxs.xsdh }}"
+        name="xsdh"
+        label="学生电话"
+        placeholder="请输入学生电话"
+        required
+        bind:change="onFieldChange"
+      />
+      <van-field
+        value="{{ bmxs.jtxxdz }}"
+        name="jtxxdz"
+        label="家庭详细地址"
+        placeholder="请输入家庭详细地址"
+        required
+        bind:change="onFieldChange"
+      />
+      <van-field
+        value="{{ bmxs.jzdh }}"
+        name="jzdh"
+        label="家长电话"
+        placeholder="请输入家长电话"
+        required
+        bind:change="onFieldChange"
+      />
+    </view>
+
+    <!-- 家长信息 -->
+    <view class="form-section">
+      <view class="section-title">家长信息</view>
+      <van-field
+        value="{{ bmxs.jzxm }}"
+        name="jzxm"
+        label="家长姓名"
+        placeholder="请输入家长姓名"
+        required
+        bind:change="onFieldChange"
+      />
+      <van-field
+        value="{{ bmxs.jzgx }}"
+        name="jzgx"
+        label="与家长关系"
+        placeholder="请选择与家长关系"
+        readonly
+        is-link
+        required
+        bind:tap="showJzgxPicker"
+      />
+      <van-field
+        value="{{ bmxs.jzdlx }}"
+        name="jzdlx"
+        label="家庭地址类型"
+        placeholder="请选择家庭地址类型"
+        readonly
+        is-link
+        required
+        bind:tap="showJzdlxPicker"
+      />
+    </view>
+
+    <!-- 其他信息 -->
+    <view class="form-section">
+      <view class="section-title">其他信息</view>
+      <van-field
+        value="{{ bmxs.zsdx }}"
+        name="zsdx"
+        label="招生对象"
+        placeholder="请选择招生对象"
+        readonly
+        is-link
+        required
+        bind:tap="showZsdxPicker"
+      />
+      <van-field
+        value="{{ bmxs.qd }}"
+        name="qd"
+        label="渠道"
+        placeholder="请选择渠道"
+        readonly
+        is-link
+        required
+        bind:tap="showQdPicker"
+      />
+      <van-field
+        value="{{ bmxs.qdjs }}"
+        name="qdjs"
+        label="渠道介绍人"
+        placeholder="请输入渠道介绍人"
+        bind:change="onFieldChange"
+      />
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-btn">
+      <van-button round block type="primary" form-type="submit" color="linear-gradient(135deg, #E86433, #FFB067)">
+        提交
+      </van-button>
+    </view>
+  </van-form>
+
+  <!-- 性别选择器 -->
+  <van-popup show="{{ showGender }}" position="bottom" bind:close="onGenderClose">
+    <van-picker
+      show-toolbar
+      columns="{{ ['男', '女'] }}"
+      bind:cancel="onGenderClose"
+      bind:confirm="onGenderConfirm"
+    />
+  </van-popup>
+
+  <!-- 政治面貌选择器 -->
+  <van-popup show="{{ showZzmm }}" position="bottom" bind:close="onZzmmClose">
+    <van-picker
+      show-toolbar
+      columns="{{ options.zzmm }}"
+      value-key="name"
+      bind:cancel="onZzmmClose"
+      bind:confirm="onZzmmConfirm"
+    />
+  </van-popup>
+
+  <!-- 与家长关系选择器 -->
+  <van-popup show="{{ showJzgx }}" position="bottom" bind:close="onJzgxClose">
+    <van-picker
+      show-toolbar
+      columns="{{ options.jzgx }}"
+      value-key="name"
+      bind:cancel="onJzgxClose"
+      bind:confirm="onJzgxConfirm"
+    />
+  </van-popup>
+
+  <!-- 家庭地址类型选择器 -->
+  <van-popup show="{{ showJzdlx }}" position="bottom" bind:close="onJzdlxClose">
+    <van-picker
+      show-toolbar
+      columns="{{ options.jzdlx }}"
+      value-key="name"
+      bind:cancel="onJzdlxClose"
+      bind:confirm="onJzdlxConfirm"
+    />
+  </van-popup>
+
+  <!-- 招生对象选择器 -->
+  <van-popup show="{{ showZsdx }}" position="bottom" bind:close="onZsdxClose">
+    <van-picker
+      show-toolbar
+      columns="{{ options.zsdx }}"
+      value-key="name"
+      bind:cancel="onZsdxClose"
+      bind:confirm="onZsdxConfirm"
+    />
+  </van-popup>
+
+  <!-- 渠道选择器 -->
+  <van-popup show="{{ showQd }}" position="bottom" bind:close="onQdClose">
+    <van-picker
+      show-toolbar
+      columns="{{ options.qd }}"
+      value-key="name"
+      bind:cancel="onQdClose"
+      bind:confirm="onQdConfirm"
+    />
+  </van-popup>
+</view> 

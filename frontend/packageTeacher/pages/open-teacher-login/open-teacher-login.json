@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "开放教育教师登录",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "/components/vant-icon/index"
+  }
+}

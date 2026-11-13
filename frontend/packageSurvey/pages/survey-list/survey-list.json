@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "问卷调查",
+  "navigationBarBackgroundColor": "#2563EB",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#F8FAFC",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index"
+  }
+}

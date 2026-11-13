@@ -1,0 +1,82 @@
+<!-- 顶部消息提示组件（来自 page-mixin） -->
+<include src="/utils/common-components.wxml" />
+
+<view class="container">
+
+
+  <view class="login-box">
+    <!-- 学校标识 -->
+    <view class="school-badge exame">
+      <view class="badge-icon">
+        <van-icon name="shield-o" size="14px" color="#fff" />
+      </view>
+      <view class="badge-text">学业考试中心</view>
+    </view>
+
+    <!-- 标题 -->
+    <view class="title">学业考试与测验助手</view>
+    <view class="title-sub">统一数字化全真考场</view>
+
+    <!-- 密码登录表单 -->
+    <view class="login-form">
+      <view class="custom-input-cell">
+        <van-icon name="user-o" size="20px" class="custom-input-icon" />
+        <input
+          class="custom-input"
+          value="{{xh}}"
+          placeholder="请输入学号"
+          bindinput="onXhChange"
+          confirm-type="next"
+        />
+        <view wx:if="{{xh}}" class="field-clear" bindtap="clearXh">
+          <van-icon name="cross" size="14px" color="#999" />
+        </view>
+      </view>
+
+      <view class="custom-input-cell">
+        <van-icon name="lock" size="20px" class="custom-input-icon" />
+        <input
+          class="custom-input"
+          value="{{password}}"
+          type="{{showPwd ? 'text' : 'password'}}"
+          password="{{!showPwd}}"
+          placeholder="请输入密码"
+          bindinput="onPasswordChange"
+          confirm-type="done"
+          bindconfirm="handleLogin"
+        />
+        <!-- 密码可见切换按钮：使用 emoji 避免依赖 iconfont -->
+        <view class="field-eye" bindtap="togglePwd" hover-class="field-eye-active" hover-stay-time="100">
+          <text class="eye-icon">{{showPwd ? '🙈' : '👁'}}</text>
+        </view>
+      </view>
+
+      <view class="remember-password">
+        <checkbox-group bindchange="handleRememberPasswordChange">
+          <checkbox value="remember" checked="{{rememberPassword}}" color="#1890FF">记住账号密码（30天）</checkbox>
+        </checkbox-group>
+      </view>
+
+      <van-button
+        type="primary"
+        block
+        color="#1890FF"
+        loading="{{loading}}"
+        loading-text="身份校验中..."
+        bind:click="handleLogin"
+      >登录考务中心</van-button>
+    </view>
+
+    <!-- 底部协议 -->
+    <view class="agreement">
+      <checkbox-group bindchange="handleAgreeChange">
+        <checkbox value="agree" checked="{{agreed}}">我已阅读并同意</checkbox>
+      </checkbox-group>
+      <view class="agreement-links">
+        <text class="link" bindtap="onAgreementTap" data-key="rule">《考场规则与诚信承诺》</text>
+        <text>和</text>
+        <text class="link" bindtap="onAgreementTap" data-key="privacy">《隐私保护政策》</text>
+      </view>
+    </view>
+  </view>
+</view>

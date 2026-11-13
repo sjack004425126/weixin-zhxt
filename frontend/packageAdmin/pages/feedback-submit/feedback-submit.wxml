@@ -1,0 +1,193 @@
+<include src="/utils/common-components.wxml" />
+<view class="page">
+  <!-- 顶部横幅：横跨整页 / 单行紧凑布局 / 图标化操作按钮 -->
+  <view class="user-hero">
+    <view class="user-avatar">
+      <van-icon name="{{userTypeIcon}}" size="48rpx" color="#1890FF" />
+    </view>
+    <view class="user-meta">
+      <view class="user-name-row">
+        <text class="user-name">{{userInfo.name || '未登录'}}</text>
+        <view wx:if="{{isAdmin}}" class="admin-badge">{{adminRoleLabel || '管理员'}}</view>
+      </view>
+      <view class="user-tag">{{userTypeLabel}}</view>
+    </view>
+    <view class="hero-icons">
+      <view wx:if="{{isAdmin}}" class="icon-btn admin" bindtap="goAdmin" hover-class="icon-btn-hover">
+        <van-icon name="orders-o" size="36rpx" />
+      </view>
+      <view class="icon-btn" bindtap="goMyFeedback" hover-class="icon-btn-hover">
+        <van-icon name="contact" size="36rpx" />
+      </view>
+      <view class="icon-btn" bindtap="onLogout" hover-class="icon-btn-hover">
+        <van-icon name="close" size="36rpx" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类切换 -->
+  <view class="card seg-card">
+    <view class="seg">
+      <view class="seg-item {{form.category==='repair' ? 'seg-active repair' : ''}}" data-cat="repair" bindtap="onCategoryTap">
+        <van-icon name="setting-o" size="32rpx" />
+        <text>维修报修</text>
+      </view>
+      <view class="seg-item {{form.category==='suggestion' ? 'seg-active suggest' : ''}}" data-cat="suggestion" bindtap="onCategoryTap">
+        <van-icon name="comment-o" size="32rpx" />
+        <text>意见建议</text>
+      </view>
+    </view>
+    <view class="seg-tip">
+      {{form.category==='repair' ? '设施损坏、水电故障、设备维修等' : '食堂菜品、教学秩序、服务态度等'}}
+    </view>
+  </view>
+
+  <!-- 维修类型（仅维修报修）：chips + 用户手动输入 -->
+  <view class="card" wx:if="{{form.category==='repair'}}">
+    <view class="field-label"><text class="dot">*</text>维修类型</view>
+    <block wx:if="{{dictLoading}}">
+      <view class="dict-loading">加载中...</view>
+    </block>
+    <block wx:elif="{{repairTypeOptions.length}}">
+      <view class="chips">
+        <view wx:for="{{repairTypeOptions}}" wx:key="code" class="chip {{form.repair_type_code===item.code ? 'chip-active' : ''}}"
+              data-code="{{item.code}}" data-label="{{item.label}}" bindtap="onRepairTypeTap">
+          {{item.label}}
+        </view>
+      </view>
+      <input class="text-input custom-input" placeholder="字典未列出？直接输入维修类型（选填）" value="{{form.repair_type_text_custom}}"
+             maxlength="32" data-key="repair_type_text_custom" bindinput="onInput" />
+    </block>
+    <block wx:else>
+      <input class="text-input" placeholder="请输入维修类型（如：水电、桌椅板凳）" value="{{form.repair_type_text_custom}}"
+             maxlength="32" data-key="repair_type_text_custom" bindinput="onInput" />
+      <view class="loc-tip-info">字典暂未配置维修类型，可直接输入</view>
+    </block>
+  </view>
+
+  <!-- 维修地点（仅维修报修）：按 type_code 顺序直接展示 chips（先楼栋→楼层→房间号…），不再弹层 -->
+  <view class="card" wx:if="{{form.category==='repair'}}">
+    <view class="field-label"><text class="dot">*</text>维修地点</view>
+    <block wx:if="{{dictLoading}}">
+      <view class="dict-loading">加载中...</view>
+    </block>
+    <block wx:elif="{{hasLocationDict}}">
+      <!-- 2026-09-28 修复：外层和内层都用 wx:for-item 显式命名，避免嵌套 wx:for 时默认 item 互相干扰；
+           同时用 <block wx:for> 包裹节点，让生成的 DOM 干净，事件能正确命中 chip。 -->
+      <block wx:for="{{orderedLocationTypes}}" wx:for-item="loc" wx:key="type_code">
+        <view class="loc-section">
+          <view class="loc-section-title">{{loc.type_code}}</view>
+          <!-- 2026-09-28：wx:if 不支持 (a || b).length 这种 JS 表达式，改用 data 字段 loc.hasChips -->
+          <view wx:if="{{loc.hasChips}}" class="chips">
+            <block wx:for="{{locationValuesByType[loc.type_code]}}" wx:for-item="v" wx:key="id">
+              <!-- 2026-09-28：WXML 不支持函数调用表达式（如 isLocSelected(a,b)），
+                   改用 form.location_chip_selected['${type_code}-${name}'] 这种属性查找 + 字符串拼接。
+                   key 格式为 `${loc.type_code}-${v.name}`，未选中时取值是 undefined（=falsy）。 -->
+              <view class="chip {{form.location_chip_selected[loc.type_code + '-' + v.name] ? 'chip-active' : ''}}"
+                    hover-class="chip-hover"
+                    data-type="{{loc.type_code}}" data-name="{{v.name}}" bindtap="onLocationChipTap">
+                {{v.name || '(未命名)'}}
+              </view>
+            </block>
+          </view>
+          <!-- 每个 type_code 下方给一个手动输入框，避开字典不全导致的不准确 -->
+          <input class="text-input custom-input" placeholder="{{loc.type_code}}未列出？直接输入（选填）"
+                 value="{{form.location_custom[loc.type_code] || ''}}"
+                 data-type="{{loc.type_code}}" bindinput="onLocationCustomInput" />
+        </view>
+      </block>
+    </block>
+    <!-- 2026-09-28：地点备注放到维修地点卡片内部，常驻；chips 只是辅助拼接 -->
+    <view class="loc-remark-card" wx:if="{{showLocRemark}}">
+      <view class="field-label"><text class="dot">*</text>地点（点上方 chips 自动拼接）</view>
+      <!-- 只读预览：chips 自动维护，按 type_code 顺序拼接，用户不能改 -->
+      <view class="loc-readonly" wx:if="{{form.location_dict_text}}">
+        <text class="loc-readonly-text">{{form.location_dict_text}}</text>
+      </view>
+      <view class="loc-readonly loc-readonly-empty" wx:else>
+        <text class="loc-readonly-text">（未选择任何地点）</text>
+      </view>
+      <!-- 用户可自由编辑的备注框（只放用户手写部分，不与 chip 段混在一起） -->
+      <textarea class="textarea loc-remark-textarea" placeholder="可继续补充，如：门口左数第三间"
+                value="{{form.location_text}}"
+                maxlength="200" data-key="location_text" bindinput="onInput" auto-height></textarea>
+      <!-- 2026-09-28：WXML 不支持 (xxx || '').length 表达式，length 算到 data 字段 -->
+      <view class="char-count">{{locationTextLen}}/200</view>
+      <view class="loc-tip-info">未列出的地点请联系管理员添加到字典后再提交</view>
+    </view>
+    <block wx:else>
+      <view class="loc-tip-info">暂未配置地点字典，请联系管理员</view>
+    </block>
+  </view>
+
+  <!-- 2026-09-27 重构：场景字段已废弃（FeedbackTicket.scene/scene_custom 列已 DROP），
+       物品字段也仅用于维修类意见建议辅助。意见建议不再单独要求选场景/对象，描述放 content 中。 -->
+
+  <!-- 描述 -->
+  <view class="card">
+    <view class="field-label"><text class="dot">*</text>详细描述</view>
+    <textarea class="textarea" placeholder="问题的具体情况、出现时间、影响范围等(至少2字)" value="{{form.content}}"
+              maxlength="500" data-key="content" bindinput="onInput" auto-height></textarea>
+    <!-- 2026-09-28：改用 data 字段，避免某些 IDE 报 form.content.length 表达式错误 -->
+    <view class="char-count">{{contentLen}}/500</view>
+  </view>
+
+  <!-- 地点补充说明已移到维修地点下方（见上） -->
+
+  <!-- 紧急程度(仅维修) -->
+  <view class="card row-card" wx:if="{{form.category==='repair'}}">
+    <view class="row-label">
+      <van-icon name="warning-o" size="32rpx" color="#FA8C16" />
+      <text>紧急情况(漏水、跳闸、设备危险)</text>
+    </view>
+    <van-switch checked="{{form.urgency==='urgent'}}" size="44rpx" bind:change="onUrgencyChange" active-color="#FA541C" />
+  </view>
+
+  <!-- 匿名(仅意见建议) -->
+  <view class="card row-card" wx:if="{{form.category==='suggestion'}}">
+    <view class="row-label">
+      <van-icon name="user-o" size="32rpx" color="#722ED1" />
+      <text>匿名提交(姓名不会展示)</text>
+    </view>
+    <van-switch checked="{{form.is_anonymous}}" size="44rpx" bind:change="onAnonChange" active-color="#722ED1" />
+  </view>
+
+  <!-- 媒体(照片/视频) -->
+  <view class="card">
+    <view class="field-label">现场照片/视频(共最多6个,视频≤30MB/60s)</view>
+    <view class="img-grid">
+      <view class="img-item" wx:for="{{form.images}}" wx:key="key" bindtap="onPreviewImage" data-index="{{index}}">
+        <block wx:if="{{item.type==='video'}}">
+          <view class="video-thumb">
+            <image wx:if="{{item.poster}}" src="{{item.url ? baseUrl + item.poster : item.localPoster}}" mode="aspectFill" class="video-poster" />
+            <view class="video-tag">视频</view>
+            <view class="video-play">
+              <van-icon name="play-circle" size="72rpx" color="#fff" />
+            </view>
+          </view>
+        </block>
+        <image wx:else src="{{item.url ? baseUrl + item.url : item.localPath}}" mode="aspectFill" />
+        <view class="img-del" catchtap="onRemoveImage" data-index="{{index}}">
+          <van-icon name="cross" size="24rpx" color="#fff" />
+        </view>
+      </view>
+      <view class="img-add" wx:if="{{form.images.length<6}}" bindtap="onChooseImage">
+        <van-icon name="photograph" size="48rpx" color="#BFBFBF" />
+        <text>照片/视频</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="agree-tip">
+    <van-icon name="info-o" size="24rpx" color="#8C8C8C" />
+    <text>请如实反馈,辱骂、虚假信息将被驳回</text>
+  </view>
+
+  <view class="submit-bar">
+    <van-button block round type="info" loading="{{submitting}}" bind:click="onSubmit" custom-style="background:linear-gradient(135deg,#1890FF,#40A9FF);border:none;height:88rpx;font-size:30rpx;font-weight:600;">
+      提交反馈
+    </van-button>
+  </view>
+
+  <!-- 2026-09-28：地点改为 chips 直接展示，不再用底部弹层 -->
+</view>

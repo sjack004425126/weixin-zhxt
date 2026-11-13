@@ -1,0 +1,100 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><van-icon name="records" size="36rpx" /></view>
+    <view class="header-text">
+      <view class="header-title">{{detail.student_name || '核对详情'}}</view>
+      <view class="header-subtitle">{{detail.student_no || ''}}</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+  </view>
+</view>
+
+<view class="container">
+  <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+  <block wx:else>
+    <!-- 状态横幅 -->
+    <view class="status-banner status-{{detail.status}}">
+      <view class="status-row">
+        <van-icon name="{{detail.status === 'verified' ? 'passed' : detail.status === 'modified' ? 'edit' : 'clock-o'}}" size="32rpx" color="#fff" />
+        <text class="status-text">{{detail.status_text}}</text>
+        <view wx:if="{{detail.status !== 'pending'}}" class="reset-btn" bindtap="onReset">重置</view>
+      </view>
+      <view class="status-time" wx:if="{{detail.submitted_at}}">提交时间：{{detail.submitted_at}}</view>
+    </view>
+
+    <!-- 修改项汇总卡片 -->
+    <view class="card">
+      <view class="card-title">
+        <text>信息修改</text>
+        <view class="title-tag">{{changedCount}} 项</view>
+      </view>
+      <block wx:if="{{changedCount === 0}}">
+        <view class="no-change-tip">
+          <van-icon name="passed" size="32rpx" color="#10b981" />
+          <text>本次核对未修改任何信息</text>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="diff-row" wx:for="{{detail.diffs}}" wx:key="field" wx:if="{{item.changed}}">
+          <view class="diff-label">{{item.label}}</view>
+          <view class="diff-body">
+            <view class="diff-old">
+              <text class="diff-tag tag-old">原</text>
+              <text class="diff-text">{{item.old || '—'}}</text>
+            </view>
+            <view class="diff-arrow">
+              <van-icon name="arrow" size="28rpx" color="#f59e0b" />
+            </view>
+            <view class="diff-new">
+              <text class="diff-tag tag-new">改</text>
+              <text class="diff-text">{{item.new || '—'}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 完整字段对照表 -->
+    <view class="card">
+      <view class="card-title"><text>完整对照</text></view>
+      <view class="kv-row" wx:for="{{detail.diffs}}" wx:key="field">
+        <view class="kv-label">{{item.label}}</view>
+        <view class="kv-values">
+          <view class="kv-line {{item.changed ? 'changed' : ''}}">
+            <text class="kv-prefix">原</text>
+            <text class="kv-text">{{item.old || '—'}}</text>
+          </view>
+          <view class="kv-line {{item.changed ? 'changed' : ''}}">
+            <text class="kv-prefix">现</text>
+            <text class="kv-text">{{item.new || '—'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 历次提交历史 -->
+    <view class="card" wx:if="{{detail.history && detail.history.length > 0}}">
+      <view class="card-title"><text>历次提交记录（{{detail.history.length}}）</text></view>
+      <view class="history-item" wx:for="{{detail.history}}" wx:key="submitted_at" wx:for-index="hIdx">
+        <view class="history-dot {{item.status === 'modified' ? 'dot-modified' : 'dot-verified'}}"></view>
+        <view class="history-body">
+          <view class="history-row">
+            <text class="history-status">{{item.status === 'modified' ? '已修改提交' : '已核对无误'}}</text>
+            <text class="history-time">{{item.submitted_at}}</text>
+          </view>
+          <view wx:if="{{item.modified && hIdx > 0}}" class="history-changes">
+            <text wx:for="{{item.modified_keys}}" wx:for-item="k" wx:key="*this" class="history-change-tag">{{detail.field_labels[k] || k}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-tip" wx:if="{{detail.history && detail.history.length > 0}}">
+      <van-icon name="info-o" size="24rpx" color="#94a3b8" />
+      <text>以上记录由学生端提交，如发现信息有误请与学生本人联系修正</text>
+    </view>
+  </block>
+</view>

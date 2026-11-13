@@ -1,0 +1,485 @@
+<!-- 顶部消息提示 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面主容器 -->
+<view class="page-root">
+
+  <!-- ===== 顶部头部 ===== -->
+  <view class="page-header">
+    <view class="header-inner">
+      <view class="header-badge">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#fff;"></text>
+      </view>
+      <view class="header-text">
+        <view class="header-title">中职迎新查询</view>
+        <view class="header-subtitle">本人手机号验证 · 查班级 · 查班主任</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 查询入口（未查到时展示） ===== -->
+  <block wx:if="{{!showResult}}">
+
+    <!-- 查询卡片 -->
+    <view class="query-card">
+      <view class="card-intro">
+        <view class="card-intro-icon">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#1890FF;"></text>
+        </view>
+        <view class="card-intro-text">
+          <view class="card-intro-title">本人手机号验证</view>
+          <view class="card-intro-desc">需本人微信绑定手机号与报名预留手机号一致</view>
+        </view>
+      </view>
+
+      <view class="phone-verify-section">
+        <view class="phone-verify-header">
+          <view class="phone-verify-title">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:22rpx;color:#059669;"></text>
+            <text>手机快捷身份认证</text>
+          </view>
+          <view class="phone-verify-tip-text">
+            使用本人微信绑定手机验证本人身份
+          </view>
+        </view>
+
+        <button
+          class="phone-btn {{verifiedPhoneToken ? 'verified' : ''}}"
+          open-type="getPhoneNumber"
+          bindgetphonenumber="onVerifyByPhone"
+        >
+          <view wx:if="{{!verifiedPhoneToken}}" class="phone-btn-inner">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#059669;"></text>
+            <text>快捷手机号验证</text>
+          </view>
+          <view wx:else class="phone-btn-inner verified-inner">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#059669;"></text>
+            <text>{{verifiedPhoneMasked}}</text>
+            <text class="reverify" bindtap="clearVerifiedPhone">重选</text>
+          </view>
+        </button>
+      </view>
+
+      <button
+        class="primary-btn {{!verifiedPhoneToken ? 'btn-disabled' : ''}}"
+        bindtap="onCheckStudentInfo"
+        disabled="{{!verifiedPhoneToken}}"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#fff;"></text>
+        <text>{{verifiedPhoneToken ? '查询班级信息' : '请先完成身份验证'}}</text>
+      </button>
+    </view>
+
+    <!-- 使用说明 -->
+    <view class="help-card">
+      <view class="help-header">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+        <text>使用说明</text>
+      </view>
+      <view class="help-content">
+        <view class="help-item">
+          <view class="help-number">1</view>
+          <text class="help-text">本功能用于查询中职新生班级信息</text>
+        </view>
+        <view class="help-item">
+          <view class="help-number">2</view>
+          <text class="help-text">需本人微信绑定手机号与报名预留手机号一致</text>
+        </view>
+        <view class="help-item">
+          <view class="help-number">3</view>
+          <text class="help-text">验证通过后可查询所在班级与班主任联系方式</text>
+        </view>
+        <view class="help-item">
+          <view class="help-number">4</view>
+          <text class="help-text">如有疑问请联系学校招生办</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 防伪说明 -->
+    <view class="trust-strip">
+      <view class="trust-item">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#059669;"></text>
+        <text>官方认证</text>
+      </view>
+      <view class="trust-sep"></view>
+      <view class="trust-item">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#059669;"></text>
+        <text>信息加密</text>
+      </view>
+      <view class="trust-sep"></view>
+      <view class="trust-item">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#059669;"></text>
+        <text>快捷验证</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 查询结果 ===== -->
+  <block wx:if="{{showResult}}">
+
+    <!-- 学生信息卡片 -->
+    <view class="result-card student-section">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:26rpx;color:inherit;"></text>
+          </view>
+          <text>学生信息</text>
+        </view>
+        <view class="card-badge enrollment-badge">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:18rpx;color:inherit;"></text>
+          <text>已报到</text>
+        </view>
+      </view>
+
+      <view class="student-card-inner">
+        <view class="student-avatar">
+          <text class="avatar-text">{{studentInfo.name.charAt(0)}}</text>
+        </view>
+        <view class="student-details">
+          <view class="student-name">{{studentInfo.name}}</view>
+          <view class="student-meta">
+            <view class="student-no">学号：{{studentInfo.student_no || '未分配'}}</view>
+            <view class="student-id">身份证：{{studentInfo.id_card}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 班级信息卡片 -->
+    <view class="result-card class-section">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:26rpx;color:inherit;"></text>
+          </view>
+          <text>班级信息</text>
+        </view>
+        <view class="card-badge">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:18rpx;color:inherit;"></text>
+          <text>已分班</text>
+        </view>
+      </view>
+
+      <view class="class-info-card">
+        <view class="class-icon">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:#52C41A;"></text>
+        </view>
+        <view class="class-details">
+          <view class="class-name">{{studentInfo.class_name}}</view>
+        </view>
+      </view>
+
+      <!-- 教室信息 -->
+      <view class="info-row" wx:if="{{studentInfo.jss}}">
+        <view class="info-label">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#1890FF;"></text>
+          <text>教室</text>
+        </view>
+        <view class="info-value">{{studentInfo.jss}}</view>
+      </view>
+
+      <!-- 寝室信息已整合到下方寝室示意图，此处不再重复展示 -->
+
+      <!-- 未分配寝室提示 -->
+      <view class="info-row no-dorm" wx:if="{{!studentInfo.dorm_info && studentInfo.class_name}}">
+        <view class="info-label">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#FF4D4F;"></text>
+          <text>寝室</text>
+        </view>
+        <view class="info-value no-value">寝室暂未分配，请联系班主任</view>
+      </view>
+    </view>
+
+    <!-- 寝室示意图 -->
+    <view class="result-card dorm-section" wx:if="{{studentInfo.dorm_info}}">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon dorm-title-icon">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:26rpx;color:inherit;"></text>
+          </view>
+          <text>寝室示意图</text>
+        </view>
+      </view>
+
+      <!-- 寝室平面图 -->
+      <view class="dorm-floor-plan">
+        <!-- 房间标题 -->
+        <view class="dorm-room-title">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:34rpx;color:#5B8FF9;"></text>
+          <text>{{studentInfo.dorm_info.ld_mc}} · {{studentInfo.dorm_info.ssh}}室</text>
+          <view class="dorm-type-tag">
+            <text>{{studentInfo.dorm_info.cwsl || 8}}人间</text>
+          </view>
+          <view class="bed-tag">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:20rpx;color:#FAAD14;"></text>
+            <text>您的床位：{{studentInfo.dorm_info.cwh}}号</text>
+          </view>
+        </view>
+
+        <!-- 寝室房间 -->
+        <view class="dorm-room">
+          <!-- 顶部：窗户 -->
+          <view class="window-area">
+            <view class="window-strip">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#52C41A;">🪟</text>
+              <text class="window-text">窗  户</text>
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#52C41A;">🪟</text>
+            </view>
+          </view>
+
+          <!-- 主体：竖向两列布局（根据寝室类型显示不同布局） -->
+          <!-- ========== 8 人间布局 ========== -->
+          <block wx:if="{{studentInfo.dorm_info.cwsl == 8 || !studentInfo.dorm_info.cwsl}}">
+          <view class="dorm-main">
+            <!-- 左侧一列：3、2、7、1 号床（从上到下） -->
+            <view class="bed-column left-column">
+              <view class="bed {{studentInfo.dorm_info.cwh === '3' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '3' ? '★' : '3'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '3' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '2' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '2' ? '★' : '2'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '2' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '7' ? 'my-bed lower-bunk' : 'lower-bunk'}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '7' ? '★' : '7'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '7' ? '您' : ''}}</text>
+                </view>
+                <view class="bed-meta">
+                  <view class="lower-bunk-tag">下铺</view>
+                  <text class="bed-position">门侧</text>
+                </view>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '1' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '1' ? '★' : '1'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '1' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">门侧</text>
+              </view>
+            </view>
+
+            <!-- 中间过道 -->
+            <view class="walkway-vertical">
+              <view class="walkway-vertical-line"></view>
+              <view class="walkway-vertical-icon">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:22rpx;color:#8C8C8C;"></text>
+                <text class="walkway-text">过道</text>
+              </view>
+              <view class="walkway-vertical-line"></view>
+            </view>
+
+            <!-- 右侧一列：4、5、8、6 号床（从上到下） -->
+            <view class="bed-column right-column">
+              <view class="bed {{studentInfo.dorm_info.cwh === '4' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '4' ? '★' : '4'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '4' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '5' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '5' ? '★' : '5'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '5' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '8' ? 'my-bed lower-bunk' : 'lower-bunk'}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '8' ? '★' : '8'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '8' ? '您' : ''}}</text>
+                </view>
+                <view class="bed-meta">
+                  <view class="lower-bunk-tag">下铺</view>
+                  <text class="bed-position">门侧</text>
+                </view>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '6' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '6' ? '★' : '6'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '6' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">门侧</text>
+              </view>
+            </view>
+          </view>
+          </block>
+
+          <!-- ========== 6 人间布局 ========== -->
+          <block wx:elif="{{studentInfo.dorm_info.cwsl == 6}}">
+          <view class="dorm-main dorm-main-6">
+            <!-- 左侧一列：3、2、1 号床（从上到下） -->
+            <view class="bed-column left-column">
+              <view class="bed {{studentInfo.dorm_info.cwh === '3' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '3' ? '★' : '3'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '3' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '2' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '2' ? '★' : '2'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '2' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '1' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '1' ? '★' : '1'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '1' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">门侧</text>
+              </view>
+            </view>
+
+            <!-- 中间过道 -->
+            <view class="walkway-vertical">
+              <view class="walkway-vertical-line"></view>
+              <view class="walkway-vertical-icon">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:22rpx;color:#8C8C8C;"></text>
+                <text class="walkway-text">过道</text>
+              </view>
+              <view class="walkway-vertical-line"></view>
+            </view>
+
+            <!-- 右侧一列：4、5、6 号床（从上到下） -->
+            <view class="bed-column right-column">
+              <view class="bed {{studentInfo.dorm_info.cwh === '4' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '4' ? '★' : '4'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '4' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '5' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '5' ? '★' : '5'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '5' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">窗侧</text>
+              </view>
+              <view class="bed {{studentInfo.dorm_info.cwh === '6' ? 'my-bed' : ''}}">
+                <view class="bed-side">
+                  <text class="bed-num">{{studentInfo.dorm_info.cwh === '6' ? '★' : '6'}}</text>
+                  <text class="bed-label">{{studentInfo.dorm_info.cwh === '6' ? '您' : ''}}</text>
+                </view>
+                <text class="bed-position">门侧</text>
+              </view>
+            </view>
+          </view>
+          </block>
+
+          <!-- 底部：入户门 -->
+          <view class="door-area">
+            <view class="door-strip">
+              <view class="door-line"></view>
+              <view class="door-icon-wrap">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#FA8C16;"></text>
+                <text class="door-text">入  户  门</text>
+              </view>
+              <view class="door-line"></view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 我的床位标记 -->
+        <view class="my-bed-marker">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#FAAD14;"></text>
+          <text class="marker-text">您的床位：{{studentInfo.dorm_info.full_dorm}}</text>
+        </view>
+
+        <!-- 图例 -->
+        <view class="dorm-legend">
+          <view class="legend-item">
+            <view class="legend-box my-legend"></view>
+            <text>您的床位</text>
+          </view>
+          <view class="legend-item">
+            <view class="legend-box other-legend"></view>
+            <text>其他床位</text>
+          </view>
+          <view class="legend-item">
+            <view class="legend-box lower-bunk-legend">
+              <text class="legend-mini-tag">下铺</text>
+            </view>
+            <text>下铺床位</text>
+          </view>
+          <view class="legend-item">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:20rpx;color:#52C41A;">🪟</text>
+            <text>窗户</text>
+          </view>
+          <view class="legend-item">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:20rpx;color:#FA8C16;"></text>
+            <text>入户门</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 班主任信息卡片 -->
+    <view class="result-card teacher-section">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:26rpx;color:inherit;"></text>
+          </view>
+          <text>班主任信息</text>
+        </view>
+      </view>
+
+      <view class="teacher-card">
+        <view class="teacher-avatar">
+          <text class="teacher-avatar-text">{{studentInfo.teacher_name ? studentInfo.teacher_name.charAt(0) : ''}}</text>
+        </view>
+        <view class="teacher-info">
+          <view class="teacher-name">{{studentInfo.teacher_name}}</view>
+          <view class="teacher-title">班主任老师</view>
+          <view class="teacher-contact" bindtap="callTeacher">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#1890FF;"></text>
+            <text class="phone-number">{{studentInfo.teacher_phone}}</text>
+            <view class="call-tag">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:22rpx;color:inherit;"></text>
+              <text>拨打</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 重新查询按钮 -->
+    <view class="requery-section">
+      <button class="requery-btn" bindtap="onReQuery">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+        <text>重新查询</text>
+      </button>
+    </view>
+  </block>
+
+  <!-- ===== 空状态 ===== -->
+  <view class="empty-state" wx:if="{{showEmpty && !showResult}}">
+    <van-empty image="search" description="未找到相关信息">
+      <view slot="description" class="empty-description">
+        <text>请确认手机号是否与报名预留一致</text>
+        <text>或联系招生办确认报名状态</text>
+      </view>
+    </van-empty>
+    <view class="requery-section">
+      <button class="requery-btn" bindtap="onReQuery">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+        <text>重新查询</text>
+      </button>
+    </view>
+  </view>
+
+</view>

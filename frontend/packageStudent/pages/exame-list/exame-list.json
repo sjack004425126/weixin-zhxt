@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "考试列表",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#E6F7FF",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

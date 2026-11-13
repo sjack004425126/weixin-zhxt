@@ -1,0 +1,359 @@
+/* 关键：引入 vant-icon 字体定义（INCIDENTS/001：text 直渲仍需 @font-face；subPackage 需 3 个 ../） */
+@import "../../../components/vant-icon/index.wxss";
+
+/* vi 类：直接用 text 渲染 vant-icon 字体的 unicode 字符（绕过 van-icon 组件 view+::before） */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+
+/* 蓝白主题（对齐 graduate-form） */
+page {
+  --primary-color: #1890FF;
+  --primary-light: #E6F7FF;
+  --primary-gradient: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+  --secondary-color: #52C41A;
+  --warning-color: #FAAD14;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.08);
+  --border-radius: 16rpx;
+}
+
+.page-header {
+  padding: 32rpx 0 24rpx;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 24rpx;
+  position: relative;
+}
+
+.header-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
+}
+
+.header-text {
+  flex: 1;
+  margin-left: 8rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+.header-nav-action {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding: 24rpx;
+  padding-top: 160rpx;
+}
+
+.notice-bar {
+  margin-bottom: 24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid var(--border-color);
+  background: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  background: var(--primary-light);
+  border-color: rgba(24, 144, 255, 0.3);
+}
+
+.notice-bar.notice-filled {
+  background: linear-gradient(135deg, #F6FFED, #F0F9E8);
+  border-color: rgba(82, 196, 26, 0.3);
+}
+
+.notice-content {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: var(--primary-color);
+}
+
+.notice-bar.notice-filled .notice-content {
+  color: var(--secondary-color);
+}
+
+.notice-content text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.form {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 32rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: var(--primary-gradient);
+}
+
+.form-group {
+  margin-bottom: 32rpx;
+  background: white;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  border: 1rpx solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3rpx;
+  background: var(--primary-gradient);
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid var(--border-color);
+}
+
+.form-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid var(--border-color);
+}
+
+.form-title-row .form-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.form-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 4rpx 12rpx;
+  background: var(--primary-light);
+  border-radius: 12rpx;
+  border: 1rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.pc-text {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.type-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.type-item {
+  flex: 1;
+  border: 2rpx solid var(--border-color);
+  border-radius: 12rpx;
+  padding: 28rpx 16rpx;
+  text-align: center;
+  background: #FAFBFC;
+}
+
+.type-item.is-on {
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
+}
+
+.type-icon {
+  font-size: 44rpx;
+  line-height: 1;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.type-item-text {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 12rpx;
+}
+
+.type-item-desc {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-top: 6rpx;
+}
+
+.site-card {
+  background: #F6FFED;
+  border: 2rpx solid rgba(82, 196, 26, 0.3);
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.site-card.site-empty {
+  background: #FFF7E6;
+  border-color: rgba(250, 173, 20, 0.3);
+}
+
+.site-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-bottom: 8rpx;
+}
+
+.site-card.site-empty .site-title {
+  color: var(--warning-color);
+}
+
+.site-addr {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.site-contact {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-top: 8rpx;
+}
+
+.last-mail-card {
+  background: var(--primary-light);
+  border: 2rpx dashed rgba(24, 144, 255, 0.4);
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+}
+
+.last-mail-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+.add-btn {
+  min-width: 240rpx !important;
+}
+
+.picker-trigger {
+  font-size: 26rpx;
+  color: #8a8f99;
+  padding: 6rpx 4rpx 0;
+}
+
+/* region-picker 触发行：对齐 van-field 左 label + 右值风格 */
+.picker-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+}
+
+.picker-text {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.picker-text.placeholder {
+  color: #969799;
+}
+
+.btn-submit {
+  margin-top: 40rpx;
+  padding: 0;
+}
+
+.btn-submit .van-button {
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+  border-radius: 44rpx !important;
+  background: var(--primary-gradient) !important;
+  border: none !important;
+  color: white !important;
+  box-shadow: 0 8rpx 24rpx rgba(24, 144, 255, 0.3) !important;
+}

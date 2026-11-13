@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="canvas-area">
+    <canvas
+      type="2d"
+      id="sigCanvas"
+      class="sig-canvas"
+      disable-scroll="{{true}}"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    ></canvas>
+  </view>
+  <view class="btn-col">
+    <button class="btn confirm-btn" bindtap="onConfirm">确认</button>
+    <button class="btn clear-btn" bindtap="onClear">清除</button>
+    <button class="btn cancel-btn" bindtap="onCancel">取消</button>
+  </view>
+</view>

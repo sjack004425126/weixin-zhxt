@@ -1,0 +1,91 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:inherit;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">请假管理</view>
+      <view class="header-subtitle">Leave Management</view>
+    </view>
+    <view class="header-nav-action" bindtap="goHome">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 提示栏 -->
+  <view class="notice-bar {{canApply ? '' : 'notice-warning'}}">
+    <view class="notice-content">
+      <text wx:if="{{canApply}}" class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#1890FF;"></text>
+      <text wx:else class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#FAAD14;"></text>
+      <text wx:if="{{canApply}}">如需请假，请点击下方按钮申请</text>
+      <text wx:else>您有未销假的请假记录，请先销假后再申请</text>
+    </view>
+  </view>
+
+  <!-- 申请按钮 -->
+  <view class="apply-btn-wrapper">
+    <van-button 
+      type="primary" 
+      block 
+      icon="plus"
+      disabled="{{!canApply}}"
+      bind:click="goToApply"
+    >申请请假</van-button>
+  </view>
+
+  <!-- 请假记录列表 -->
+  <view class="list-section">
+    <view class="section-title">
+      <text>请假记录</text>
+      <text class="record-count">共 {{leaveList.length}} 条</text>
+    </view>
+
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+    <view wx:elif="{{leaveList.length === 0}}" class="empty-state">
+      <van-empty description="暂无请假记录" />
+    </view>
+
+    <view wx:else class="leave-list">
+      <view 
+        class="leave-item" 
+        wx:for="{{leaveList}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goToDetail"
+      >
+        <view class="leave-header">
+          <view class="leave-type">
+            <van-tag type="{{item.qjlb === '病假' ? 'danger' : item.qjlb === '事假' ? 'warning' : 'primary'}}">{{item.qjlb}}</van-tag>
+          </view>
+          <view class="leave-status {{item.xj_zt === 1 ? 'status-completed' : (item.bzr_zt === 2 || item.xsk_zt === 2) ? 'status-rejected' : (item.bzr_zt === 1 && item.xsk_zt === 1) ? 'status-approved' : 'status-pending'}}">
+            <text wx:if="{{item.xj_zt === 1}}">已销假</text>
+            <text wx:elif="{{item.bzr_zt === 2 || item.xsk_zt === 2}}">审批不通过</text>
+            <text wx:elif="{{item.bzr_zt === 1 && item.xsk_zt === 1}}">审批通过</text>
+            <text wx:elif="{{item.bzr_zt === 0 && item.xsk_zt === 0}}">待审批</text>
+            <text wx:else>审批中</text>
+          </view>
+        </view>
+        
+        <view class="leave-content">
+          <view class="leave-reason">{{item.qjsy}}</view>
+          <view class="leave-time">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+            <text>{{item.qjkssj}} 至 {{item.qjjssj}}</text>
+          </view>
+        </view>
+
+        <view class="leave-footer">
+          <text class="apply-time">申请时间：{{item.qjsqsj}}</text>
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#999;"></text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

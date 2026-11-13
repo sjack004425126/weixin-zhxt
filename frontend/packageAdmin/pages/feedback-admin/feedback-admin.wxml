@@ -1,0 +1,465 @@
+<include src="/utils/common-components.wxml" />
+<van-dialog id="van-dialog" />
+<view class="page">
+
+  <!-- 数据看板：紧凑横排 -->
+  <view class="stats">
+    <view class="stat-item" data-value="pending" bindtap="onTabTap">
+      <view class="stat-num pending-color">{{stats.pending || 0}}</view>
+      <view class="stat-label">待受理</view>
+    </view>
+    <view class="stat-item" data-value="processing" bindtap="onTabTap">
+      <view class="stat-num processing-color">{{stats.processing || 0}}</view>
+      <view class="stat-label">处理中</view>
+    </view>
+    <view class="stat-item" data-value="done" bindtap="onTabTap">
+      <view class="stat-num done-color">{{stats.done || 0}}</view>
+      <view class="stat-label">已办结</view>
+    </view>
+    <view class="stat-item" data-value="rejected" bindtap="onTabTap">
+      <view class="stat-num rejected-color">{{stats.rejected || 0}}</view>
+      <view class="stat-label">已驳回</view>
+    </view>
+  </view>
+
+  <!-- 筛选区：粘顶 -->
+  <view class="filters">
+
+    <!-- 顶栏：仅搜索框（筛选按钮已移到状态 Tab 同一行） -->
+    <view class="filter-topbar">
+      <van-search value="{{keyword}}" placeholder="搜索标题/工单号/反馈人" shape="round"
+                  bind:change="onKeywordChange" bind:search="onSearch" />
+    </view>
+
+    <!-- 状态 Tab + 筛选按钮（同一行：Tab 可横向滚动，筛选按钮固定在右侧） -->
+    <view class="tab-row">
+      <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="tab-scroll">
+        <view class="tab-item {{activeStatus==='' ? 'tab-active' : ''}}"
+              data-value="" bindtap="onTabTap">全部</view>
+        <view class="tab-item {{activeStatus==='pending' ? 'tab-active tab-pending' : ''}}"
+              data-value="pending" bindtap="onTabTap">待受理</view>
+        <view class="tab-item {{activeStatus==='processing' ? 'tab-active tab-processing' : ''}}"
+              data-value="processing" bindtap="onTabTap">处理中</view>
+        <view class="tab-item {{activeStatus==='done' ? 'tab-active tab-done' : ''}}"
+              data-value="done" bindtap="onTabTap">已办结</view>
+        <view class="tab-item {{activeStatus==='rejected' ? 'tab-active tab-rejected' : ''}}"
+              data-value="rejected" bindtap="onTabTap">已驳回</view>
+      </scroll-view>
+      <view class="filter-btn {{fpFilterCount > 0 ? 'applied' : ''}}" bindtap="openFilterPanel">
+        <van-icon name="filter-o" size="20rpx" color="{{fpFilterCount > 0 ? '#FA8C16' : '#fff'}}" class="filter-btn-icon" />
+        <text>筛选</text>
+        <text wx:if="{{fpFilterCount > 0}}" class="filter-btn-badge">{{fpFilterCount}}</text>
+        <!-- 2026-09-29：已选条件下，一键清除。catchtap 阻断冒泡到 openFilterPanel -->
+        <view wx:if="{{fpFilterCount > 0}}" class="filter-btn-clear" catchtap="clearFilterQuick" hover-class="filter-btn-clear-hover">
+          <van-icon name="cross" size="22rpx" color="{{fpFilterCount > 0 ? '#FA8C16' : '#fff'}}" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list" wx:if="{{items.length>0}}">
+    <view wx:for="{{items}}" wx:key="id" class="item-card" data-id="{{item.id}}" bindtap="onTap">
+
+      <!-- 左侧类型色条 -->
+      <view class="card-stripe {{item.category==='repair' ? 'stripe-repair' : 'stripe-suggest'}}"></view>
+
+      <view class="card-body">
+        <!-- 头部:标签行 -->
+        <view class="item-head">
+          <view class="cat-tag {{item.category==='repair' ? 'cat-repair' : 'cat-suggest'}}">
+            {{item.category==='repair' ? '维修' : '建议'}}
+          </view>
+          <view wx:if="{{item.urgency==='urgent'}}" class="urgent-tag">
+            <text class="urg-flame">🔥</text>
+            <text>紧急</text>
+          </view>
+          <view class="status-tag status-{{item.status}}">{{statusLabels[item.status]}}</view>
+        </view>
+
+        <!-- 标题 + 工单号 -->
+        <view class="item-title">{{item.title}}</view>
+        <view class="ticket-no">No. {{item.ticket_no}}</view>
+
+        <!-- 摘要 -->
+        <view class="item-desc">{{item.content}}</view>
+
+        <!-- 媒体缩略图(照片/视频封面) -->
+        <view wx:if="{{item.images.length>0}}" class="item-thumbs">
+          <block wx:for="{{item.images}}" wx:for-item="img" wx:for-index="ix" wx:key="key">
+            <view wx:if="{{ix<4}}" class="thumb-wrap">
+              <view wx:if="{{img.type==='video'}}" class="thumb thumb-video">
+                <image wx:if="{{img.poster}}" src="{{baseUrl}}{{img.poster}}" mode="aspectFill" class="thumb-poster" />
+                <van-icon name="play-circle" size="40rpx" color="#fff"
+                          custom-style="position:relative;z-index:1;filter:drop-shadow(0 2rpx 6rpx rgba(0,0,0,0.45));" />
+              </view>
+              <image wx:else src="{{baseUrl}}{{img.url}}" mode="aspectFill" class="thumb" />
+            </view>
+          </block>
+          <view wx:if="{{item.images.length>4}}" class="thumb-more">+{{item.images.length-4}}</view>
+        </view>
+
+        <!-- 反馈人信息卡 -->
+        <view class="reporter-bar">
+          <view class="rep-left">
+            <view class="rep-avatar {{item.is_anonymous ? 'rep-anon' : ''}}">
+              <van-icon name="{{item.is_anonymous ? 'user-circle-o' : 'manager-o'}}" size="28rpx" color="#fff" />
+            </view>
+            <view class="rep-info">
+              <view class="rep-name">
+                <text>{{item.is_anonymous ? '匿名用户' : item.reporter_name}}</text>
+                <text wx:if="{{userTypeLabels[item.reporter_user_type]}}" class="rep-utype">{{userTypeLabels[item.reporter_user_type]}}</text>
+              </view>
+              <view wx:if="{{item.reporter_dept}}" class="rep-dept">{{item.reporter_dept}}</view>
+            </view>
+          </view>
+          <view wx:if="{{!item.is_anonymous && item.reporter_phone}}" class="call-btn"
+                catchtap="onCallReporter" data-phone="{{item.reporter_phone}}">
+            <van-icon name="phone-o" size="26rpx" color="#1890FF" />
+            <text>电话</text>
+          </view>
+        </view>
+
+        <!-- 2026-09-28 方案 C：地点按段展示，列表段 + 备注段 -->
+        <view wx:if="{{item.repair_type_text || item.location_dict_text || item.location_user_text}}" class="item-meta-row">
+          <view wx:if="{{item.repair_type_text}}" class="meta-tag meta-rt">
+            <van-icon name="setting-o" size="22rpx" color="#FA8C16" />
+            <text>{{item.repair_type_text}}</text>
+          </view>
+          <view wx:if="{{item.location_dict_text}}" class="meta-tag meta-loc" bindtap="onTap" data-id="{{item.id}}">
+            <van-icon name="location-o" size="22rpx" color="#1890FF" />
+            <text class="meta-loc-text">{{item.location_dict_text}}</text>
+          </view>
+          <view wx:if="{{item.location_user_text}}" class="meta-tag meta-loc" bindtap="onTap" data-id="{{item.id}}">
+            <van-icon name="edit" size="22rpx" color="#13C2C2" />
+            <text class="meta-loc-text">{{item.location_user_text}}</text>
+          </view>
+        </view>
+
+        <!-- 合并展示串（兼容旧的 location_text + detail fallback） -->
+        <view wx:if="{{item.location_text && !item.location_dict_text && !item.location_user_text}}" class="loc-row">
+          <van-icon name="location-o" size="24rpx" color="#1890FF" />
+          <text class="loc">{{item.location_text}}</text>
+        </view>
+
+        <!-- 处理结果(已办结/处理中) -->
+        <view wx:if="{{(item.status==='done' || item.status==='processing') && item.handle_remark}}" class="reply-box">
+          <view class="reply-label">
+            <van-icon name="passed" size="24rpx" color="#52C41A" />
+            <text>处理结果</text>
+            <text wx:if="{{item.handler_name}}" class="reply-handler">· {{item.handler_name}}</text>
+          </view>
+          <view class="reply-content">{{item.handle_remark}}</view>
+        </view>
+
+        <!-- 驳回原因 -->
+        <view wx:if="{{item.status==='rejected' && item.reject_reason}}" class="reply-box reply-reject">
+          <view class="reply-label">
+            <van-icon name="close" size="24rpx" color="#FF4D4F" />
+            <text>驳回原因</text>
+            <text wx:if="{{item.handler_name}}" class="reply-handler">· {{item.handler_name}}</text>
+          </view>
+          <view class="reply-content">{{item.reject_reason}}</view>
+        </view>
+
+        <!-- 底部:时间 -->
+        <view class="item-foot">
+          <view class="foot-time">
+            <van-icon name="clock-o" size="22rpx" color="#BFBFBF" />
+            <text>{{item.created_at}}</text>
+          </view>
+          <view class="foot-arrow">
+            查看详情
+            <van-icon name="arrow" size="20rpx" color="#1890FF" />
+          </view>
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <van-empty wx:if="{{!loading && items.length===0}}" description="暂无反馈" />
+  <view wx:if="{{noMore && items.length>0}}" class="no-more">— 没有更多了 —</view>
+
+</view>
+
+<!-- ===== 维修地点选择器（按 type_code 任意组合，2026-09-27 重构） ===== -->
+<view wx:if="{{locationPickerVisible}}" class="loc-mask" bindtap="closeLocationPicker"></view>
+<view wx:if="{{locationPickerVisible}}" class="loc-panel">
+  <view class="loc-header">
+    <text class="loc-title">筛选维修地点</text>
+    <view class="loc-close" bindtap="closeLocationPicker">
+      <van-icon name="cross" size="32rpx" color="#666" />
+    </view>
+  </view>
+  <!-- 左侧类型 + 右侧值 -->
+  <view class="loc-step">
+    <view class="loc-col loc-col-left">
+      <scroll-view scroll-y class="loc-col-scroll">
+        <view wx:for="{{locationTypes}}" wx:key="type_code"
+              class="loc-cat {{locPickerType===item.type_code ? 'loc-cat-active' : ''}}"
+              data-type="{{item.type_code}}" bindtap="onLocTypeTap">
+          {{item.type_code}} ({{item.count}})
+        </view>
+        <view wx:if="{{!locationTypes.length}}" class="loc-empty">暂无地点类型</view>
+      </scroll-view>
+    </view>
+    <view class="loc-col loc-col-right">
+      <scroll-view scroll-y class="loc-col-scroll">
+        <view wx:if="{{!locPickerType}}" class="loc-empty">请选择左侧类型</view>
+        <view wx:for="{{locPickerOptions}}" wx:key="id" class="loc-item"
+              data-name="{{item.name}}" bindtap="onLocPickerSelect">{{item.name}}</view>
+        <view wx:if="{{locPickerType && !locPickerOptions.length}}" class="loc-empty">该类型下暂无值</view>
+      </scroll-view>
+    </view>
+  </view>
+  <view class="loc-footer">
+    <view class="loc-btn cancel" bindtap="closeLocationPicker">取消</view>
+  </view>
+</view>
+
+<!-- ===== 弹窗筛选面板：12306 风格（左侧导航 + 右侧内容） ===== -->
+<van-popup show="{{filterPanelVisible}}" position="bottom" round
+           bind:close="closeFilterPanel" close-on-click-overlay
+           custom-style="background:transparent;">
+  <view class="fp-panel">
+    <view class="fp-header">
+      <view class="fp-header-left">
+        <text class="fp-title">筛选（多选）</text>
+      </view>
+      <view class="fp-clear" bindtap="resetFilterPanel">清空</view>
+      <view class="fp-header-right" bindtap="closeFilterPanel">
+        <van-icon name="cross" size="36rpx" color="#8C8C8C" />
+      </view>
+    </view>
+
+    <!-- 左右两列布局：左侧导航 + 右侧内容 -->
+    <view class="fp-body">
+      <!-- 左：导航菜单 -->
+      <scroll-view scroll-y class="fp-nav">
+        <view wx:for="{{fpNav}}" wx:key="key"
+              class="fp-nav-item {{fpActiveNav===item.key ? 'fp-nav-item-active' : ''}} {{(item.key==='repairType' && fpRepairTypeCodes.length>0) || (item.key==='location' && fpLocationTypeCount>0) ? 'fp-nav-has' : ''}}"
+              data-key="{{item.key}}" bindtap="onFpNavTap">
+          <text class="fp-nav-label">{{item.label}}</text>
+          <text wx:if="{{(item.key==='repairType' && fpRepairTypeCodes.length>0) || (item.key==='location' && fpLocationTypeCount>0)}}"
+                class="fp-nav-count">{{item.key==='repairType' ? fpRepairTypeCodes.length : fpLocationTypeCount}}</text>
+        </view>
+      </scroll-view>
+
+      <!-- 右：内容区 -->
+      <!-- 2026-09-29：地点放上面（默认选中），维修类型放下面 -->
+      <scroll-view scroll-y scroll-top="{{fpContentScrollTop}}" class="fp-content" wx:if="{{fpActiveNav==='location'}}">
+
+        <view class="fp-content-title">维修地点（多选） · 已选 {{fpLocationTotalCount}} 个 · 跨 {{fpLocationTypeCount}} 个类型</view>
+        <view wx:if="{{locationTypes.length>0}}">
+          <view wx:for="{{locationTypes}}" wx:key="type_code" class="fp-loc-block">
+            <view class="fp-loc-block-head">
+              <text class="fp-loc-block-title">{{item.type_code}}</text>
+              <text wx:if="{{fpLocationTypeSet[item.type_code]}}" class="fp-loc-block-selected">已选 {{fpLocationByType[item.type_code].length}}</text>
+              <text class="fp-loc-block-meta" wx:if="{{item.count}}">{{item.count}} 项</text>
+            </view>
+            <view wx:if="{{locationValuesByType[item.type_code].length>0}}" class="fp-loc-values">
+              <view wx:for="{{locationValuesByType[item.type_code]}}" wx:for-item="v" wx:key="id"
+                    class="fp-chip fp-chip-big {{fpLocationSet[v.name] ? 'fp-chip-on-blue' : ''}}"
+                    data-type="{{item.type_code}}" data-name="{{v.name}}" bindtap="onFpLocationToggle">
+                <text>{{v.name}}</text>
+                <text wx:if="{{fpLocationSet[v.name]}}" class="fp-chip-check-text">✓</text>
+              </view>
+            </view>
+            <view wx:else class="fp-loc-empty">该类型下暂无值</view>
+          </view>
+        </view>
+        <view wx:else class="fp-loc-empty">暂无地点字典</view>
+      </scroll-view>
+
+      <scroll-view scroll-y scroll-top="{{fpContentScrollTop}}" class="fp-content" wx:elif="{{fpActiveNav==='repairType'}}">
+
+        <view class="fp-content-title">维修类型（多选） · 已选 {{fpRepairTypeCodes.length}} 个</view>
+        <view wx:if="{{repairTypes.length>0}}" class="fp-chip-row">
+          <view wx:for="{{repairTypes}}" wx:key="code"
+                class="fp-chip fp-chip-big {{fpRepairTypeSet[item.code] ? 'fp-chip-on-orange' : ''}}"
+                data-code="{{item.code}}" data-label="{{item.label}}" bindtap="onFpRepairTypeToggle">
+            <text>{{item.label}}</text>
+            <text wx:if="{{fpRepairTypeSet[item.code]}}" class="fp-chip-check-text">✓</text>
+          </view>
+        </view>
+        <view wx:else class="fp-loc-empty">暂无维修类型字典</view>
+      </scroll-view>
+
+    </view>
+
+    <view class="fp-footer">
+      <view class="fp-footer-reset" bindtap="resetFilterPanel">清空</view>
+      <view class="fp-footer-apply" bindtap="applyFilterPanel">应用筛选</view>
+    </view>
+  </view>
+</van-popup>
+
+<!-- ===== 工单详情弹出层 ===== -->
+<van-popup show="{{detailShow}}" position="bottom" round safe-area-inset-bottom
+           bind:close="closeDetail" custom-style="height:92vh;display:flex;flex-direction:column;overflow:hidden;">
+
+  <!-- 顶部拖拽条 + 标题 + 关闭 -->
+  <view class="popup-header">
+    <view class="popup-drag-bar"></view>
+    <view class="popup-title-row">
+      <text class="popup-title">工单详情</text>
+      <van-icon name="cross" size="40rpx" color="#8C8C8C" bindtap="closeDetail" />
+    </view>
+  </view>
+
+  <!-- 可滚动内容区 -->
+  <scroll-view scroll-y class="popup-scroll">
+    <van-loading wx:if="{{!detail}}" type="spinner" color="#1890FF"
+                 custom-style="display:flex;justify-content:center;padding:100rpx 0;" />
+
+    <view wx:if="{{detail}}" class="d-wrap">
+
+      <!-- 工单基本信息 -->
+      <view class="d-card">
+        <view class="d-head-row">
+          <view class="d-cat-tag {{detail.category==='repair' ? 'd-cat-repair' : 'd-cat-suggest'}}">
+            {{detail.category==='repair' ? '维修报修' : '意见建议'}}
+          </view>
+          <view wx:if="{{detail.urgency==='urgent'}}" class="d-urgent-tag">紧急</view>
+          <view class="d-status-tag d-status-{{detail.status}}">{{statusLabels[detail.status]}}</view>
+        </view>
+        <view class="d-title">{{detail.title}}</view>
+        <view class="d-ticket-no">工单号 {{detail.ticket_no}}</view>
+        <view class="d-content">{{detail.content}}</view>
+        <view class="d-meta-row" wx:if="{{detail.location_dict_text || detail.location_user_text || detail.location_text}}">
+          <van-icon name="location-o" size="26rpx" color="#1890FF" />
+          <text>{{detail.location_dict_text || detail.location_user_text || detail.location_text}}</text>
+        </view>
+        <view class="d-meta-row" wx:if="{{detail.repair_type_text}}">
+          <van-icon name="setting-o" size="26rpx" color="#FA8C16" />
+          <text>{{detail.repair_type_text}}</text>
+        </view>
+        <view class="d-img-grid" wx:if="{{detail.images.length>0}}">
+          <view wx:for="{{detail.images}}" wx:key="key" class="d-img-wrap"
+                bindtap="previewDetailImage" data-list="reporter" data-index="{{index}}">
+            <view wx:if="{{item.type==='video'}}" class="d-video-thumb">
+              <image wx:if="{{item.poster}}" src="{{baseUrl}}{{item.poster}}" mode="aspectFill" class="d-video-poster" />
+              <van-icon name="play-circle" size="56rpx" color="#fff" custom-style="position:relative;z-index:1;" />
+              <view class="d-video-tag">视频</view>
+            </view>
+            <image wx:else src="{{baseUrl}}{{item.url}}" mode="aspectFill" class="d-img" />
+          </view>
+        </view>
+        <view class="d-reporter">
+          <view class="d-reporter-row">
+            <van-icon name="user-o" size="26rpx" color="#8C8C8C" />
+            <text>{{detail.is_anonymous ? '匿名用户' : detail.reporter_name}}</text>
+            <text wx:if="{{!detail.is_anonymous}}" class="d-phone">{{detail.reporter_phone}}</text>
+          </view>
+          <view class="d-reporter-row">
+            <text>{{userTypeLabels[detail.reporter_user_type]}}</text>
+            <text wx:if="{{detail.reporter_dept}}"> · {{detail.reporter_dept}}</text>
+            <text> · {{detail.created_at}}</text>
+          </view>
+        </view>
+        <view class="d-action-call" wx:if="{{!detail.is_anonymous && detail.reporter_phone}}" bindtap="callDetailReporter">
+          <van-icon name="phone-o" size="28rpx" color="#1890FF" />
+          <text>拨打电话联系反馈人</text>
+        </view>
+      </view>
+
+      <!-- 已办结 -->
+      <view wx:if="{{detail.status==='done'}}" class="d-card d-status-card-done">
+        <view class="d-card-title"><van-icon name="checked" size="32rpx" color="#52C41A" /><text>已办结</text></view>
+        <view class="d-content">{{detail.handle_remark}}</view>
+        <view class="d-img-grid" wx:if="{{detail.handle_images.length>0}}">
+          <view wx:for="{{detail.handle_images}}" wx:key="key" class="d-img-wrap"
+                bindtap="previewDetailImage" data-list="handle" data-index="{{index}}">
+            <view wx:if="{{item.type==='video'}}" class="d-video-thumb">
+              <image wx:if="{{item.poster}}" src="{{baseUrl}}{{item.poster}}" mode="aspectFill" class="d-video-poster" />
+              <van-icon name="play-circle" size="56rpx" color="#fff" custom-style="position:relative;z-index:1;" />
+              <view class="d-video-tag">视频</view>
+            </view>
+            <image wx:else src="{{baseUrl}}{{item.url}}" mode="aspectFill" class="d-img" />
+          </view>
+        </view>
+        <view class="d-handler-meta">{{detail.handler_name}} · {{detail.handle_at}}</view>
+      </view>
+
+      <!-- 已驳回 -->
+      <view wx:if="{{detail.status==='rejected'}}" class="d-card d-status-card-reject">
+        <view class="d-card-title"><van-icon name="close" size="32rpx" color="#FF4D4F" /><text>已驳回</text></view>
+        <view class="d-content">{{detail.reject_reason}}</view>
+        <view class="d-handler-meta">{{detail.handler_name}} · {{detail.handle_at}}</view>
+      </view>
+
+      <!-- 处理表单（待受理 / 处理中） -->
+      <view wx:if="{{detail.status==='pending' || detail.status==='processing'}}" class="d-card">
+        <view class="d-card-title">
+          <van-icon name="edit" size="32rpx" color="#1890FF" /><text>处理意见</text>
+        </view>
+        <textarea class="d-textarea" placeholder="请填写处理情况、整改措施..." value="{{detailForm.remark}}"
+                  maxlength="500" bindinput="onDetailRemarkInput" auto-height></textarea>
+        <view class="d-field-label d-mt">整改照片/视频(共最多6个,视频≤30MB/60s)</view>
+        <view class="d-img-grid">
+          <view class="d-img-item" wx:for="{{detailForm.images}}" wx:key="key"
+                bindtap="onPreviewDetailHandle" data-index="{{index}}">
+            <view wx:if="{{item.type==='video'}}" class="d-video-thumb">
+              <image wx:if="{{item.poster}}" src="{{baseUrl}}{{item.poster}}" mode="aspectFill" class="d-video-poster" />
+              <van-icon name="play-circle" size="56rpx" color="#fff" custom-style="position:relative;z-index:1;" />
+              <view class="d-video-tag">视频</view>
+            </view>
+            <image wx:else src="{{baseUrl}}{{item.url}}" mode="aspectFill" />
+            <view class="d-img-del" catchtap="onRemoveDetailImage" data-index="{{index}}">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+          </view>
+          <view class="d-img-add" wx:if="{{detailForm.images.length<6}}" bindtap="onChooseDetailImage">
+            <van-icon name="photograph" size="48rpx" color="#BFBFBF" />
+            <text>照片/视频</text>
+          </view>
+        </view>
+        <view class="d-row-line" wx:if="{{!detail.is_anonymous}}">
+          <view class="d-row-label">
+            <van-icon name="chat-o" size="28rpx" color="#1890FF" />
+            <text>办结后向反馈人发送短信通知</text>
+          </view>
+          <van-switch checked="{{detailForm.send_sms}}" size="44rpx" bind:change="onDetailSmsChange" active-color="#1890FF" />
+        </view>
+        <view class="d-btn-group">
+          <view class="d-btn-cell">
+            <van-button plain type="info" bind:click="onDetailProcess" loading="{{detailSubmitting}}" custom-style="width:100%;">标记处理中</van-button>
+          </view>
+          <view class="d-btn-cell">
+            <van-button type="info" bind:click="onDetailDone" loading="{{detailSubmitting}}"
+                        custom-style="width:100%;background:linear-gradient(135deg,#52C41A,#73D13D);border:none;">完成办结</van-button>
+          </view>
+        </view>
+        <view class="d-reject-link" bindtap="onDetailReject">驳回此反馈</view>
+      </view>
+
+      <!-- 时间线 -->
+      <view class="d-card">
+        <view class="d-card-title">
+          <van-icon name="clock-o" size="32rpx" color="#1890FF" /><text>处理进度</text>
+        </view>
+        <view class="d-timeline">
+          <view wx:for="{{detailTimeline}}" wx:key="created_at" class="d-tl-item">
+            <view class="d-tl-dot d-tl-dot-{{item.action}}"></view>
+            <view class="d-tl-body">
+              <view class="d-tl-action">{{actionLabels[item.action] || item.action}}</view>
+              <view class="d-tl-meta">{{item.operator_name || '-'}} · {{item.created_at}}</view>
+              <view class="d-tl-remark" wx:if="{{item.remark}}">{{item.remark}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 危险操作 -->
+      <view class="d-card d-danger-card">
+        <view class="d-card-title">
+          <van-icon name="warning-o" size="32rpx" color="#FF4D4F" /><text>危险操作</text>
+        </view>
+        <view class="d-danger-tip">删除后该工单将从所有列表和统计中移除,数据保留备查。</view>
+        <view class="d-danger-btn" bindtap="onDetailDelete">删除此反馈</view>
+      </view>
+
+    </view>
+  </scroll-view>
+</van-popup>

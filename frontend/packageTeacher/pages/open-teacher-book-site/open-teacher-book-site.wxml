@@ -1,0 +1,44 @@
+<!-- pages/open-teacher-book-site/open-teacher-book-site.wxml -->
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:#fff;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">新书自取地点设置</view>
+      <view class="header-subtitle">Pickup Site</view>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <view class="notice-bar">
+    <view class="notice-content">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#1890FF;"></text>
+      <text>设置后，所带班级选择“到校领取”的学生将看到该地点。一个老师带多个班时共用同一地址。</text>
+    </view>
+  </view>
+
+  <view class="form">
+    <view class="form-group">
+      <view class="form-title">自取地点</view>
+      <van-field
+        label="自取地点"
+        value="{{address}}"
+        placeholder="例如：校本部一楼教材室（找张老师）"
+        type="textarea"
+        autosize
+        maxlength="200"
+        show-word-limit
+        bind:change="onInputChange"
+      />
+      <view class="tip">留空保存表示清空；学生端将提示“联系班主任”。最多200字。</view>
+    </view>
+
+    <view class="btn-submit">
+      <van-button type="primary" block loading="{{saving}}" bind:click="onSave">保存</van-button>
+    </view>
+  </view>
+</view>

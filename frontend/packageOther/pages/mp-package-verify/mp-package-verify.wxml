@@ -1,0 +1,66 @@
+<view class="container">
+  <view class="banner">
+    <view class="banner-title">mp 包验证页</view>
+    <view class="banner-sub">验证 svg 项目 dist/mp/ 在小程序的渲染</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">✓</text>
+      <text>验证项 ①：app.wxss @import 加载的英文类名</text>
+    </view>
+    <view class="section-desc">
+      本页面没有自己 @import my-iconfont.wxss，依赖 app.wxss 全局引入
+    </view>
+    <view class="grid">
+      <view class="grid-item">
+        <view class="icon-wrap"><text class="icon-grid"></text></view>
+        <view class="icon-name">icon-grid</view>
+      </view>
+      <view class="grid-item">
+        <view class="icon-wrap"><text class="icon-home"></text></view>
+        <view class="icon-name">icon-home</view>
+      </view>
+      <view class="grid-item">
+        <view class="icon-wrap"><text class="icon-plus"></text></view>
+        <view class="icon-name">icon-plus</view>
+      </view>
+      <view class="grid-item">
+        <view class="icon-wrap"><text class="icon-upload"></text></view>
+        <view class="icon-name">icon-upload</view>
+      </view>
+      <view class="grid-item">
+        <view class="icon-wrap"><text class="icon-user"></text></view>
+        <view class="icon-name">icon-user</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">✓</text>
+      <text>验证项 ②：动态大小 + 颜色</text>
+    </view>
+    <view class="section-desc">直接通过 style 属性控制 font-size / color</view>
+    <view class="dynamic-demo">
+      <text class="icon-grid" style="font-size:120rpx;color:#1890ff"></text>
+      <text class="icon-home" style="font-size:120rpx;color:#52c41a"></text>
+      <text class="icon-plus" style="font-size:120rpx;color:#f5222d"></text>
+      <text class="icon-upload" style="font-size:120rpx;color:#fa8c16"></text>
+      <text class="icon-user" style="font-size:120rpx;color:#722ed1"></text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text class="section-num">✓</text>
+      <text>验证项 ③：动态数据（推荐方式）</text>
+    </view>
+    <view class="section-desc">js data 里放 unicode，wxml 用 {{code}} 渲染（避免 wxml 报错）</view>
+    <view class="dynamic-demo">
+      <block wx:for="{{codes}}" wx:key="cls">
+        <text class="icon-{{item.cls}}">{{item.code}}</text>
+      </block>
+    </view>
+  </view>
+</view>

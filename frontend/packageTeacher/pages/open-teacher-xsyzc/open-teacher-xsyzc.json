@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "形势与政策",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-dropdown-menu": "@vant/weapp/dropdown-menu/index",
+    "van-dropdown-item": "@vant/weapp/dropdown-item/index",
+    "van-search": "@vant/weapp/search/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-popup": "@vant/weapp/popup/index"
+  }
+}

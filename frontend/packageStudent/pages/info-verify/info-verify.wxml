@@ -1,0 +1,217 @@
+<!-- pages/info-verify/info-verify.wxml -->
+<view class="page">
+  <include src="/utils/common-components.wxml" />
+
+  <!-- 可滚动内容区 -->
+  <scroll-view class="page-scroll" scroll-y="true">
+    <!-- 顶部标题 -->
+    <view class="hd">
+      <view class="hd-title">学生信息核对</view>
+      <view class="hd-sub">请逐项确认，有误项可点击修改</view>
+    </view>
+
+    <!-- 筛选签 -->
+    <view class="tabs">
+      <view
+        wx:for="{{filters}}"
+        wx:key="key"
+        class="tab {{filter === item.key ? 'is-on' : ''}}"
+        data-filter="{{item.key}}"
+        catchtap="onFilterChange"
+      >{{item.label}}<text class="tab-count sv">{{counts[item.key]}}</text></view>
+    </view>
+
+    <!-- 状态横幅（已提交时显示） -->
+    <view class="status-banner {{statusClass}}" wx:if="{{status !== 'pending'}}">
+      <view class="status-banner-row">
+        <view class="status-dot"></view>
+        <view class="status-banner-text">{{statusText}}</view>
+      </view>
+      <view class="status-banner-tip" wx:if="{{submittedAt}}">核对时间：{{submittedAt}}</view>
+    </view>
+
+    <!-- 学习承诺书卡片 -->
+    <view class="section" wx:if="{{status === 'pending'}}">
+      <view class="commitment-card">
+        <view class="commitment-row">
+          <!-- 左侧勾选框：仅切换勾选状态，阻止冒泡 -->
+          <view
+            class="commitment-checkbox {{commitmentChecked ? 'is-checked' : ''}}"
+            catchtap="onCommitmentToggle"
+          >
+            <van-icon wx:if="{{commitmentChecked}}" name="success" size="36rpx" color="#fff" />
+          </view>
+          <!-- 右侧文字 + 箭头：仅打开弹窗，阻止冒泡 -->
+          <view class="commitment-link-text" catchtap="onOpenCommitment">
+            <text class="commitment-title">我已阅读并同意签署学习承诺书</text>
+            <text class="commitment-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 信息核对列表（按分组） -->
+    <block wx:for="{{viewGroups}}" wx:for-item="group" wx:key="key">
+      <view class="group-name">{{group.name}}</view>
+
+      <block wx:for="{{group.rows}}" wx:for-item="row" wx:key="key">
+        <view class="row {{row.state === 'err' ? 'row-force' : ''}}">
+          <!-- 第一行：字段名 + 状态标签 + 操作按钮 -->
+          <view class="row-head">
+            <text class="row-lbl">{{row.label}}</text>
+
+            <view class="row-chip">
+              <view wx:if="{{row.editing}}" class="chip chip-md">编辑中</view>
+              <view wx:elif="{{row.state === 'ok'}}" class="chip chip-ok">
+                <van-icon name="success" size="18rpx" color="#389e0d" />
+                <text>已核对</text>
+              </view>
+              <view wx:elif="{{row.state === 'md'}}" class="chip chip-md">已修改</view>
+              <view wx:elif="{{row.state === 'err'}}" class="chip chip-err">
+                <van-icon name="warning-o" size="18rpx" color="#d4380d" />
+                <text>数据异常</text>
+              </view>
+              <view wx:else class="chip chip-no">未核对</view>
+            </view>
+
+            <view class="row-acts">
+              <block wx:if="{{row.editing}}">
+                <view class="mini-btn mini-btn-pri" data-key="{{row.key}}" catchtap="onSaveField">保存</view>
+                <view class="mini-btn" data-key="{{row.key}}" catchtap="onCancelEdit">取消</view>
+              </block>
+              <block wx:elif="{{!row.readonly && row.state !== 'ok' && row.state !== 'md' && status === 'pending'}}">
+                <view
+                  class="mini-btn mini-btn-ok"
+                  data-key="{{row.key}}"
+                  catchtap="onConfirmField"
+                >确认</view>
+                <view class="mini-btn" data-key="{{row.key}}" catchtap="onEditField">编辑</view>
+              </block>
+            </view>
+          </view>
+
+          <!-- 第二行：值 / 编辑框 -->
+          <view class="row-val">
+            <block wx:if="{{row.editing}}">
+              <!-- 下拉字段 -->
+              <view wx:if="{{row.hasOptions}}" class="picker-row editing" data-key="{{row.key}}" catchtap="onOpenPicker">
+                <text class="picker-text">{{row.displayText || '点击选择'}}</text>
+                <text class="picker-arrow">›</text>
+              </view>
+              <!-- 手动输入 -->
+              <input
+                wx:else
+                class="row-input {{row.inputError ? 'is-err' : ''}}"
+                value="{{row.draft || row.value}}"
+                placeholder="请输入正确的{{row.label}}"
+                data-key="{{row.key}}"
+                bindinput="onFieldChange"
+                bindconfirm="onSaveField"
+              />
+            </block>
+
+            <!-- 编辑态下的格式校验错误提示 -->
+            <text wx:if="{{row.editing && row.inputError}}" class="row-err">{{row.inputError}}</text>
+
+            <block wx:else>
+              <text class="row-text {{row.modified ? 'is-md' : ''}}">{{row.displayText || '（空）'}}</text>
+              <!-- 已修改：原值 -->
+              <text wx:if="{{row.modified}}" class="row-orig">
+                原值：{{row.originalText || '（空）'}}
+              </text>
+              <!-- 数据异常提示 -->
+              <text wx:if="{{row.state === 'err'}}" class="row-orig is-err">{{row.errorMsg}}</text>
+            </block>
+          </view>
+        </view>
+      </block>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-box" wx:if="{{viewGroups.length === 0}}">
+      <text class="empty-text">该状态下暂无条目</text>
+    </view>
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="foot-bar" wx:if="{{status === 'pending'}}">
+    <view class="foot-btns">
+      <view
+        class="secondary-btn {{hasAction ? '' : 'is-disabled'}}"
+        catchtap="onCancelAll"
+      >全部取消</view>
+      <view
+        class="primary-btn {{loading ? 'is-loading' : ''}}"
+        catchtap="onSubmit"
+      >{{loading ? '提交中...' : (changedCount > 0 ? '提交修改并保存' : '提交核对结果')}}</view>
+    </view>
+  </view>
+
+  <!-- 已提交状态提示 -->
+  <view class="foot-bar" wx:if="{{status !== 'pending'}}">
+    <view class="primary-btn is-disabled">已提交完成，无需操作</view>
+  </view>
+
+  <!-- 全局唯一 picker 弹层 -->
+  <van-popup
+    show="{{pickerKey !== ''}}"
+    position="bottom"
+    round
+    bind:close="onPickerClose"
+  >
+    <van-picker
+      show-toolbar
+      title="选择{{pickerFieldLabel}}"
+      columns="{{pickerColumns}}"
+      default-index="{{pickerIndex}}"
+      bind:cancel="onPickerClose"
+      bind:change="onPickerChange"
+      bind:confirm="onPickerConfirm"
+    />
+  </van-popup>
+
+  <!-- 学习承诺书弹窗 -->
+  <van-popup
+    show="{{showCommitment}}"
+    position="right"
+    closeable
+    custom-style="width:100%;height:100%;background:#f4f6fb;"
+    bind:close="onCommitmentClose"
+  >
+    <view class="commitment-page">
+      <!-- 顶部导航 -->
+      <view class="commitment-header">
+        <view class="commitment-header-left" bindtap="onCommitmentClose">
+          <text class="commitment-close-icon">×</text>
+        </view>
+        <view class="commitment-header-title">学习承诺书</view>
+        <view class="commitment-header-right"></view>
+      </view>
+
+      <!-- 承诺书内容 -->
+      <scroll-view class="commitment-scroll" scroll-y="true">
+        <view class="commitment-content">
+          <view class="commitment-doc-title">黔东南开放大学学生学习承诺书</view>
+
+          <view class="commitment-text">
+            我自愿报名参加国家开放大学
+            <text class="commitment-blank commitment-level">{{commitmentLevel || '（待定）'}}</text>
+            层次
+            <text class="commitment-blank commitment-major">{{commitmentMajor || '（待定）'}}</text>
+            专业的学习。我郑重承诺：
+          </view>
+
+          <view class="commitment-item">1. 自觉遵守学校规章制度，尊重老师，团结同学。</view>
+          <view class="commitment-item">2. 开学初认真核对本人信息（姓名、性别、身份证号、民族、联系方式）。</view>
+          <view class="commitment-item">3. 主动学习，积极参加学校的面授课教学。每学期面授课到课率至少达50%。</view>
+          <view class="commitment-item">4. 按时完成网上作业及纸质形考作业。积极参加网上学习，保证上线天数不少于25天，在线行为次数不少于1200次。</view>
+          <view class="commitment-item">5. 第二学年按时缴纳学费，否则作为休学或退学处理。</view>
+          <view class="commitment-item">6. 认真撰写毕业论文，不抄袭，不找人代笔。论文按时提交并参与答辩。</view>
+          <view class="commitment-item">7. 期末考试期间自觉遵守考试纪律，尊重监考老师，不作弊，不找人代考替考。否则成绩以0分处理。</view>
+          <view class="commitment-item">8. 本人在学习期间，若不能做到以上承诺，愿意承担由此所造成的一切后果。</view>
+          <view class="commitment-text">本人熟读以上条款，内容清楚。</view>
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
+</view>

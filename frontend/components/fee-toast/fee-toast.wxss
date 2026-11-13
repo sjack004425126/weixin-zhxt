@@ -1,0 +1,114 @@
+.fee-toast {
+  position: fixed;
+  right: 30rpx;
+  top: 30rpx;
+  background-color: rgba(232, 100, 51, 0.65);
+  color: #fff;
+  padding: 24rpx 32rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4rpx 12rpx rgba(232, 100, 51, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.fee-toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.toast-content .van-icon {
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.toast-content .toast-text {
+  font-size: 28rpx;
+}
+
+/* 成功状态 */
+.fee-toast.success {
+  background: rgba(39, 174, 96, 0.9);
+}
+
+/* 错误状态 */
+.fee-toast.error {
+  background: rgba(231, 76, 60, 0.9);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.major-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+  opacity: 0;
+  transform: translateX(20rpx);
+  animation: slideIn 0.3s ease forwards;
+  animation-delay: 0.1s;
+}
+
+.fee-item {
+  margin-bottom: 8rpx;
+  opacity: 0;
+  transform: translateX(20rpx);
+  animation: slideIn 0.3s ease forwards;
+}
+
+.fee-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.fee-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.total {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.3);
+  font-weight: bold;
+  animation-delay: 0.4s;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+} 

@@ -1,0 +1,85 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><van-icon name="hotel-o" size="40rpx" /></view>
+    <view class="header-text">
+      <view class="header-title">留宿管理</view>
+      <view class="header-subtitle">Stay Management</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+  </view>
+</view>
+
+<view class="container">
+  <view class="filter-bar">
+    <van-dropdown-menu>
+      <van-dropdown-item value="{{ statusFilter }}" bind:change="onStatusChange" options="{{ statusOptions }}" />
+    </van-dropdown-menu>
+  </view>
+
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+    <view wx:elif="{{filteredList.length === 0}}" class="empty-state"><van-empty description="暂无留宿学生" /></view>
+    <view wx:else class="group-list">
+      <view class="class-group" wx:for="{{groupedList}}" wx:key="bj_mc">
+        <!-- 班级标题 -->
+        <view class="class-group-title">{{item.bj_mc}}</view>
+        <!-- 学生卡片行（左右两列） -->
+        <view class="photo-wall">
+          <view class="photo-item" wx:for="{{item.students}}" wx:for-item="stu" wx:key="id">
+            <view class="photo-index">{{index + 1}}</view>
+            <view class="photo-avatar">
+              <image wx:if="{{stu.photo_url}}" src="{{stu.photo_url}}" mode="aspectFill"></image>
+              <view wx:else class="avatar-placeholder"><van-icon name="user-o" size="60rpx" color="#999" /></view>
+            </view>
+            <view class="photo-info">
+              <view class="photo-name">{{stu.xm}}</view>
+              <view class="photo-dorm" wx:if="{{stu.dorm_info}}">{{stu.dorm_info}}</view>
+              <view class="photo-dorm none" wx:else>未分配宿舍</view>
+            </view>
+            <!-- 已批准：展示留宿日期（两行） -->
+            <view class="stay-date-wrap" wx:if="{{stu.stay && stu.stay.status === 1}}">
+              <text class="stay-date-line">起：{{stu.stay.start_date}}</text>
+              <text class="stay-date-line">止：{{stu.stay.end_date}}</text>
+            </view>
+            <!-- 留宿状态按钮 -->
+            <view class="stay-btn stay-btn-{{stu.stay.status}}" wx:if="{{stu.stay}}" catchtap="onStayTap" data-student="{{stu}}">
+              {{statusMap[stu.stay.status]}}
+            </view>
+            <view class="stay-btn stay-btn-none" wx:else>无申请</view>
+            <!-- 拨号按钮 -->
+            <view class="call-btn" catchtap="callStudent" data-phone="{{stu.xsdh}}" data-name="{{stu.xm}}">
+              <van-icon name="phone-o" size="28rpx" color="#52c41a" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 留宿详情/审批弹窗 -->
+<van-popup show="{{showDetail}}" position="bottom" round closeable bind:close="closeDetail" custom-style="max-height: 65vh;">
+  <view class="detail-popup" wx:if="{{currentStudent}}">
+    <view class="detail-title">留宿详情 - {{currentStudent.xm}}</view>
+    <view class="detail-info">
+      <view class="info-row"><text class="info-label">留宿类型</text><text class="info-value">{{currentStudent.stay.ls_type === 'weekend' ? '周末' : currentStudent.stay.ls_type === 'holiday' ? '假期' : '其他'}}</text></view>
+      <view class="info-row"><text class="info-label">留宿日期</text><text class="info-value">{{currentStudent.stay.start_date}} 至 {{currentStudent.stay.end_date}}</text></view>
+      <view class="info-row"><text class="info-label">留宿原因</text><text class="info-value">{{currentStudent.stay.ls_reason}}</text></view>
+      <view class="info-row"><text class="info-label">宿舍信息</text><text class="info-value">{{currentStudent.dorm_info || '未分配'}}</text></view>
+      <view class="info-row"><text class="info-label">申请时间</text><text class="info-value">{{currentStudent.stay.cjsj}}</text></view>
+      <view class="info-row"><text class="info-label">当前状态</text><view class="stay-status-tag status-{{currentStudent.stay.status}}">{{statusMap[currentStudent.stay.status]}}</view></view>
+      <view class="info-row" wx:if="{{currentStudent.stay.approve_by}}"><text class="info-label">审批人</text><text class="info-value">{{currentStudent.stay.approve_by}}</text></view>
+      <view class="info-row" wx:if="{{currentStudent.stay.approve_remark}}"><text class="info-label">审批备注</text><text class="info-value">{{currentStudent.stay.approve_remark}}</text></view>
+    </view>
+    <!-- 审批操作（仅待审批状态） -->
+    <view class="approve-section" wx:if="{{currentStudent.stay.status === 0}}">
+      <van-field label="审批备注" value="{{approveRemark}}" bind:change="onRemarkChange" placeholder="可选填写备注" />
+      <view class="approve-btns">
+        <van-button type="success" size="small" loading="{{approving}}" bind:click="approvePass">批准</van-button>
+        <van-button type="danger" size="small" loading="{{approving}}" bind:click="approveReject">拒绝</van-button>
+      </view>
+    </view>
+  </view>
+</van-popup>

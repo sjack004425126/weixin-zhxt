@@ -1,0 +1,677 @@
+/* ============================================================
+ * 全屏容器
+ * ============================================================ */
+.enroll-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* ============================================================
+ * 浮光掠影动态背景（页面级 fixed 背景，永远固定，图片滑动时不动）
+ *  - position: fixed，不在 swiper 内部，不随图片移动
+ *  - 多个柔光圆斑（径向渐变），缓慢漂移/缩放/淡入淡出
+ *  - + 一条斜向"掠影"光带横扫
+ *  - 仅装饰，pointer-events:none 让 swiper 滑动穿透
+ * ============================================================ */
+.light-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    #d8e7ff 0%,
+    #ffffff 35%,
+    #ffe9d4 70%,
+    #f0e0ff 100%
+  );
+}
+
+.light-bg__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70rpx);
+  opacity: 0.85;
+  will-change: transform, opacity;
+  /* soft-light 让 blob 颜色跟背景融合得更自然、对比更强 */
+  mix-blend-mode: soft-light;
+}
+
+.light-bg__blob--a {
+  width: 520rpx;
+  height: 520rpx;
+  top: -120rpx;
+  left: -120rpx;
+  background: radial-gradient(circle, rgba(255, 154, 60, 0.95) 0%, rgba(255, 154, 60, 0) 65%);
+  animation: blobDriftA 16s ease-in-out infinite;
+}
+
+.light-bg__blob--b {
+  width: 560rpx;
+  height: 560rpx;
+  top: 28%;
+  right: -180rpx;
+  background: radial-gradient(circle, rgba(64, 158, 255, 0.95) 0%, rgba(64, 158, 255, 0) 65%);
+  animation: blobDriftB 22s ease-in-out infinite;
+}
+
+.light-bg__blob--c {
+  width: 420rpx;
+  height: 420rpx;
+  bottom: -100rpx;
+  left: 22%;
+  background: radial-gradient(circle, rgba(178, 102, 255, 0.85) 0%, rgba(178, 102, 255, 0) 65%);
+  animation: blobDriftC 26s ease-in-out infinite;
+}
+
+.light-bg__blob--d {
+  width: 340rpx;
+  height: 340rpx;
+  top: 52%;
+  left: 10%;
+  background: radial-gradient(circle, rgba(36, 220, 170, 0.85) 0%, rgba(36, 220, 170, 0) 65%);
+  animation: blobDriftD 18s ease-in-out infinite;
+}
+
+/* 斜向光带：擦亮感（更亮的白光带） */
+.light-bg__sweep {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0) 42%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0) 58%,
+    transparent 70%
+  );
+  animation: sweepAcross 8s ease-in-out infinite;
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes blobDriftA {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50%      { transform: translate(80rpx, 120rpx) scale(1.15); opacity: 0.75; }
+}
+
+@keyframes blobDriftB {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.55; }
+  50%      { transform: translate(-100rpx, 80rpx) scale(1.1); opacity: 0.4; }
+}
+
+@keyframes blobDriftC {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50%      { transform: translate(60rpx, -80rpx) scale(1.2); opacity: 0.7; }
+}
+
+@keyframes blobDriftD {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.45; }
+  50%      { transform: translate(-60rpx, -100rpx) scale(1.15); opacity: 0.65; }
+}
+
+@keyframes sweepAcross {
+  0%   { transform: translateX(-30%) rotate(0deg); opacity: 0; }
+  20%  { opacity: 0.7; }
+  50%  { transform: translateX(30%) rotate(2deg); opacity: 0.9; }
+  80%  { opacity: 0.5; }
+  100% { transform: translateX(70%) rotate(0deg); opacity: 0; }
+}
+
+/* prefers-reduced-motion 关闭动画（无障碍） */
+@media (prefers-reduced-motion: reduce) {
+  .light-bg__blob,
+  .light-bg__sweep {
+    animation: none;
+  }
+}
+
+/* ============================================================
+ * 轮播：占满整屏
+ * ============================================================ */
+.swiper {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+/* swiper-item：占满整屏，flex 居中图片（高度溢出由 image 自身 widthFix 比例控制） */
+.swiper-item {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 图片统一规则：
+ *   - 宽度永远 = 100vw（与屏幕等宽）
+ *   - 高度由图片自身宽高比自动算出（mode="widthFix" + width:100vw + height:auto）
+ *   - 高度 > 100vh 时垂直居中，溢出部分被 swiper-item overflow:hidden 裁掉（不被拉伸）
+ */
+.brochure-image {
+  width: 100vw;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* 加载占位 */
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+}
+
+.placeholder-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid #e6e6e6;
+  border-top: 4rpx solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16rpx;
+}
+
+.placeholder-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* ============================================================
+ * 浮动标题 - 第 1 层（与微信胶囊同行，左对齐）
+ *  - 白字 + 多层 text-shadow（保证在任何彩色图片背景上对比度 ≥4.5:1）
+ *  - 不加黑底/胶囊框（避免和 home/音乐按钮风格重叠，让标题"轻"起来）
+ *  - 字号 28rpx，字重 500（不抢焦点）
+ *  - 与第二行 .floating-top 的 padding 一致（左侧 24rpx），保证两行左对齐
+ *  - height 与胶囊同高（capsuleHeight），flex align 居中，垂直 baseline 对齐
+ *  - padding-right 由 JS 动态算 = 87px + 胶囊右边距 + 8px，避免压住微信胶囊
+ *  - 单行 ellipsis 截断
+ * ============================================================ */
+.page-title {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 195;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;  /* 左对齐 */
+  padding: 0 16px;
+  box-sizing: border-box;
+  pointer-events: none;
+  /* 容器本身不画背景，让图片内容透出 */
+}
+
+.page-title__text {
+  display: block;
+  max-width: 100%;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: 1rpx;
+  line-height: 1.4;  /* 容器已 flex 居中，line-height 只影响多行 */
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* 多层阴影：在彩色图片上保证白字对比度 4.5:1+ */
+  text-shadow:
+    0 1rpx 2rpx rgba(0, 0, 0, 0.55),
+    0 0 8rpx rgba(0, 0, 0, 0.35),
+    0 0 16rpx rgba(0, 0, 0, 0.25);
+}
+
+.floating-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+  /* 透明背景，让 light-bg 的浮光透过来 */
+  background: transparent;
+  pointer-events: none; /* 让 swiper 滑动穿透；内部子元素单独启用 */
+}
+
+.floating-top > view {
+  pointer-events: auto;
+}
+
+.floating-top__spacer {
+  flex: 1;
+  height: 1rpx;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* 右：actions 行内并排 */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+/* ============================================================
+ * 通用动作按钮（72rpx，与音乐按钮对齐）
+ * ============================================================ */
+.action-btn,
+.music-btn {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.action-btn-hover {
+  transform: scale(0.9);
+}
+
+.action-btn--ghost {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.action-btn__icon {
+  width: 36rpx;
+  height: 36rpx;
+  position: relative;
+}
+
+.action-btn__icon-img {
+  width: 44rpx;
+  height: 44rpx;
+  display: block;
+}
+
+/* 返回首页按钮内的图标（白底时显示黑色剪影房子；ghost 按钮时显示白色剪影） */
+.icon-home {
+  width: 40rpx;
+  height: 40rpx;
+  position: relative;
+  display: block;
+}
+/* 屋顶（三角形） */
+.icon-home::before {
+  content: '';
+  position: absolute;
+  top: 4rpx;
+  left: 50%;
+  width: 32rpx;
+  height: 16rpx;
+  transform: translateX(-50%);
+  background: #ffffff;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+/* 房身 */
+.icon-home::after {
+  content: '';
+  position: absolute;
+  top: 18rpx;
+  left: 50%;
+  width: 24rpx;
+  height: 16rpx;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border-radius: 0 0 3rpx 3rpx;
+  box-sizing: border-box;
+}
+
+/* 最后一页：按钮脉动提示 */
+.action-btn--pulse {
+  animation: actionPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes actionPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12), 0 0 0 0 rgba(24, 144, 255, 0.35);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12), 0 0 0 12rpx rgba(24, 144, 255, 0);
+  }
+}
+
+/* ============================================================
+ * 页码徽章（72rpx 高，与按钮完美对齐）
+ * ============================================================ */
+.page-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72rpx;
+  padding: 0 28rpx;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 36rpx;
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  color: #ffffff;
+  font-feature-settings: "tnum" 1;
+  line-height: 1;
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.18);
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.page-counter-hover {
+  transform: scale(0.95);
+}
+
+.page-counter .current {
+  font-size: 34rpx;
+  font-weight: 700;
+  letter-spacing: 0.5rpx;
+}
+
+.page-counter .separator {
+  font-size: 22rpx;
+  margin: 0 8rpx;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+}
+
+.page-counter .total {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+}
+
+/* ============================================================
+ * 音乐按钮（72rpx，与返回首页、页码同高同基线）
+ * ============================================================ */
+.music-btn {
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+}
+
+/* 播放时外圈蓝光呼吸 */
+.music-btn__glow {
+  position: absolute;
+  top: -10rpx;
+  left: -10rpx;
+  right: -10rpx;
+  bottom: -10rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(24, 144, 255, 0.35) 0%, rgba(24, 144, 255, 0) 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.music-btn.is-playing .music-btn__glow {
+  opacity: 1;
+  animation: glowPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.18); opacity: 1; }
+}
+
+/* 音乐图标图片：播放时旋转（旋转放在外层 view，<image> native 组件不一定支持 CSS transform） */
+.music-btn__spin {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.music-btn__spin.is-spin {
+  animation: musicSpin 6s linear infinite;
+}
+
+.music-btn__icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: block;
+}
+
+.music-btn__placeholder {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #1890ff;
+}
+
+.music-btn__placeholder-text {
+  line-height: 1;
+}
+
+@keyframes musicSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 暂停时（不旋转）—— 不需要动画类 */
+
+/* 未就绪时：半透明 + 进度环 */
+.music-btn.is-disabled {
+  opacity: 0.7;
+}
+
+.music-btn.is-loading {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.music-btn.is-loading::before {
+  content: '';
+  position: absolute;
+  top: -3rpx;
+  left: -3rpx;
+  right: -3rpx;
+  bottom: -3rpx;
+  border: 3rpx solid transparent;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* 播放中：轻微脉动 */
+.music-btn.is-playing {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ============================================================
+ * 首次进入提示：顶部居中气泡（4s 自动消失）
+ * ============================================================ */
+.hint-bubble {
+  position: fixed;
+  top: 200rpx;       /* 避开 status bar + 顶栏 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  padding: 12rpx 28rpx 12rpx 22rpx;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  border-radius: 36rpx;
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.2);
+  animation: hintFloat 4s ease-in-out forwards;
+  pointer-events: none;
+}
+
+.hint-bubble__dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #1890ff;
+  box-shadow: 0 0 12rpx rgba(24, 144, 255, 0.7);
+  margin-right: 12rpx;
+  animation: hintBlink 1.2s ease-in-out infinite;
+}
+
+.hint-bubble__text {
+  font-size: 24rpx;
+  letter-spacing: 1rpx;
+}
+
+/* ============================================================
+ * 左下角：返回上一页按钮
+ * ============================================================ */
+.back-btn {
+  position: fixed;
+  bottom: 80rpx;
+  left: 32rpx;
+  z-index: 150;
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  transition: transform 0.18s ease, box-shadow 0.25s ease;
+}
+
+.back-btn-hover {
+  transform: scale(0.9);
+}
+
+/* 左箭头：vant-icon 字体的 arrow-left unicode 字符 */
+.back-btn__arrow {
+  display: inline-block;
+  font-family: vant-icon, sans-serif;
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1;
+  margin-left: 4rpx;
+}
+
+@keyframes hintBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes hintFloat {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 16rpx);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10rpx);
+  }
+}
+
+/* ============================================================
+ * 加载 & 空状态
+ * ============================================================ */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  backdrop-filter: blur(10rpx);
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #e6e6e6;
+  border-top: 4rpx solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24rpx;
+}
+
+.loading-overlay text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.empty-state {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+/* ============================================================
+ * 小屏适配：64rpx
+ * ============================================================ */
+@media (max-width: 750rpx) {
+  .action-btn, .music-btn, .page-counter { height: 64rpx; }
+  .action-btn, .music-btn { width: 64rpx; }
+  .page-counter { padding: 0 22rpx; }
+  .page-counter .current { font-size: 30rpx; }
+  .music-btn__icon { width: 50rpx; height: 50rpx; }
+  .actions { gap: 12rpx; }
+}

@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "咨询详情",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "top-message": "/components/top-message/top-message"
+  }
+}

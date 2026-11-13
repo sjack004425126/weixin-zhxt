@@ -1,0 +1,134 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 头像提示条 + 处理中遮罩 -->
+  <include src="/utils/avatar-components.wxml" />
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <view class="avatar-container">
+        <view class="avatar-wrapper" bindtap="onAvatarTap">
+          <image class="avatar" src="{{avatarUrl || defaultAvatar}}" mode="aspectFill" binderror="onAvatarError"></image>
+          <view class="avatar-badge" wx:if="{{!hasAvatar}}">!</view>
+        </view>
+      </view>
+      <view class="info-wrap">
+        <view class="name-row">
+          <text class="name">{{userInfo.t_xm || '未登录'}}</text>
+          <view class="status-tag teacher">教师</view>
+        </view>
+        <view class="user-detail">
+          <van-icon name="contact" size="28rpx" />
+          <text>{{userInfo.t_yhm || '-'}}</text>
+        </view>
+        <view class="user-detail">
+          <van-icon name="phone" size="28rpx" />
+          <text>{{userInfo.t_dh || '-'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="function-list">
+    <!-- 功能占位 - 后续完善 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">教学管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="班级管理"
+          icon="cluster-o"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-class/open-teacher-class"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="学生管理"
+          icon="friends-o"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-student/open-teacher-student"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="毕业生登记表"
+          icon="orders-o"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-graduate/open-teacher-graduate"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="毕业证领取"
+          icon="certificate"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-diploma/open-teacher-diploma"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="书费退费查询"
+          icon="balance-o"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-refund/open-teacher-refund"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="信息核对"
+          icon="records"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-info-verify-list/open-teacher-info-verify-list"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="补考报考管理"
+          icon="todo-list-o"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-exam/open-teacher-exam"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="形势与政策"
+          icon="records"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-xsyzc/open-teacher-xsyzc"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="评阅管理"
+          icon="edit"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-review/open-teacher-review"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="新书自取地点"
+          icon="logistics"
+          is-link
+          data-url="/packageTeacher/pages/open-teacher-book-site/open-teacher-book-site"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
+    <!-- 设置 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">设置</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="退出登录"
+          icon="close"
+          is-link
+          bind:click="handleLogout"
+          title-class="logout-text"
+        />
+        <van-cell
+          title="系统版本：{{version}}"
+          icon=""
+          is-link
+        />
+      </van-cell-group>
+    </view>
+  </view>
+</view>

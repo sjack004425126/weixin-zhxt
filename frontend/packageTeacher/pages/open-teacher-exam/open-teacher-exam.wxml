@@ -1,0 +1,149 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><van-icon name="todo-list-o" size="40rpx" /></view>
+    <view class="header-text">
+      <view class="header-title">报考管理</view>
+      <view class="header-subtitle">Exam Registration</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+  </view>
+</view>
+
+<view class="container">
+  <view class="filter-bar">
+    <van-dropdown-menu>
+      <van-dropdown-item value="{{ selectedClassId }}" bind:change="onClassChange" options="{{ classOptions }}" />
+      <van-dropdown-item value="{{ statusFilter }}" bind:change="onStatusFilterChange" options="{{ statusOptions }}" />
+    </van-dropdown-menu>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <van-icon name="search" size="28rpx" color="#999" />
+    <input class="search-input" placeholder="搜索姓名、学号、电话" value="{{searchKeyword}}" bindinput="onSearchInput" confirm-type="search" />
+    <van-icon wx:if="{{searchKeyword}}" name="clear" size="28rpx" color="#ccc" bindtap="clearSearch" />
+  </view>
+
+  <view class="stats-bar" wx:if="{{!loading && stats.total > 0}}">
+    <view class="stats-row">
+      <view class="stats-item"><text class="stats-label">全班</text><text class="stats-value">{{stats.total}}</text></view>
+      <view class="stats-item has-fail"><text class="stats-label">需报考</text><text class="stats-value">{{stats.has_fail}}</text></view>
+      <view class="stats-item all-reg"><text class="stats-label">全报</text><text class="stats-value">{{stats.all_registered}}</text></view>
+      <view class="stats-item selected-info" wx:if="{{selectedCount > 0}}"><text class="stats-label">已选</text><text class="stats-value">{{selectedCount}}</text></view>
+    </view>
+    <view class="actions-row">
+      <view class="select-actions">
+        <view class="select-btn" bindtap="selectAll"><text>全选</text></view>
+        <view class="select-btn" bindtap="deselectAll"><text>清空</text></view>
+      </view>
+      <view class="sms-trigger" bindtap="openSmsPopup"><van-icon name="comment-o" size="28rpx" /><text>短信</text></view>
+    </view>
+  </view>
+
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+    <view wx:elif="{{!hasLoaded && !loading}}" class="empty-state"><van-empty description="请选择班级、状态或输入关键字进行筛选" /></view>
+    <view wx:elif="{{studentList.length === 0 && !loading}}" class="empty-state"><van-empty description="暂无需要报考的学生" /></view>
+    <view wx:else class="student-wall">
+      <view 
+        class="student-card status-{{item.status}} {{selectedMap[item.id] ? 'selected' : ''}}" 
+        wx:for="{{studentList}}" wx:key="id"
+        bindtap="toggleSelect" data-id="{{item.id}}"
+      >
+        <view class="card-badge badge-{{item.status}}">
+          <van-icon name="{{item.status === 'all_registered' ? 'passed' : item.status === 'partial' ? 'clock-o' : 'warning-o'}}" size="24rpx" />
+        </view>
+        <view class="card-name">{{item.xm}}</view>
+        <view class="card-count">{{item.fail_count}}科</view>
+        <view class="card-progress">{{item.registered_count}}/{{item.fail_count}}</view>
+        <view class="card-status tag-{{item.status}}">
+          {{item.status === 'all_registered' ? '已报' : item.status === 'partial' ? '部分' : '未报'}}
+        </view>
+        <view class="card-detail-link" catchtap="onCardTap" data-xh="{{item.xh}}" data-xm="{{item.xm}}">
+          <van-icon name="search" size="32rpx" color="#1890ff" />
+        </view>
+      </view>
+    </view>
+    <view class="load-more" wx:if="{{loadingMore}}"><van-loading size="20px">加载更多...</van-loading></view>
+    <view class="no-more" wx:if="{{noMore && studentList.length > 0}}"><text>— 已加载全部 —</text></view>
+  </view>
+</view>
+
+<!-- 科目详情弹窗 -->
+<van-popup show="{{showDetail}}" position="bottom" round closeable bind:close="onCloseDetail" custom-style="max-height: 70vh;">
+  <view class="detail-popup">
+    <view class="detail-title">{{detailName}} 不及格科目</view>
+    <view class="detail-list" wx:if="{{detailCourses.length > 0}}">
+      <view class="detail-item" wx:for="{{detailCourses}}" wx:key="kcid">
+        <view class="detail-left">
+          <view class="detail-kcmc">{{item.kcmc}}</view>
+          <view class="detail-score">成绩: {{item.zhcj || '无'}}</view>
+        </view>
+        <view class="detail-right">
+          <van-tag type="{{item.bk_status === '已支付' ? 'success' : item.bk_status === '未报考' ? 'default' : 'warning'}}" size="medium">{{item.bk_status}}</van-tag>
+        </view>
+      </view>
+    </view>
+    <van-loading wx:if="{{detailLoading}}" size="24px" vertical>加载中...</van-loading>
+  </view>
+</van-popup>
+
+<van-popup show="{{ showSmsPopup }}" position="bottom" round closeable bind:close="closeSmsPopup" custom-style="height: 70vh;">
+  <view class="sms-popup">
+    <view class="sms-header">
+      <view class="sms-header-icon">
+        <van-icon name="comment-o" size="40rpx" color="#E86433" />
+      </view>
+      <view class="sms-header-info">
+        <view class="sms-title">短信通知</view>
+        <view class="sms-subtitle">将发送给 {{selectedCount}} 名学生</view>
+      </view>
+    </view>
+    <view class="sms-input-wrap" wx:if="{{!smsHasBanned}}">
+      <view class="sms-input-label">短信内容</view>
+      <textarea class="sms-textarea" placeholder="请输入短信内容..." value="{{smsContent}}" bindinput="onSmsInput" maxlength="200" auto-height="{{false}}"></textarea>
+      <view class="sms-input-footer">
+        <view class="sms-tip">
+          <van-icon name="info-o" size="24rpx" color="#bbb" />
+          <text>内容将自动检测违禁词</text>
+        </view>
+        <view class="sms-count {{smsContent.length > 180 ? 'warn' : ''}}">{{smsContent.length}}/200</view>
+      </view>
+    </view>
+    <view class="sms-preview-wrap" wx:if="{{smsHasBanned}}">
+      <view class="sms-preview-header">
+        <van-icon name="warning-o" size="28rpx" color="#ff4d4f" />
+        <text class="sms-preview-label">检测到违禁词，请处理后再发送</text>
+      </view>
+      <view class="sms-preview-box">
+        <text wx:for="{{smsHighlightParts}}" wx:key="index" class="{{item.banned ? 'hl-banned' : 'hl-normal'}}">{{item.text}}</text>
+      </view>
+    </view>
+    <view class="banned-list-wrap" wx:if="{{smsHasBanned}}">
+      <view class="banned-list-title">违禁词处理：</view>
+      <view class="banned-item" wx:for="{{bannedHandleList}}" wx:key="word">
+        <view class="banned-item-header">
+          <text class="banned-item-word">{{item.word}}</text>
+          <view class="banned-action-toggle">
+            <text class="toggle-opt {{item.action === 'delete' ? 'active' : ''}}" bindtap="onBannedActionChange" data-idx="{{index}}">删除</text>
+            <text class="toggle-opt {{item.action === 'replace' ? 'active' : ''}}" bindtap="onBannedActionChange" data-idx="{{index}}">替换</text>
+          </view>
+        </view>
+        <view class="banned-replace-row" wx:if="{{item.action === 'replace'}}">
+          <input class="banned-replace-input" placeholder="替换为..." value="{{item.replacement}}" bindinput="onBannedReplacementInput" data-idx="{{index}}" />
+        </view>
+      </view>
+    </view>
+    <view class="sms-footer">
+      <view class="sms-btn-row" wx:if="{{smsHasBanned}}">
+        <van-button type="default" custom-class="sms-btn-half" bind:click="onBackToEdit" icon="arrow-left">返回编辑</van-button>
+        <van-button type="warning" custom-class="sms-btn-half" bind:click="applyBannedHandle" icon="passed">应用修改</van-button>
+      </view>
+      <van-button wx:else type="warning" block round loading="{{smsSending}}" disabled="{{smsSending || smsContent.length === 0}}" bind:click="sendSms" custom-style="height: 88rpx; font-size: 30rpx; font-weight: 600;">
+        发送短信
+      </van-button>
+    </view>
+  </view>
+</van-popup>

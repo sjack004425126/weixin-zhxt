@@ -1,0 +1,144 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 切换身份按钮 -->
+  <view class="switch-role-btn" bindtap="goToUserCenter">
+    <view class="switch-role-icon">
+      <van-icon name="exchange" size="18rpx" color="#E86433" />
+    </view>
+    <text>切换身份</text>
+  </view>
+
+  <view class="login-box">
+    <!-- 学校标识 -->
+    <view class="school-badge university">
+      <view class="badge-icon"><van-icon name="certificate" size="28rpx" color="#fff" /></view>
+      <view class="badge-text">开放学生端</view>
+    </view>
+    <!-- 标题 -->
+    <view class="title">黔东南开大-智慧教务平台</view>
+
+    <!-- 登录方式切换 -->
+    <view class="login-type">
+      <view
+        class="type-icon {{loginType === 'password' ? 'active' : ''}}"
+        bindtap="switchLoginType"
+        data-type="password"
+      >
+        <van-icon name="lock" size="48rpx" />
+      </view>
+      <view
+        class="type-icon {{loginType === 'quick' ? 'active' : ''}}"
+        bindtap="switchLoginType"
+        data-type="quick"
+      >
+        <van-icon name="phone-o" size="48rpx" />
+      </view>
+      <view
+        class="type-icon {{loginType === 'phone' ? 'active' : ''}}"
+        bindtap="switchLoginType"
+        data-type="phone"
+      >
+        <van-icon name="chat-o" size="48rpx" />
+      </view>
+    </view>
+
+    <!-- 手机号登录表单 -->
+    <view class="login-form" wx:if="{{loginType === 'phone'}}">
+      <view class="custom-input-cell">
+        <van-icon name="phone-o" size="40rpx" color="#E86433" class="custom-input-icon" />
+        <input
+          class="custom-input"
+          value="{{ phone }}"
+          placeholder="请输入手机号"
+          type="number"
+          maxlength="11"
+          bindinput="onPhoneChange"
+        />
+      </view>
+      <view class="verify-code-field">
+        <view class="custom-input-cell" style="flex:1;margin-bottom:30rpx;">
+          <van-icon name="shield-o" size="40rpx" color="#E86433" class="custom-input-icon" />
+          <input
+            class="custom-input"
+            value="{{ verifyCode }}"
+            placeholder="请输入验证码"
+            type="number"
+            maxlength="6"
+            bindinput="onVerifyCodeChange"
+          />
+        </view>
+        <van-button
+          size="small"
+          type="primary"
+          color="{{canSendCode ? '#E86433' : '#999'}}"
+          bind:click="sendVerifyCode"
+          disabled="{{!canSendCode}}"
+        >{{sendCodeText}}</van-button>
+      </view>
+      <van-button
+        type="primary"
+        block
+        color="linear-gradient(135deg, #E86433, #FFB067)"
+        bind:click="handlePhoneLogin"
+      >登录</van-button>
+    </view>
+
+    <!-- 快捷登录 -->
+    <view class="login-form" wx:if="{{loginType === 'quick'}}">
+      <view class="quick-login-tip">请使用手机号快捷登录</view>
+      <button
+        class="phone-login-btn"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="getPhoneNumber"
+      >
+        <van-icon name="phone-o" size="36rpx" />
+        手机号快捷登录
+      </button>
+    </view>
+
+    <!-- 密码登录表单 -->
+    <view class="login-form" wx:if="{{loginType === 'password'}}">
+      <view class="custom-input-cell">
+        <van-icon name="user-o" size="40rpx" color="#E86433" class="custom-input-icon" />
+        <input
+          class="custom-input"
+          value="{{ username }}"
+          placeholder="请输入用户名"
+          bindinput="onUsernameChange"
+        />
+      </view>
+      <view class="custom-input-cell">
+        <van-icon name="closed-eye" size="40rpx" color="#E86433" class="custom-input-icon" />
+        <input
+          class="custom-input"
+          value="{{ password }}"
+          type="password"
+          placeholder="请输入密码"
+          bindinput="onPasswordChange"
+        />
+      </view>
+      <van-button
+        type="primary"
+        block
+        color="linear-gradient(135deg, #E86433, #FFB067)"
+        bind:click="handlePasswordLogin"
+      >登录</van-button>
+    </view>
+
+    <!-- 底部协议 -->
+    <view class="agreement">
+      <checkbox-group bindchange="handleAgreeChange">
+        <checkbox value="agree" checked="{{isAgree}}">我已阅读并同意</checkbox>
+      </checkbox-group>
+      <view class="agreement-links">
+        <text class="link" bindtap="navigateToUserAgreement">《用户协议》</text>
+        <text>和</text>
+        <text class="link" bindtap="navigateToPrivacyPolicy">《隐私政策》</text>
+      </view>
+      <view class="version">
+        <text>版本：{{version}}</text>
+      </view>
+    </view>
+  </view>
+</view>

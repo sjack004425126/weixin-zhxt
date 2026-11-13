@@ -1,0 +1,102 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view wx:if="{{loading}}" class="loading-tip">
+  <van-icon name="loading" size="36rpx" color="#1890FF" />
+  <text>加载中...</text>
+</view>
+
+<block wx:else>
+  <!-- 顶部状态条 -->
+  <view class="exam-topbar">
+    <view class="topbar-left">
+      <text class="topbar-title">{{exam.title || '考试中'}}</text>
+    </view>
+    <view class="topbar-mid">
+      <text class="topbar-progress">{{currentIndex + 1}}/{{questions.length}}</text>
+    </view>
+    <view class="topbar-right">
+      <text class="topbar-time">{{countdownStr}}</text>
+    </view>
+  </view>
+
+  <!-- 题目卡 -->
+  <view wx:if="{{questions[currentIndex]}}" class="question-card">
+    <view class="q-header">
+      <text class="q-type">{{questions[currentIndex].type}}</text>
+      <text class="q-order">第 {{questions[currentIndex].order}} 题</text>
+      <text class="q-score">{{questions[currentIndex].score}} 分</text>
+    </view>
+
+    <view class="q-content">
+      <text>{{questions[currentIndex].content}}</text>
+    </view>
+
+    <!-- 选项：单选/判断 -->
+    <block wx:if="{{questions[currentIndex].type === '单选题' || questions[currentIndex].type === '判断题'}}">
+      <view
+        wx:for="{{questions[currentIndex].options}}"
+        wx:key="id"
+        class="q-option {{item.selected ? 'option-selected' : ''}}"
+        data-qindex="{{currentIndex}}"
+        data-oindex="{{index}}"
+        bindtap="selectOption"
+      >
+        <text class="option-label">{{item.label}}</text>
+        <text class="option-content">{{item.content}}</text>
+      </view>
+    </block>
+
+    <!-- 选项：多选 -->
+    <block wx:elif="{{questions[currentIndex].type === '多选题'}}">
+      <view
+        wx:for="{{questions[currentIndex].options}}"
+        wx:key="id"
+        class="q-option {{item.selected ? 'option-selected' : ''}}"
+        data-qindex="{{currentIndex}}"
+        data-oindex="{{index}}"
+        bindtap="toggleMultiOption"
+      >
+        <text class="option-label">{{item.label}}</text>
+        <text class="option-content">{{item.content}}</text>
+        <text wx:if="{{item.selected}}" class="option-mark">✓</text>
+      </view>
+    </block>
+
+    <!-- 填空/简答 -->
+    <block wx:else>
+      <textarea
+        class="q-textarea"
+        placeholder="请输入答案"
+        value="{{questions[currentIndex].answerText}}"
+        data-qindex="{{currentIndex}}"
+        bindinput="onTextInput"
+        maxlength="-1"
+      />
+    </block>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="exam-bottom">
+    <view class="btn-nav" bindtap="prevQuestion">上一题</view>
+    <view class="btn-nav btn-card" bindtap="goToQuestion" data-index="{{questions.length - 1}}">答题卡</view>
+    <view class="btn-nav" bindtap="nextQuestion">下一题</view>
+    <view class="btn-nav btn-submit" bindtap="submitPaper">交卷</view>
+  </view>
+
+  <!-- 答题卡浮层 -->
+  <view class="answer-card-mask" wx:if="{{false}}" bindtap="">
+    <view class="answer-card">
+      <view class="card-title">答题卡</view>
+      <view class="card-grid">
+        <view
+          wx:for="{{questions}}"
+          wx:key="id"
+          class="card-cell {{index === currentIndex ? 'cell-current' : ''}} {{item.answered ? 'cell-answered' : ''}}"
+          data-index="{{index}}"
+          bindtap="goToQuestion"
+        >{{item.order}}</view>
+      </view>
+    </view>
+  </view>
+</block>

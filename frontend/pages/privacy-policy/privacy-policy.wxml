@@ -1,0 +1,53 @@
+<view class="container">
+  <view class="title">隐私政策</view>
+  <view class="content">
+    <view class="section">
+      <view class="section-title">1. 信息收集</view>
+      <view class="section-content">
+        <text>1.1 为了提供服务，我们会收集以下信息：</text>
+        <text>• 您的基本信息（如姓名、学号）</text>
+        <text>• 您的联系方式</text>
+        <text>• 您的课程信息</text>
+        <text>• 支付相关信息</text>
+        <text>1.2 我们承诺只收集必要的信息，并采取严格的保护措施。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">2. 信息使用</view>
+      <view class="section-content">
+        <text>2.1 我们使用收集的信息用于：</text>
+        <text>• 提供补考缴费服务</text>
+        <text>• 身份验证</text>
+        <text>• 客户服务</text>
+        <text>• 系统维护和优化</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">3. 信息保护</view>
+      <view class="section-content">
+        <text>3.1 我们采用业界标准的安全技术来保护您的信息。</text>
+        <text>3.2 我们不会将您的信息出售、出租或以其他方式提供给任何第三方。</text>
+        <text>3.3 只有经过授权的工作人员才能访问您的信息。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">4. 信息存储</view>
+      <view class="section-content">
+        <text>4.1 我们会在中华人民共和国境内存储您的信息。</text>
+        <text>4.2 我们会在必要的期限内保存您的信息。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">5. 您的权利</view>
+      <view class="section-content">
+        <text>5.1 您有权查询、更正您的个人信息。</text>
+        <text>5.2 您有权删除您的账号。</text>
+        <text>5.3 您有权拒绝我们使用您的信息进行营销。</text>
+      </view>
+    </view>
+  </view>
+</view> 

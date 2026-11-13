@@ -1,0 +1,450 @@
+<view class="container">
+
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-badge" wx:if="{{headerBadge}}">
+      <text class="header-badge-text">{{headerBadge}}</text>
+    </view>
+    <view class="header-title" wx:for="{{headerTitles}}" wx:key="index">{{item}}</view>
+    <view class="header-subtitle" wx:if="{{headerSubtitle}}">{{headerSubtitle}}</view>
+    <!-- 刷新字典按钮：当本地缓存的姓名/高校/专业字典与服务端不一致时手动拉最新 -->
+    <view class="header-refresh" bindtap="refreshDicts">
+      <van-icon name="replay" size="28rpx" color="#1a56db" />
+      <text class="header-refresh-text">刷新字典</text>
+    </view>
+  </view>
+
+  <view class="form-container">
+
+    <!-- ===== 卡片1：基本信息 ===== -->
+    <view class="form-card">
+      <view class="section-header">
+        <view class="section-icon"><van-icon name="manager-o" size="32rpx" color="#1a56db" /></view>
+        <view>
+          <view class="section-title">基本信息</view>
+          <view class="section-desc">请准确填写本人信息</view>
+        </view>
+      </view>
+      <view class="form-body">
+
+        <!-- Q1 姓名 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">您的姓名（请搜索本人姓名）</text><text class="required-mark">*</text></view>
+          <view class="picker-content {{formData.student_no ? 'selected' : ''}}" bindtap="showStudentPopup">
+            <text>{{selectedStudentText || '点击选择本人'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </view>
+
+        <!-- Q2 手机号 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">手机号码</text><text class="required-mark">*</text></view>
+          <input class="form-input {{focusField === 'phone' ? 'focused' : ''}}" placeholder="请输入11位手机号" type="number" maxlength="11" value="{{formData.phone}}" bindinput="onPhoneInput" bindfocus="onInputFocus" bindblur="onInputBlur" data-field="phone" />
+        </view>
+
+        <!-- Q3 是否精准服务 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">是否精准服务</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{yesnoOptions}}" range-key="label" bindchange="bindPicker" data-field="precise_service" data-options="yesnoOptions" data-textfield="">
+            <view class="picker-content {{formData.precise_service ? 'selected' : ''}}">
+              <text>{{formData.precise_service === '1' ? '是' : (formData.precise_service === '2' ? '否' : '请选择')}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- Q4 毕业去向 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">您的毕业去向</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{destinationOptions}}" range-key="label" bindchange="bindPicker" data-field="destination" data-options="destinationOptions" data-textfield="selectedDestinationText">
+            <view class="picker-content {{formData.destination ? 'selected' : ''}}">
+              <text>{{selectedDestinationText || '请选择毕业去向'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- ===== 卡片2：应征义务兵 (destination=2) ===== -->
+    <view class="form-card" wx:if="{{formData.destination === '2'}}">
+      <view class="section-header">
+        <view class="section-icon"><van-icon name="medal-o" size="32rpx" color="#1a56db" /></view>
+        <view>
+          <view class="section-title">应征义务兵信息</view>
+        </view>
+      </view>
+      <view class="form-body">
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">征兵办公室全称</text><text class="required-mark">*</text></view>
+          <input class="form-input" placeholder="请输入征兵办公室全称" value="{{formData.military_office}}" bindinput="onTextInput" data-field="military_office" />
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 卡片3：升学信息 (destination=5,6,7,8) ===== -->
+    <view class="form-card" wx:if="{{formData.destination === '5' || formData.destination === '6' || formData.destination === '7' || formData.destination === '8'}}">
+      <view class="section-header">
+        <view class="section-icon"><van-icon name="bookmark-o" size="32rpx" color="#1a56db" /></view>
+        <view>
+          <view class="section-title">升学信息</view>
+        </view>
+      </view>
+      <view class="form-body">
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">升学层次</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{eduLevelOptions}}" range-key="label" bindchange="bindPicker" data-field="education_level" data-options="eduLevelOptions" data-textfield="selectedEduLevelText">
+            <view class="picker-content {{formData.education_level ? 'selected' : ''}}">
+              <text>{{selectedEduLevelText || '请选择升学层次'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">录取高校名称</text><text class="required-mark">*</text></view>
+          <view class="picker-content {{formData.college_code ? 'selected' : ''}}" bindtap="showCollegePopup">
+            <text>{{selectedCollegeText || '请选择录取高校'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">录取专业名称</text><text class="required-mark">*</text></view>
+          <view class="picker-content {{formData.major_code ? 'selected' : ''}}" bindtap="showMajorPopup">
+            <text>{{selectedMajorText || '请选择录取专业'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">录取分数</text><text class="required-mark">*</text></view>
+          <input class="form-input" placeholder="请输入录取分数" value="{{formData.admission_score}}" bindinput="onTextInput" data-field="admission_score" />
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 卡片4：就业信息 (destination=1 / 3 / 4)，按原始 jumpto 显示 ===== -->
+    <view class="form-card" wx:if="{{formData.destination === '1' || formData.destination === '3' || formData.destination === '4'}}">
+      <view class="section-header">
+        <view class="section-icon"><van-icon name="bag-o" size="32rpx" color="#1a56db" /></view>
+        <view>
+          <view class="section-title">就业信息</view>
+        </view>
+      </view>
+      <view class="form-body">
+
+        <!-- Q10 合同：仅 destination=1 -->
+        <view class="form-item" wx:if="{{formData.destination === '1'}}">
+          <view class="form-label"><text class="label-text">合同/协议签订情况</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{contractOptions}}" range-key="label" bindchange="bindPicker" data-field="contract_type" data-options="contractOptions" data-textfield="selectedContractText">
+            <view class="picker-content {{formData.contract_type ? 'selected' : ''}}">
+              <text>{{selectedContractText || '请选择合同年限'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- Q11 就业渠道：仅 destination=1 -->
+        <view class="form-item" wx:if="{{formData.destination === '1'}}">
+          <view class="form-label"><text class="label-text">就业渠道</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{channelOptions}}" range-key="label" bindchange="bindPicker" data-field="employment_channel" data-options="channelOptions" data-textfield="selectedChannelText">
+            <view class="picker-content {{formData.employment_channel ? 'selected' : ''}}">
+              <text>{{selectedChannelText || '请选择就业渠道'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- Q12 工作单位：destination=1 / 3 -->
+        <view class="form-item" wx:if="{{formData.destination === '1' || formData.destination === '3'}}">
+          <view class="form-label"><text class="label-text">工作单位名称</text><text class="required-mark">*</text></view>
+          <input class="form-input" placeholder="请输入工作单位名称" value="{{formData.company_name}}" bindinput="onTextInput" data-field="company_name" />
+        </view>
+
+        <!-- Q13 省份/城市/区县：destination=1 / 3 -->
+        <view class="form-item" wx:if="{{formData.destination === '1' || formData.destination === '3'}}">
+          <view class="form-label"><text class="label-text">单位所在省份/城市</text><text class="required-mark">*</text></view>
+          <view class="picker-content {{formData.work_province_city ? 'selected' : ''}}" bindtap="openAreaPopup">
+            <text>{{formData.work_province_city || '请选择省/市/区'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </view>
+
+        <!-- Q14 详细地址：destination=1 / 3 -->
+        <view class="form-item" wx:if="{{formData.destination === '1' || formData.destination === '3'}}">
+          <view class="form-label"><text class="label-text">单位详细地址</text><text class="required-mark">*</text></view>
+          <input class="form-input" placeholder="请输入单位详细地址" value="{{formData.work_address}}" bindinput="onTextInput" data-field="work_address" />
+        </view>
+
+        <!-- Q15 单位性质：destination=1 / 3 -->
+        <view class="form-item" wx:if="{{formData.destination === '1' || formData.destination === '3'}}">
+          <view class="form-label"><text class="label-text">单位性质</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{natureOptions}}" range-key="label" bindchange="bindPicker" data-field="company_nature" data-options="natureOptions" data-textfield="selectedNatureText">
+            <view class="picker-content {{formData.company_nature ? 'selected' : ''}}">
+              <text>{{selectedNatureText || '请选择单位性质'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- Q16 行业：destination=1 / 3 / 4 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">所处行业</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{industryOptions}}" range-key="label" bindchange="bindPicker" data-field="industry" data-options="industryOptions" data-textfield="selectedIndustryText">
+            <view class="picker-content {{formData.industry ? 'selected' : ''}}">
+              <text>{{selectedIndustryText || '请选择所处行业'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- Q17 岗位：1 / 3 / 4 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">工作岗位</text><text class="required-mark">*</text></view>
+          <input class="form-input" placeholder="请输入工作岗位（如：销售、客服等）" value="{{formData.position_name}}" bindinput="onTextInput" data-field="position_name" />
+        </view>
+
+        <!-- Q18 月薪：1 / 3 / 4 -->
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">当前月薪（元）</text><text class="required-mark">*</text></view>
+          <input class="form-input" type="number" placeholder="请填写阿拉伯数字，无工作填0" value="{{formData.monthly_salary}}" bindinput="onTextInput" data-field="monthly_salary" />
+        </view>
+
+      </view>
+    </view>
+
+    <!-- ===== 卡片5：就业凭证上传（destination 1-8 显示，9/10/11 隐藏） ===== -->
+    <view class="form-card" wx:if="{{formData.destination && formData.destination !== '9' && formData.destination !== '10' && formData.destination !== '11'}}">
+      <view class="section-header">
+        <view class="section-icon"><van-icon name="photograph" size="32rpx" color="#1a56db" /></view>
+        <view>
+          <view class="section-title">就业凭证 <text class="required-mark">*</text></view>
+          <view class="section-desc">合同/入伍凭证/营业执照/录取通知书</view>
+        </view>
+      </view>
+      <view class="form-body">
+        <view class="upload-box" bindtap="{{certificateUrlDisplay ? '' : 'chooseFile'}}">
+          <view class="upload-placeholder" wx:if="{{!certificateUrlDisplay}}">
+            <van-icon name="photograph" size="56rpx" color="#c5cee0" />
+            <text class="upload-placeholder-text">点击上传图片凭证</text>
+          </view>
+          <block wx:else>
+            <image class="upload-preview" src="{{certificateUrlDisplay}}" mode="aspectFill" catchtap="previewUploadedImage" data-src="{{certificateUrlDisplay}}" />
+            <view class="upload-delete" catchtap="deleteFile">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+            <view class="upload-redo" catchtap="chooseFile">
+              <van-icon name="replay" size="24rpx" color="#fff" />
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 卡片6：满意度与建议 ===== -->
+    <view class="form-card" wx:if="{{formData.destination}}">
+      <view class="section-header">
+        <view class="section-icon"><van-icon name="comment-o" size="32rpx" color="#1a56db" /></view>
+        <view>
+          <view class="section-title">满意度与建议</view>
+        </view>
+      </view>
+      <view class="form-body">
+
+        <!-- Q20 满意度：仅 destination 1-8 -->
+        <view class="form-item" wx:if="{{formData.destination !== '9' && formData.destination !== '10' && formData.destination !== '11'}}">
+          <view class="form-label"><text class="label-text">对当前就业现状是否满意</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{satisfactionOptions}}" range-key="label" bindchange="bindPicker" data-field="satisfaction" data-options="satisfactionOptions" data-textfield="selectedSatisfactionText">
+            <view class="picker-content {{formData.satisfaction ? 'selected' : ''}}">
+              <text>{{selectedSatisfactionText || '请选择满意度'}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- Q21 推荐：destination=10 跳过 -->
+        <view class="form-item" wx:if="{{formData.destination !== '10'}}">
+          <view class="form-label"><text class="label-text">是否需要学校进行就业推荐</text><text class="required-mark">*</text></view>
+          <picker mode="selector" range="{{yesnoOptions}}" range-key="label" bindchange="bindPicker" data-field="need_recommendation" data-options="yesnoOptions" data-textfield="">
+            <view class="picker-content {{formData.need_recommendation ? 'selected' : ''}}">
+              <text>{{formData.need_recommendation === '1' ? '是' : (formData.need_recommendation === '2' ? '否' : '请选择')}}</text>
+              <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label"><text class="label-text">其他意见或建议</text><text class="required-mark">*</text></view>
+          <textarea class="form-textarea" placeholder="如果没有请填“无”" value="{{formData.feedback}}" bindinput="onTextInput" data-field="feedback" maxlength="500" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn {{canSubmit ? 'active' : 'disabled'}}" bindtap="submitForm" disabled="{{!canSubmit || isSubmitting}}">{{isSubmitting ? '提交中...' : '提交调查'}}</button>
+      <view class="submit-hint" wx:if="{{!canSubmit}}">请填写完所有必填项后提交</view>
+    </view>
+
+  </view>
+
+  <!-- ===== 学生选择弹窗 ===== -->
+  <van-popup show="{{showStudentPopup}}" position="bottom" round bind:close="closeStudentPopup" custom-style="height: 70vh;">
+    <view class="popup-wrap">
+      <view class="popup-header">
+        <text class="popup-title">{{studentDetail ? '确认本人信息' : '选择本人'}}</text>
+        <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeStudentPopup" />
+      </view>
+
+      <!-- 模式 A：搜索列表 -->
+      <block wx:if="{{!studentDetail}}">
+        <view class="search-section">
+          <view class="search-box">
+            <van-icon name="search" size="28rpx" color="#9ca3af" />
+            <input class="search-input" placeholder="请输入姓名或学号搜索" value="{{studentKeyword}}" bindinput="onStudentSearch" />
+          </view>
+        </view>
+        <scroll-view class="popup-list" scroll-y bindscrolltolower="onStudentScrollLower" bindscroll="onListScroll" data-list="student" lower-threshold="300" throttle="{{false}}">
+          <view wx:if="{{studentLoading}}" class="empty-state loading-text">加载中...</view>
+          <view wx:elif="{{studentList.length === 0}}" class="empty-state">
+            <van-empty description="{{studentKeyword ? '未找到匹配的学生' : (studentTotal ? '加载中...' : '暂无可选学生')}}" />
+          </view>
+          <view wx:elif="{{studentDetailLoading}}" class="empty-state loading-text">正在加载学生详情...</view>
+          <block wx:else>
+            <view class="student-item" wx:for="{{studentList}}" wx:key="xs_xh" bindtap="selectStudent" data-xh="{{item.xs_xh}}">
+              <view class="student-name">{{item.xs_xm}}</view>
+              <view class="student-meta">{{item.xs_xh}}</view>
+            </view>
+            <view wx:if="{{studentHasMore}}" class="list-truncate-tip">上拉加载更多·已显示 {{studentList.length}}/{{studentKeyword ? studentList.length : studentTotal}} 条</view>
+            <view wx:else class="list-truncate-tip">已显示全部 {{studentList.length}} 条</view>
+          </block>
+        </scroll-view>
+      </block>
+
+      <!-- 模式 B：确认本人 -->
+      <block wx:else>
+        <view class="confirm-card">
+          <view class="confirm-row"><text class="confirm-label">姓名</text><text class="confirm-value">{{studentDetail.xs_xm}}</text></view>
+          <view class="confirm-row"><text class="confirm-label">学号</text><text class="confirm-value">{{studentDetail.xs_xh}}</text></view>
+          <view class="confirm-row"><text class="confirm-label">性别</text><text class="confirm-value">{{studentDetail.xs_xb || '—'}}</text></view>
+          <view class="confirm-row"><text class="confirm-label">班级</text><text class="confirm-value">{{studentDetail.bj_mc || '—'}}</text></view>
+          <view class="confirm-row"><text class="confirm-label">班主任</text><text class="confirm-value">{{studentDetail.bzr || '—'}}</text></view>
+          <view class="confirm-row"><text class="confirm-label">身份证</text><text class="confirm-value">{{studentDetail.xs_sfzh || '—'}}</text></view>
+        </view>
+        <view class="confirm-actions">
+          <button class="btn-secondary" bindtap="backStudentList">返回重新选择</button>
+          <button class="btn-primary" bindtap="confirmStudent">就是本人</button>
+        </view>
+      </block>
+    </view>
+  </van-popup>
+
+  <!-- ===== 高校选择弹窗 ===== -->
+  <van-popup show="{{showCollegePopup}}" position="bottom" round bind:close="closeCollegePopup" custom-style="height: 80vh;">
+    <view class="popup-wrap">
+      <view class="popup-header">
+        <text class="popup-title">选择录取高校</text>
+        <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeCollegePopup" />
+      </view>
+      <view class="search-section">
+        <view class="search-box">
+          <van-icon name="search" size="28rpx" color="#9ca3af" />
+          <input class="search-input" placeholder="搜索学校名称 / 省份" value="{{collegeKeyword}}" bindinput="onCollegeSearch" />
+        </view>
+      </view>
+      <view class="custom-input-bar">
+        <input class="form-input" placeholder="找不到？手动输入高校名称" value="{{collegeCustomInput}}" bindinput="onCollegeCustomInput" />
+        <view class="custom-confirm-btn" bindtap="confirmCustomCollege">确定</view>
+      </view>
+      <view class="custom-tip">列表按省份排序，可滑动查找</view>
+      <scroll-view class="popup-list" scroll-y bindscrolltolower="onCollegeScrollLower" bindscroll="onListScroll" data-list="college" lower-threshold="300">
+        <view wx:if="{{collegeGrouped.length === 0}}" class="empty-state">
+          <van-empty description="未找到匹配的高校，可在上方手动输入" />
+        </view>
+        <block wx:for="{{collegeGrouped}}" wx:key="province" wx:for-item="grp">
+          <view class="province-header">{{grp.province}} ({{grp.items.length}})</view>
+          <view class="dict-item {{formData.college_code === item.code ? 'active' : ''}}"
+                wx:for="{{grp.items}}" wx:key="code" wx:for-item="item"
+                bindtap="selectCollege" data-code="{{item.code}}">
+            <view>
+              <text>{{item.label}}</text>
+              <text wx:if="{{item.level}}" class="dict-item-meta">{{item.level}}</text>
+            </view>
+            <van-icon wx:if="{{formData.college_code === item.code}}" name="success" size="32rpx" color="#1a56db" />
+          </view>
+        </block>
+        <view wx:if="{{collegeGrouped.length > 0 && collegeHasMore}}" class="list-truncate-tip">上拉加载更多</view>
+        <view wx:elif="{{collegeGrouped.length > 0}}" class="list-truncate-tip">已显示全部</view>
+      </scroll-view>
+    </view>
+  </van-popup>
+
+  <!-- ===== 专业选择弹窗 ===== -->
+  <van-popup show="{{showMajorPopup}}" position="bottom" round bind:close="closeMajorPopup" custom-style="height: 80vh;">
+    <view class="popup-wrap">
+      <view class="popup-header">
+        <text class="popup-title">选择录取专业</text>
+        <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeMajorPopup" />
+      </view>
+      <view class="search-section">
+        <view class="search-box">
+          <van-icon name="search" size="28rpx" color="#9ca3af" />
+          <input class="search-input" placeholder="搜索专业名称 / 代码" value="{{majorKeyword}}" bindinput="onMajorSearch" />
+        </view>
+      </view>
+      <view class="custom-input-bar">
+        <input class="form-input" placeholder="找不到？手动输入专业名称" value="{{majorCustomInput}}" bindinput="onMajorCustomInput" />
+        <view class="custom-confirm-btn" bindtap="confirmCustomMajor">确定</view>
+      </view>
+      <scroll-view class="popup-list" scroll-y bindscrolltolower="onMajorScrollLower" bindscroll="onListScroll" data-list="major" lower-threshold="300">
+        <view wx:if="{{majorListFiltered.length === 0}}" class="empty-state">
+          <van-empty description="未找到匹配的专业，可在上方手动输入" />
+        </view>
+        <view class="dict-item {{formData.major_code === item.code ? 'active' : ''}}"
+              wx:for="{{majorListFiltered}}" wx:key="code"
+              bindtap="selectMajor" data-code="{{item.code}}">
+          <text>{{item.label}}</text>
+          <van-icon wx:if="{{formData.major_code === item.code}}" name="success" size="32rpx" color="#1a56db" />
+        </view>
+        <view wx:if="{{majorListFiltered.length > 0 && majorHasMore}}" class="list-truncate-tip">上拉加载更多·已显示 {{majorListFiltered.length}} 条</view>
+        <view wx:elif="{{majorListFiltered.length > 0}}" class="list-truncate-tip">已显示全部 {{majorListFiltered.length}} 条</view>
+      </scroll-view>
+    </view>
+  </van-popup>
+
+  <!-- ===== 省/市/区 地址选择弹窗 ===== -->
+  <van-popup show="{{showAreaPopup}}" position="bottom" round bind:close="closeAreaPopup" custom-style="height: 60vh;">
+    <van-area
+      area-list="{{areaList}}"
+      value="{{areaCode}}"
+      title="选择单位所在地区"
+      columns-num="3"
+      bind:confirm="onAreaConfirm"
+      bind:cancel="closeAreaPopup"
+    />
+  </van-popup>
+
+</view>
+
+
+<!-- ===== 提交成功弹窗 ===== -->
+<view class="success-modal-mask" wx:if="{{showSuccessModal}}" catchtouchmove="true">
+  <view class="success-modal-card">
+    <view class="success-modal-icon">✓</view>
+    <view class="success-modal-title">提交成功</view>
+    <view class="success-modal-desc">感谢您的填写</view>
+    
+    <view class="success-modal-code-section" wx:if="{{successQueryCode}}">
+      <view class="success-modal-code-label">您的查询码</view>
+      <view class="success-modal-code-value">{{successQueryCode}}</view>
+      <view class="success-modal-code-hint">已通过短信发送至您手机，凭此码可查看和修改信息</view>
+    </view>
+    
+    <view class="success-modal-actions">
+      <button class="success-modal-copy-btn" bindtap="copySuccessQueryCode" wx:if="{{successQueryCode}}">复制查询码</button>
+      <button class="success-modal-close-btn" bindtap="closeSuccessModal">关闭</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,213 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/icon-test/icon-test",
+    "pages/icon-isolate/icon-isolate",
+    "pages/login-icons-test/login-icons-test",
+    "pages/kf-chat/kf-chat",
+    "pages/user-center/user-center",
+    "pages/SmartTeacher/SmartTeacher",
+    "pages/login/login",
+    "pages/enrollment-webview/enrollment-webview",
+    "pages/intro/intro",
+    "pages/enroll/enroll",
+    "pages/courses/courses",
+    "pages/user-agreement/user-agreement",
+    "pages/privacy-policy/privacy-policy",
+    "pages/meter-recharge/meter-recharge"
+  ],
+  "subPackages": [
+    {
+      "root": "packageVocational",
+      "name": "vocational",
+      "pages": [
+        "pages/vocational-enroll/vocational-enroll",
+        "pages/vocational-login/vocational-login",
+        "pages/vocational-my/vocational-my",
+        "pages/vocational-tuition/vocational-tuition",
+        "pages/vocational-info/vocational-info",
+        "pages/vocational-info-verify/vocational-info-verify",
+        "pages/vocational-club-courses/vocational-club-courses",
+        "pages/vocational-zzbm/vocational-zzbm",
+        "pages/vocational-new-payment/vocational-new-payment",
+        "pages/vocational-payment-confirm/vocational-payment-confirm",
+        "pages/vocational-stay/vocational-stay",
+        "pages/vocational-card/vocational-card",
+        "pages/vocational-counsel-list/vocational-counsel-list",
+        "pages/vocational-counsel-detail/vocational-counsel-detail"
+      ]
+    },
+    {
+      "root": "packageTeacher",
+      "name": "teacher",
+      "pages": [
+        "pages/vocational-teacher-login/vocational-teacher-login",
+        "pages/vocational-teacher-home/vocational-teacher-home",
+        "pages/vocational-teacher-leave/vocational-teacher-leave",
+        "pages/vocational-teacher-leave-detail/vocational-teacher-leave-detail",
+        "pages/vocational-teacher-photo/vocational-teacher-photo",
+        "pages/vocational-teacher-club-stats/vocational-teacher-club-stats",
+        "pages/vocational-teacher-dormitory/vocational-teacher-dormitory",
+        "pages/vocational-teacher-stay/vocational-teacher-stay",
+        "pages/vocational-teacher-counsel-detail/vocational-teacher-counsel-detail",
+        "pages/open-teacher-login/open-teacher-login",
+        "pages/open-teacher-my/open-teacher-my",
+        "pages/open-teacher-student/open-teacher-student",
+        "pages/open-teacher-class/open-teacher-class",
+        "pages/open-teacher-graduate/open-teacher-graduate",
+        "pages/open-teacher-diploma/open-teacher-diploma",
+        "pages/open-teacher-refund/open-teacher-refund",
+        "pages/open-teacher-exam/open-teacher-exam",
+        "pages/open-teacher-xsyzc/open-teacher-xsyzc",
+        "pages/open-teacher-review/open-teacher-review",
+        "pages/open-teacher-review-grade/open-teacher-review-grade",
+        "pages/open-teacher-info-verify-list/open-teacher-info-verify-list",
+        "pages/open-teacher-info-verify-detail/open-teacher-info-verify-detail",
+        "pages/open-teacher-book-site/open-teacher-book-site"
+      ]
+    },
+    {
+      "root": "packageEnroll",
+      "name": "enroll",
+      "pages": [
+        "pages/adult-exam-enroll/adult-exam-enroll",
+        "pages/adult-enroll/adult-enroll",
+        "pages/enrollment-query/enrollment-query",
+        "pages/enroll-guide/enroll-guide",
+        "pages/new-student-payment/new-student-payment",
+        "pages/three-plus-four-register/three-plus-four-register"
+      ]
+    },
+    {
+      "root": "packageStudent",
+      "name": "student",
+      "pages": [
+        "pages/graduate-form/graduate-form",
+        "pages/diploma-status/diploma-status",
+        "pages/exam-notice/exam-notice",
+        "pages/semester-courses/semester-courses",
+        "pages/payment-bukao/payment-bukao",
+        "pages/confirm-payment/confirm-payment",
+        "pages/student-info/student-info",
+        "pages/degree-english/degree-english",
+        "pages/refund/refund",
+        "pages/graduate-employment-survey/graduate-employment-survey",
+        "pages/job-recommend/job-recommend",
+        "pages/my/my",
+        "pages/my-courses/my-courses",
+        "pages/score/score",
+        "pages/exame-list/exame-list",
+        "pages/exame-info/exame-info",
+        "pages/exame-paper/exame-paper",
+        "pages/politics-score/politics-score",
+        "pages/tuition/tuition",
+        "pages/payment-records/payment-records",
+        "pages/info-verify/info-verify",
+        "pages/book-pickup/book-pickup"
+      ]
+    },
+    {
+      "root": "packageAdmin",
+      "name": "admin",
+      "pages": [
+        "pages/monitor/monitor",
+        "pages/major-manage/major-manage",
+        "pages/admin-nav/admin-nav",
+        "pages/leave-list/leave-list",
+        "pages/leave-apply/leave-apply",
+        "pages/leave-detail/leave-detail",
+        "pages/feedback-login/feedback-login",
+        "pages/feedback-submit/feedback-submit",
+        "pages/feedback-my/feedback-my",
+        "pages/feedback-detail/feedback-detail",
+        "pages/feedback-admin/feedback-admin",
+        "pages/feedback-admin-detail/feedback-admin-detail",
+        "pages/grad-emp-survey/grad-emp-survey",
+        "pages/grad-emp-survey-detail/grad-emp-survey-detail"
+      ]
+    },
+    {
+      "root": "packageOther",
+      "name": "other",
+      "pages": [
+        "pages/video-player/video-player",
+        "pages/signature-page/signature-page",
+        "pages/test-select/test-select",
+        "pages/test-top-message/test-top-message",
+        "pages/test-http-request/test-http-request",
+        "pages/qa/qa",
+        "pages/static-icon-test/static-icon-test",
+        "pages/mp-package-verify/mp-package-verify"
+      ]
+    },
+    {
+      "root": "packageSurvey",
+      "name": "survey",
+      "pages": [
+        "pages/survey-fill/survey-fill",
+        "pages/survey-list/survey-list"
+      ]
+    },
+    {
+      "root": "packageExame",
+      "name": "exame",
+      "pages": [
+        "pages/mini-login/mini-login",
+        "pages/mini-list/mini-list",
+        "pages/mini-room/mini-room",
+        "pages/mini-scores/mini-scores"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1890FF",
+    "navigationBarTitleText": "智慧教务平台",
+    "navigationBarTextStyle": "white"
+  },
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-picker": "@vant/weapp/picker/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-icon": "/components/vant-icon/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-notice-bar": "@vant/weapp/notice-bar/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-dialog": "@vant/weapp/dialog/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-search": "@vant/weapp/search/index",
+    "van-switch": "@vant/weapp/switch/index",
+    "signature": "/components/signature/index",
+    "top-message": "/components/top-message/top-message"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "useExtendedLib": {
+    "weui": true
+  },
+  "requiredBackgroundModes": ["audio"],
+  "tabBar": {
+    "custom": false,
+    "color": "#999999",
+    "selectedColor": "#333333",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "主页",
+        "iconPath": "static/images/tabbar/index.png",
+        "selectedIconPath": "static/images/tabbar/index-active.png"
+      },
+      {
+        "pagePath": "pages/user-center/user-center",
+        "text": "个人中心",
+        "iconPath": "static/images/tabbar/my.png",
+        "selectedIconPath": "static/images/tabbar/my-active.png"
+      }
+    ]
+  }
+}

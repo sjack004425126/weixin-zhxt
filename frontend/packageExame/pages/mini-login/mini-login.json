@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "考生登录",
+  "navigationBarBackgroundColor": "#F0F8FF",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#F0F8FF",
+  "disableScroll": true,
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-button": "@vant/weapp/button/index"
+  }
+}

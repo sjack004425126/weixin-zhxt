@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="title">用户协议</view>
+  <view class="content">
+    <view class="section">
+      <view class="section-title">1. 协议的接受和修改</view>
+      <view class="section-content">
+        <text>1.1 本协议是用户（以下简称"您"）与补考缴费小程序（以下简称"我们"）之间的法律协议。</text>
+        <text>1.2 您在使用我们的服务时，即表示您已经同意本协议的所有条款。</text>
+        <text>1.3 我们保留在任何时候修改本协议的权利。修改后的协议将在小程序内公布。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">2. 服务内容</view>
+      <view class="section-content">
+        <text>2.1 我们提供补考缴费服务，包括但不限于：课程查询、报名、缴费等功能。</text>
+        <text>2.2 我们保留随时修改、中断或终止服务的权利。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">3. 用户责任</view>
+      <view class="section-content">
+        <text>3.1 您应当遵守中华人民共和国相关法律法规。</text>
+        <text>3.2 您应当妥善保管账号信息，因账号信息保管不善造成的损失由您自行承担。</text>
+        <text>3.3 您应当按时完成缴费，并对自己的选课和缴费行为负责。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">4. 支付和退款</view>
+      <view class="section-content">
+        <text>4.1 所有费用以实际显示金额为准。</text>
+        <text>4.2 支付完成后，除特殊情况外，已缴费用不予退还。</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">5. 免责声明</view>
+      <view class="section-content">
+        <text>5.1 因不可抗力或第三方原因造成的服务中断或其他问题，我们不承担责任。</text>
+        <text>5.2 您理解并同意使用我们的服务所存在的风险将完全由您自己承担。</text>
+      </view>
+    </view>
+  </view>
+</view> 

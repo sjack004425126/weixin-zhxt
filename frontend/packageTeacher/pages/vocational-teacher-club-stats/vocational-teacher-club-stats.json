@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "社团课选课统计",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-progress": "@vant/weapp/progress/index"
+  }
+}

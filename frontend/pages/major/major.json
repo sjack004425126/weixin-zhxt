@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "专业介绍",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "fee-toast": "/components/fee-toast/fee-toast"
+  }
+} 

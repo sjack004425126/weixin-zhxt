@@ -1,0 +1,126 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 顶部导航 -->
+<view class="nav-bar">
+  <view class="nav-inner">
+    <view class="nav-icon-wrap">
+      <van-icon name="certificate" size="36rpx" color="#fff" />
+    </view>
+    <view class="nav-title-wrap">
+      <text class="nav-title">毕业证书状态</text>
+      <text class="nav-sub">Diploma Status</text>
+    </view>
+    <view class="nav-home" bindtap="goHome">
+      <van-icon name="wap-home-o" size="36rpx" />
+    </view>
+  </view>
+</view>
+
+<view class="page-body">
+
+  <view class="loading-wrap" wx:if="{{!diplomaInfo}}">
+    <van-loading size="48rpx" color="#1890FF" vertical>加载中...</van-loading>
+  </view>
+
+  <block wx:if="{{diplomaInfo}}">
+
+    <!-- 证书状态卡片 -->
+    <view class="diploma-hero {{diplomaInfo.student_info.status === '毕业' ? 'hero-graduated' : 'hero-studying'}}">
+      <view class="hero-icon-wrap">
+        <van-icon name="{{diplomaInfo.student_info.status === '毕业' ? 'certificate' : 'clock-o'}}" size="64rpx" color="#fff" />
+      </view>
+      <text class="hero-title">{{diplomaInfo.student_info.status === '毕业' ? '已毕业' : diplomaInfo.student_info.status}}</text>
+      <text class="hero-sub" wx:if="{{diplomaInfo.diploma_info}}">
+        {{diplomaInfo.diploma_info.status === 1 ? '证书可领取' : '证书待发放'}}
+      </text>
+      <text class="hero-sub" wx:elif="{{diplomaInfo.student_info.status !== '毕业'}}">毕业证书还未到校</text>
+    </view>
+
+    <!-- 证书详情 -->
+    <block wx:if="{{diplomaInfo.student_info.status === '毕业' && diplomaInfo.diploma_info}}">
+      <view class="section">
+        <view class="section-header">
+          <view class="section-title-wrap">
+            <view class="section-dot primary-dot"></view>
+            <text class="section-title">证书信息</text>
+          </view>
+          <view class="status-pill {{diplomaInfo.diploma_info.status === 1 ? 'pill-success' : 'pill-pending'}}">
+            {{diplomaInfo.diploma_info.status === 1 ? '可领取' : '待发放'}}
+          </view>
+        </view>
+
+        <view class="info-card">
+          <view class="info-grid">
+            <view class="info-grid-item">
+              <text class="info-label">批次</text>
+              <text class="info-value">{{diplomaInfo.diploma_info.batch}}</text>
+            </view>
+            <view class="info-grid-item">
+              <text class="info-label">学历层次</text>
+              <text class="info-value">{{diplomaInfo.diploma_info.education_level}}</text>
+            </view>
+            <view class="info-grid-item">
+              <text class="info-label">专业</text>
+              <text class="info-value">{{diplomaInfo.diploma_info.major}}</text>
+            </view>
+            <view class="info-grid-item">
+              <text class="info-label">性别</text>
+              <text class="info-value">{{diplomaInfo.diploma_info.gender}}</text>
+            </view>
+          </view>
+          <view class="info-row-full">
+            <van-icon name="clock-o" size="28rpx" color="#1890FF" />
+            <text class="info-label">领取时间</text>
+            <text class="info-value {{diplomaInfo.diploma_info.receive_time ? '' : 'pending-text'}}">
+              {{diplomaInfo.diploma_info.receive_time || '暂未领取'}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 未到校提示 -->
+    <view class="waiting-card" wx:elif="{{diplomaInfo.student_info.status !== '毕业' || !diplomaInfo.diploma_info}}">
+      <van-icon name="info-o" size="48rpx" color="#1890FF" />
+      <text class="waiting-text">毕业证书还未到校，请耐心等待</text>
+    </view>
+
+    <!-- 通知事项 -->
+    <view class="section" wx:if="{{diplomaInfo.notice}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot primary-dot"></view>
+          <text class="section-title">通知事项</text>
+        </view>
+      </view>
+
+      <!-- 概要 -->
+      <view class="notice-bar" wx:if="{{diplomaInfo.notice.general}}">
+        <van-icon name="info-o" size="28rpx" color="#1890FF" />
+        <text class="notice-text">{{diplomaInfo.notice.general}}</text>
+      </view>
+
+      <!-- 领取流程 -->
+      <view class="flow-card" wx:if="{{diplomaInfo.notice.process.length > 0}}">
+        <text class="flow-title">领取流程</text>
+        <view class="flow-steps">
+          <view class="flow-step" wx:for="{{diplomaInfo.notice.process}}" wx:key="index">
+            <view class="step-num">{{index + 1}}</view>
+            <text class="step-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 时间和注意事项 -->
+      <view class="notice-item" wx:if="{{diplomaInfo.notice.time}}">
+        <van-icon name="clock-o" size="28rpx" color="#E86433" />
+        <text class="notice-item-text">{{diplomaInfo.notice.time}}</text>
+      </view>
+      <view class="notice-item" wx:if="{{diplomaInfo.notice.location}}">
+        <van-icon name="warning-o" size="28rpx" color="#FAAD14" />
+        <text class="notice-item-text">{{diplomaInfo.notice.location}}</text>
+      </view>
+    </view>
+
+  </block>
+</view>

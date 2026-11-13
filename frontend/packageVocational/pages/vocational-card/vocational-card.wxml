@@ -1,0 +1,384 @@
+<!-- ===================================================================
+     走读通行证页面（重构设计稿）
+     设计参考：design/src/components/StudentPassCard.tsx
+     风格：亚克力毛玻璃 + 极简排版 + 几何防伪线条 + 翻转双面卡片
+     主题色：冷萃薄荷 mint (#059669 emerald-600)
+     =================================================================== -->
+
+<view class="vc-page">
+  <include src="/utils/common-components.wxml" />
+
+  <!-- ===== 加载态：毛玻璃骨架屏 ===== -->
+  <view wx:if="{{loading}}" class="vc-skeleton">
+    <view class="vc-skel__shine"></view>
+    <view class="vc-skel__hole"></view>
+    <view class="vc-skel__header">
+      <view class="vc-skel__circle"></view>
+      <view class="vc-skel__lines">
+        <view class="vc-skel__bar vc-skel__bar--w70"></view>
+        <view class="vc-skel__bar vc-skel__bar--w90"></view>
+      </view>
+      <view class="vc-skel__pill"></view>
+    </view>
+    <view class="vc-skel__body">
+      <view class="vc-skel__photo"></view>
+      <view class="vc-skel__lines">
+        <view class="vc-skel__bar vc-skel__bar--w50 vc-skel__bar--lg"></view>
+        <view class="vc-skel__bar vc-skel__bar--w80"></view>
+        <view class="vc-skel__bar vc-skel__bar--w60"></view>
+        <view class="vc-skel__bar vc-skel__bar--w70"></view>
+      </view>
+    </view>
+    <view class="vc-skel__bar vc-skel__bar--full"></view>
+    <view class="vc-skel__bar vc-skel__bar--full"></view>
+  </view>
+
+  <!-- ===== 错误态 ===== -->
+  <view wx:elif="{{error}}" class="vc-error">
+    <view class="vc-error__icon">
+      <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="none" stroke="#F43F5E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="12" y1="9"  x2="12" y2="13" stroke="#F43F5E" stroke-width="2" stroke-linecap="round"/>
+        <line x1="12" y1="17" x2="12.01" y2="17" stroke="#F43F5E" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </view>
+    <text class="vc-error__title">数据加载受阻</text>
+    <text class="vc-error__desc">{{error}}</text>
+    <view class="vc-error__btn" hover-class="vc-error__btn--hover" bindtap="onRefresh">
+      <text>点击重新加载</text>
+    </view>
+  </view>
+
+  <!-- ===== 空态（不在册）===== -->
+  <view wx:elif="{{cardData && !cardData.valid}}" class="vc-empty">
+    <!-- 挂绳孔 -->
+    <view class="vc-lanyard__hole"></view>
+    <view class="vc-empty__icon-wrap">
+      <view class="vc-empty__icon">
+        <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="9" cy="7" r="4" fill="none" stroke="#059669" stroke-width="1.6"/>
+          <line x1="17" y1="11" x2="22" y2="16" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+          <line x1="22" y1="11" x2="17" y2="16" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </view>
+      <view class="vc-empty__badge">!</view>
+    </view>
+    <text class="vc-empty__title">本学期暂未办理走读证</text>
+    <text class="vc-empty__reason">{{cardData.reason || '你不在本期走读名单中，或尚未完成审批备案'}}</text>
+
+    <view class="vc-empty__notice">
+      <view class="vc-empty__notice-title">
+        <text>如何申请办理走读？</text>
+      </view>
+      <view class="vc-empty__notice-body">
+        <text>1. 下载填写《走读生安全责任承诺书》</text>
+        <text>2. 由家长签字确认并提交班主任初审</text>
+        <text>3. 学生工作处审批后将自动生成电子走读证</text>
+      </view>
+    </view>
+
+    <view class="vc-empty__btn" hover-class="vc-empty__btn--hover" bindtap="onContactTeacher">
+      <text>联系班主任 / 查看办理指引</text>
+    </view>
+  </view>
+
+  <!-- ===== 走读证（在册）===== -->
+  <block wx:elif="{{cardData && cardData.valid}}">
+
+    <!-- Lanyard 卡扣（挂绳顶部视觉元素） -->
+    <view class="vc-lanyard">
+      <view class="vc-lanyard__strap"></view>
+      <view class="vc-lanyard__clip"></view>
+    </view>
+
+    <!-- 卡片 3D 翻转容器 -->
+    <view class="vc-pass-card {{isFlipped ? 'vc-pass-card--flipped' : ''}}">
+
+      <!-- ============== 正面 ============== -->
+      <view class="vc-face vc-face--front">
+
+        <!-- 几何防伪底纹（guilloché 波浪线） -->
+        <view class="vc-guilloche">
+          <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="vcGuillocheGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#059669" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#059669" stop-opacity="0.1"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,40 Q100,10 200,40 T400,40 M0,60 Q100,30 200,60 T400,60 M0,80 Q100,50 200,80 T400,80 M0,100 Q100,70 200,100 T400,100 M0,120 Q100,90 200,120 T400,120 M0,140 Q100,110 200,140 T400,140 M0,160 Q100,130 200,160 T400,160" fill="none" stroke="url(#vcGuillocheGrad)" stroke-width="0.8"/>
+          </svg>
+        </view>
+
+        <!-- 四角瞄准刻度 -->
+        <view class="vc-corner-tick vc-corner-tick--tl"></view>
+        <view class="vc-corner-tick vc-corner-tick--tr"></view>
+        <view class="vc-corner-tick vc-corner-tick--bl"></view>
+        <view class="vc-corner-tick vc-corner-tick--br"></view>
+
+        <!-- 卡片挂绳孔（顶部） -->
+        <view class="vc-face__hole"></view>
+
+        <!-- ===== 卡片头部：校徽 + 校名 + 走读生徽章 ===== -->
+        <view class="vc-head">
+          <view class="vc-head__brand">
+            <!-- 几何校徽（盾+书+星） -->
+            <view class="vc-emblem">
+              <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" stroke="#059669" stroke-width="1.5" stroke-opacity="0.4"/>
+                <circle cx="24" cy="24" r="18" stroke="#059669" stroke-width="0.8" stroke-dasharray="2 2" stroke-opacity="0.6"/>
+                <path d="M24 11V35M24 35L15 29C13 27.5 13 24 15 22.5L24 17L33 22.5C35 24 35 27.5 33 29L24 35Z" stroke="#059669" stroke-width="1.6" stroke-linejoin="round"/>
+                <polygon points="24,8 27,15 24,14 21,15" fill="#059669" fill-opacity="0.8"/>
+                <circle cx="24" cy="24" r="2.5" fill="#059669"/>
+              </svg>
+            </view>
+            <view class="vc-head__school">
+              <text class="vc-head__school-cn">{{cardData.school_name_cn || '黔东南中等职业技术学校'}}</text>
+              <text class="vc-head__school-en">{{cardData.school_name_en || 'QIANDONGNAN SECONDARY VOCATIONAL AND TECHNICAL SCHOOL'}}</text>
+            </view>
+          </view>
+
+          <!-- 走读生徽章 -->
+          <view class="vc-status-pill">
+            <view class="vc-status-pill__dot"></view>
+            <text class="vc-status-pill__text">走读生</text>
+          </view>
+        </view>
+
+        <!-- 证件编号 / 坐标 / 学期 -->
+        <view class="vc-head__meta">
+          <text class="vc-head__meta-key">ID: {{cardData.pass_no || 'ZD-2025-0982'}}</text>
+          <text class="vc-head__meta-key">26°35'N · 107°58'E</text>
+          <text class="vc-head__meta-key vc-head__meta-key--accent">{{cardData._semester_text || ''}}</text>
+        </view>
+
+        <!-- ===== 卡片主体：照片 + 信息 ===== -->
+        <view class="vc-body-main">
+          <!-- 照片框 -->
+          <view class="vc-photo-wrap">
+            <view class="vc-photo" hover-class="vc-photo--hover" bindtap="onPhotoTap">
+              <image
+                wx:if="{{cardData._photo_url}}"
+                src="{{cardData._photo_url}}"
+                mode="aspectFill"
+                class="vc-photo__img"
+                binderror="onPhotoError"
+              />
+              <view wx:else class="vc-photo__placeholder">
+                <view class="vc-photo__placeholder-icon">
+                  <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="none" stroke="#94A3B8" stroke-width="1.5"/>
+                    <circle cx="12" cy="7" r="4" fill="none" stroke="#94A3B8" stroke-width="1.5"/>
+                  </svg>
+                </view>
+                <text class="vc-photo__placeholder-text">{{cardData.xm[0] || '学'}}</text>
+              </view>
+              <!-- 防伪水印 -->
+              <view class="vc-photo__watermark">COMMUTER PASS</view>
+              <!-- 照片四角瞄准刻度 -->
+              <view class="vc-photo__tick vc-photo__tick--tl"></view>
+              <view class="vc-photo__tick vc-photo__tick--tr"></view>
+              <view class="vc-photo__tick vc-photo__tick--bl"></view>
+              <view class="vc-photo__tick vc-photo__tick--br"></view>
+            </view>
+            <text class="vc-photo__caption">VERIFIED PHOTO</text>
+          </view>
+
+          <!-- 字段信息 -->
+          <view class="vc-fields">
+            <view class="vc-field">
+              <text class="vc-field__label">STUDENT NAME / 姓名</text>
+              <view class="vc-field__name-row">
+                <text class="vc-field__name">{{cardData.xm}}</text>
+                <view class="vc-field__valid">
+                  <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+                    <polyline points="22 4 12 14.01 9 11.01" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <text>在册</text>
+                </view>
+              </view>
+            </view>
+
+            <view class="vc-fields__divider"></view>
+
+            <view class="vc-field">
+              <text class="vc-field__label">STUDENT ID / 学号</text>
+              <text class="vc-field__value vc-field__value--mono">{{cardData.xh}}</text>
+            </view>
+
+            <view class="vc-field">
+              <text class="vc-field__label">CLASS / 班级</text>
+              <text class="vc-field__value">{{cardData.class_name || '未分班'}}</text>
+            </view>
+
+            <view class="vc-field">
+              <text class="vc-field__label">ID CARD / 证件号</text>
+              <text class="vc-field__value vc-field__value--mono vc-field__value--muted">{{cardData.sfzh_masked || '—'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- ===== 动态防伪时间戳条 ===== -->
+        <view class="vc-clock">
+          <view class="vc-clock__icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="#FFFFFF" stroke-width="1.6"/>
+              <polyline points="12 6 12 12 16 14" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </view>
+          <view class="vc-clock__body">
+            <view class="vc-clock__head">
+              <text class="vc-clock__title">动态防伪时间戳</text>
+              <view class="vc-clock__pulse"></view>
+            </view>
+            <text class="vc-clock__time">{{liveDate}} <text class="vc-clock__time-accent">{{liveTime}}</text></text>
+          </view>
+          <view class="vc-clock__status">
+            <text class="vc-clock__status-label">STATUS</text>
+            <text class="vc-clock__status-value">核验有效</text>
+          </view>
+        </view>
+
+        <!-- ===== 卡片底部：校训 + 翻转按钮 ===== -->
+        <view class="vc-foot">
+          <view class="vc-foot__motto">
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path d="M12 2l1.7 5.4h5.6l-4.5 3.3 1.7 5.4L12 12.8 7.5 16.1l1.7-5.4L4.7 7.4h5.6L12 2z" fill="#059669"/>
+            </svg>
+            <text class="vc-foot__motto-text">{{cardData.motto || '砺志以学 · 厚德而行'}}</text>
+          </view>
+          <view class="vc-foot__flip" hover-class="vc-foot__flip--hover" catchtap="onFlipToggle">
+            <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <text>翻转背面</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ============== 背面 ============== -->
+      <view class="vc-face vc-face--back">
+        <!-- 背面几何底纹 -->
+        <view class="vc-guilloche">
+          <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="vcGuillocheGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#059669" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#059669" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,40 Q100,10 200,40 T400,40 M0,60 Q100,30 200,60 T400,60 M0,80 Q100,50 200,80 T400,80 M0,100 Q100,70 200,100 T400,100 M0,120 Q100,90 200,120 T400,120 M0,140 Q100,110 200,140 T400,140 M0,160 Q100,130 200,160 T400,160" fill="none" stroke="url(#vcGuillocheGrad2)" stroke-width="0.8"/>
+          </svg>
+        </view>
+
+        <!-- 背面挂绳孔 -->
+        <view class="vc-face__hole"></view>
+
+        <!-- 黑色磁条 / NFC 模拟 -->
+        <view class="vc-magstrip">
+          <text class="vc-magstrip__label">STUDENT COMMUTER RFID CARD · 13.56MHz</text>
+          <view class="vc-magstrip__status">
+            <view class="vc-magstrip__dot"></view>
+            <text>ONLINE</text>
+          </view>
+        </view>
+
+        <!-- 使用须知 -->
+        <view class="vc-terms">
+          <view class="vc-terms__head">
+            <view class="vc-terms__head-left">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="#059669" stroke-width="1.6" stroke-linejoin="round"/>
+                <polyline points="9 12 11 14 15 10" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <text class="vc-terms__title">走读生日常行为规范及使用须知</text>
+            </view>
+            <text class="vc-terms__tag">TERMS</text>
+          </view>
+
+          <view class="vc-terms__list">
+            <view class="vc-terms__item">
+              <text class="vc-terms__num">01.</text>
+              <text class="vc-terms__text">本证为走读生唯一校门通行电子及实体凭证，<text class="vc-terms__strong">仅限本人使用</text>，严禁借予他人或擅自转让涂改。</text>
+            </view>
+            <view class="vc-terms__item">
+              <text class="vc-terms__num">02.</text>
+              <text class="vc-terms__text">每日上学、放学出入校门须主动配合安保核验证件；非走读时间段出入需持班主任签发电子请假单。</text>
+            </view>
+            <view class="vc-terms__item">
+              <text class="vc-terms__num">03.</text>
+              <text class="vc-terms__text">走读途中严格遵守交通安全法规，注意人身与财产安全，离校后径直回家，不在校外危险场所逗留。</text>
+            </view>
+            <view class="vc-terms__item">
+              <text class="vc-terms__num">04.</text>
+              <text class="vc-terms__text">若学期休学、转学或变更为住读生，须按规程注销走读资格并交回实体证件。</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 签发 + 印章 -->
+        <view class="vc-issuer">
+          <view class="vc-issuer__info">
+            <view class="vc-issuer__row">
+              <text class="vc-issuer__label">ISSUED BY / 签发部门</text>
+              <text class="vc-issuer__value">学生科</text>
+            </view>
+            <view class="vc-issuer__row">
+              <text class="vc-issuer__label">EMERGENCY / 紧急联络</text>
+              <view class="vc-issuer__value">
+                <text class="vc-issuer__phone">📞</text>
+                <text wx:if="{{cardData.bzr_name || cardData.bzr_phone}}" class="vc-issuer__contact">
+                  {{cardData.bzr_name || '班主任'}}
+                  <text
+                    wx:if="{{cardData.bzr_phone}}"
+                    class="vc-issuer__phone-link"
+                    data-phone="{{cardData.bzr_phone}}"
+                    bindtap="onCallTeacher"
+                  >{{cardData.bzr_phone}}</text>
+                  <text wx:else class="vc-issuer__phone-muted">电话待补充</text>
+                </text>
+                <text wx:else class="vc-issuer__phone-muted">班主任信息待补充</text>
+              </view>
+            </view>
+            <text class="vc-issuer__valid">有效截止：{{cardData.valid_until || '2026-01-20'}}</text>
+          </view>
+
+          <!-- 红色印章 -->
+          <view class="vc-seal">
+            <view class="vc-seal__outer"></view>
+            <view class="vc-seal__inner">
+              <text class="vc-seal__top">{{cardData.school_name_cn || '黔东南中等职业技术学校'}}</text>
+              <view class="vc-seal__star">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#DC2626"/>
+                </svg>
+              </view>
+              <text class="vc-seal__bot">学生科 · 走读管理专用章</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 背面底部 -->
+        <view class="vc-foot vc-foot--back">
+          <text class="vc-foot__serial">SERIAL NO: {{cardData.pass_no || 'ZD-2025-0982'}}-REV2</text>
+          <view class="vc-foot__flip" hover-class="vc-foot__flip--hover" catchtap="onFlipToggle">
+            <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <text>翻回正面</text>
+          </view>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- 翻转提示 -->
+    <text class="vc-tip-text">💡 点击卡片可翻转查看背面使用须知与官方印章</text>
+
+  </block>
+
+</view>

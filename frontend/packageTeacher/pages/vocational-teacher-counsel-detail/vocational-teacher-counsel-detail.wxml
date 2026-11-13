@@ -1,0 +1,252 @@
+<include src="/utils/common-components.wxml" />
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:#fff;"></text></view>
+    <view class="header-text">
+      <view class="header-title">{{detail.title}}</view>
+      <view class="header-subtitle">{{detail.doctor_name}} · 咨询预约管理</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:30rpx;color:#047857;"></text></view>
+  </view>
+</view>
+
+<view class="container">
+  <block wx:if="{{loading}}">
+    <van-loading size="24px" vertical>加载中...</van-loading>
+  </block>
+
+  <block wx:else>
+    <!-- 视图切换 -->
+    <view class="tabs">
+      <view class="tab {{pageMode==='list'?'on':''}}" data-mode="list" bindtap="setPageMode">预约名单</view>
+      <view class="tab {{pageMode==='slots'?'on':''}}" data-mode="slots" bindtap="setPageMode">号段排班</view>
+    </view>
+
+    <!-- ============ 视图1：预约名单（按天卡片展示，一眼看出哪天几个号） ============ -->
+    <block wx:if="{{pageMode==='list'}}">
+      <view wx:if="{{!dayGroups || dayGroups.length===0}}" class="empty-card">暂无号段，请先到「号段排班」按天发布</view>
+
+      <!-- 每日排号快速导航横滑卡片：手机端横滑触控，一眼看出哪天几个号 -->
+      <view wx:if="{{dayGroups && dayGroups.length > 0}}" class="overview-section">
+        <view class="overview-bar-title">
+          <text>每日排号一览</text>
+          <text class="overview-bar-tip">点击卡片可快速定位到该天</text>
+        </view>
+        <scroll-view class="overview-scroll" scroll-x enable-flex scroll-anchoring scroll-with-animation>
+          <block wx:for="{{dayGroups}}" wx:key="date">
+            <view class="overview-day-pill {{activeDayDate===item.date?'active':''}}" data-date="{{item.date}}" bindtap="scrollToDay">
+              <view class="ov-date-row">
+                <text class="ov-date">{{item.shortDate || item.date}}</text>
+                <text class="ov-weekday">{{item.weekday}}</text>
+              </view>
+              <view class="ov-number-badge">
+                <text class="ov-num">{{item.total_quota}}</text>
+                <text class="ov-unit">个号</text>
+              </view>
+              <view class="ov-progress-bar">
+                <view class="ov-progress-fill" style="width: {{item.total_quota > 0 ? (item.total_booked / item.total_quota * 100) : 0}}%;"></view>
+              </view>
+              <view class="ov-sub">已约 {{item.total_booked}}/{{item.total_quota}} · {{item.slots.length}}段</view>
+            </view>
+          </block>
+        </scroll-view>
+      </view>
+
+      <!-- 按天展示的排号卡片列表（仅前5天） -->
+      <block wx:for="{{dayGroups}}" wx:key="date">
+        <view class="day-card" id="day-{{item.date}}">
+          <!-- 每日卡片头部：包含日期、星期、几号几个号段统计 -->
+          <view class="day-card-head">
+            <view class="day-head-left">
+              <view class="day-title-row">
+                <text class="day-title-text">{{item.date}} 咨询安排</text>
+                <text class="day-tag-chip">{{item.weekday}}</text>
+              </view>
+              <text class="muted-tip">{{item.slots.length}} 个号段 · 每天 A/B/C 独立编号</text>
+            </view>
+            <view class="day-head-right">
+              <view class="day-total-badge">
+                <text class="day-badge-num">{{item.total_quota}}</text>
+                <text class="day-badge-unit">个号</text>
+              </view>
+              <text class="day-booked-stat">已约 {{item.total_booked}}/{{item.total_quota}}</text>
+            </view>
+          </view>
+
+          <!-- 每日号段列表（嵌套在每日卡片内，排版整洁分明） -->
+          <view class="day-slots-list">
+            <block wx:for="{{item.slots}}" wx:for-item="it" wx:key="id">
+              <view class="slot-card">
+                <view class="slot-head">
+                  <view class="slot-head-left">
+                    <text class="slot-tag">{{it.slot_tag}}</text>
+                    <text class="slot-time">{{it.time_range}}</text>
+                  </view>
+                  <text class="status-chip {{it.status}}">{{it.status_text}}</text>
+                </view>
+
+                <view class="slot-meta">
+                  <text>{{it.category||'心理咨询'}}</text>
+                  <text>·</text>
+                  <text>{{it.location||'地点待定'}}</text>
+                  <text>·</text>
+                  <text>已约 {{it.booked}}/{{it.quota}}</text>
+                </view>
+
+                <view wx:if="{{it.tickets.length===0}}" class="empty">该号段暂无预约</view>
+
+                <!-- 学生排号卡片 -->
+                <view class="tickets-list">
+                  <block wx:for="{{it.tickets}}" wx:for-item="t" wx:key="id">
+                    <view class="stu-card" data-id="{{t.id}}" bindtap="openProfile">
+                      <view class="stu-card-top">
+                        <text class="stu-code">{{t.display_no}}</text>
+                        <text class="stu-name">{{t.xm}}</text>
+                        <text class="ticket-status {{t.status}}">{{t.status_text}}</text>
+                      </view>
+                      <view class="stu-card-sub">
+                        <text>{{t.bj_mc}}</text>
+                        <text>·</text>
+                        <text>学号 {{t.xh}}</text>
+                      </view>
+                      <view class="stu-card-tip">点击查看学生档案</view>
+                      <view class="ticket-ops" catchtap="noop">
+                        <view wx:if="{{t.status==='booked'}}" class="op" data-id="{{t.id}}" catchtap="markAttended">完成咨询</view>
+                        <view wx:if="{{t.status==='booked'}}" class="op op-warn" data-id="{{t.id}}" data-code="{{t.display_no}}" catchtap="markMissed">未赴约</view>
+                      </view>
+                      <view class="remark-row" catchtap="noop">
+                        <input class="remark-input" placeholder="备注（学生不可见）" value="{{t.remark}}" data-id="{{t.id}}" bindinput="onRemarkInput" />
+                        <view class="remark-save" data-id="{{t.id}}" catchtap="saveRemark">保存</view>
+                      </view>
+                    </view>
+                  </block>
+                </view>
+
+                <!-- 号段管理操作（全新规整双按钮排版，杜绝换行阶梯错位） -->
+                <view class="slot-ops-box">
+                  <view class="slot-ops-head">
+                    <text class="slot-ops-label">号段操作</text>
+                    <text class="slot-ops-hint">仅教师可见</text>
+                  </view>
+                  <view class="slot-ops-grid">
+                    <view class="slot-btn slot-btn-settle" data-id="{{it.id}}" data-tag="{{it.slot_tag}}" data-date="{{it.counsel_date}}" bindtap="settleSlot">
+                      结束此号段（未赴约作废）
+                    </view>
+                    <view class="slot-btn slot-btn-del" data-id="{{it.id}}" data-tag="{{it.slot_tag}}" data-date="{{it.counsel_date}}" bindtap="deleteSlot">
+                      <text class="vi"></text> 删除此空号段
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </block>
+          </view>
+        </view>
+      </block>
+    </block>
+
+    <!-- ============ 视图2：号段排班 ============ -->
+    <block wx:if="{{pageMode==='slots'}}">
+      <view class="card">
+        <view class="card-head">
+          <text class="card-title-text">新增号段</text>
+          <text class="muted-tip">日期与地点可逐段自定义</text>
+        </view>
+
+        <view class="form">
+          <view class="f-row">
+            <text class="f-lbl">咨询日期</text>
+            <picker mode="date" value="{{newSlotDate}}" bindchange="onNewSlotDateChange">
+              <view class="f-picker">{{newSlotDate||'选择日期'}}</view>
+            </picker>
+          </view>
+          <view class="f-row">
+            <text class="f-lbl">开始时间</text>
+            <picker mode="time" value="{{newSlotStart}}" bindchange="onNewSlotInput" data-field="newSlotStart">
+              <view class="f-picker">{{newSlotStart||'选择时间'}}</view>
+            </picker>
+          </view>
+          <view class="f-row">
+            <text class="f-lbl">结束时间</text>
+            <picker mode="time" value="{{newSlotEnd}}" bindchange="onNewSlotInput" data-field="newSlotEnd">
+              <view class="f-picker">{{newSlotEnd||'选择时间'}}</view>
+            </picker>
+          </view>
+          <view class="f-row">
+            <text class="f-lbl">放号数量</text>
+            <input class="f-input" type="number" value="{{newSlotQuota}}" data-field="newSlotQuota" bindinput="onNewSlotInput" />
+          </view>
+          <view class="f-row">
+            <text class="f-lbl">项目类别</text>
+            <input class="f-input" placeholder="如个体深度心理咨询" value="{{newSlotCategory}}" data-field="newSlotCategory" bindinput="onNewSlotInput" />
+          </view>
+          <view class="f-row">
+            <text class="f-lbl">咨询地点</text>
+            <input class="f-input" placeholder="如实训2栋301" value="{{newSlotLocation}}" data-field="newSlotLocation" bindinput="onNewSlotInput" />
+          </view>
+        </view>
+
+        <view class="form-actions">
+          <van-button size="small" type="primary" bindtap="submitNewSlot">发布号段</van-button>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <!-- ============ 学生档案卡片弹窗 ============ -->
+  <van-popup show="{{showProfile}}" position="bottom" round closeable bind:close="closeProfile" custom-class="profile-popup">
+    <view class="profile-wrap">
+      <view class="profile-drag-handle"></view>
+      <block wx:if="{{profileLoading}}">
+        <van-loading size="24px" vertical>档案加载中...</van-loading>
+      </block>
+      <block wx:else>
+        <view class="profile-head">
+          <view class="profile-avatar" bindtap="previewProfilePhoto">
+            <image wx:if="{{profile.photo_url_full}}" src="{{profile.photo_url_full}}" mode="aspectFill"></image>
+            <view wx:else class="avatar-fallback">{{profile.xm}}</view>
+          </view>
+          <view class="profile-title">
+            <view class="profile-name">{{profile.xm}}<text class="profile-code">{{profileBooking.display_no}}</text></view>
+            <view class="profile-sub">{{profile.bj_mc}} · 学号 {{profile.xh}}</view>
+          </view>
+          <text class="ticket-status {{profileBooking.status}}">{{profileBooking.status==='booked'?'待咨询':(profileBooking.status==='attended'?'已咨询':'已取消')}}</text>
+        </view>
+
+        <view class="profile-grid" wx:if="{{profile}}">
+          <view class="p-row"><text class="p-lbl">姓名</text><text class="p-val">{{profile.xm}}</text></view>
+          <view class="p-row"><text class="p-lbl">学号</text><text class="p-val">{{profile.xh}}</text></view>
+          <view class="p-row"><text class="p-lbl">性别</text><text class="p-val">{{profile.xb||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">民族</text><text class="p-val">{{profile.mz||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">班级</text><text class="p-val">{{profile.bj_mc||'—'}}</text></view>
+          <view class="p-row">
+            <text class="p-lbl">班主任</text>
+            <text class="p-val clickable" data-phone="{{profile.bzr_phone}}" bindtap="callProfilePhone">{{profile.bzr_name||'—'}}{{profile.bzr_phone ? ' · ' + profile.bzr_phone : ''}}</text>
+          </view>
+          <view class="p-row"><text class="p-lbl">专业</text><text class="p-val">{{profile.zymc||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">身份证号</text><text class="p-val mono">{{profile.sfzh||'—'}}</text></view>
+          <view class="p-row">
+            <text class="p-lbl">学生电话</text>
+            <text class="p-val mono clickable" data-phone="{{profile.xsdh}}" bindtap="callProfilePhone">{{profile.xsdh||'—'}}</text>
+          </view>
+          <view class="p-row"><text class="p-lbl">政治面貌</text><text class="p-val">{{profile.zzmm||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">居住地类型</text><text class="p-val">{{profile.jzdlx||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">户口性质</text><text class="p-val">{{profile.hkxz||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">家庭住址</text><text class="p-val">{{profile.jtxxdz||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">监护人</text><text class="p-val">{{profile.jzxm||'—'}} {{profile.jzgx}}</text></view>
+          <view class="p-row">
+            <text class="p-lbl">监护人电话</text>
+            <text class="p-val mono clickable" data-phone="{{profile.jzdh}}" bindtap="callProfilePhone">{{profile.jzdh||'—'}}</text>
+          </view>
+          <view class="p-row"><text class="p-lbl">毕业学校</text><text class="p-val">{{profile.byxxmc||'—'}}</text></view>
+          <view class="p-row"><text class="p-lbl">招生对象</text><text class="p-val">{{profile.zsdx||'—'}}</text></view>
+          <view class="profile-booking-tip" wx:if="{{profileSlot}}">预约：{{profileSlot.counsel_date}} {{profileSlot.time_range}} · {{profileSlot.category}} · {{profileSlot.location}}</view>
+        </view>
+
+        <view class="profile-actions">
+          <van-button size="small" plain bindtap="closeProfile">关闭</van-button>
+          <van-button wx:if="{{profileBooking.status==='booked'}}" size="small" type="danger" bindtap="cancelBookingFromProfile">取消预约</van-button>
+        </view>
+      </block>
+    </view>
+  </van-popup>
+</view>

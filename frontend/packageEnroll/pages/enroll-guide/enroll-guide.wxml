@@ -1,0 +1,47 @@
+<view class="page">
+  <!-- 顶部区域 -->
+  <view class="header">
+    <view class="title">招生简章</view>
+    <view class="subtitle">选择您要查看的招生简章类型</view>
+  </view>
+
+  <!-- 卡片列表 -->
+  <view class="cards">
+    <view class="card" bindtap="goToOpenEnroll">
+      <view class="card-icon open-icon">🎓</view>
+      <view class="card-content">
+        <text class="card-title">开放教育</text>
+        <text class="card-desc">国家开放大学贵州分部黔东南开放大学招生简章</text>
+      </view>
+      <view class="card-arrow">›</view>
+    </view>
+
+
+
+    <view class="card" bindtap="goToAdultExam">
+      <view class="card-icon adult-icon">📖</view>
+      <view class="card-content">
+        <text class="card-title">成人高考</text>
+        <text class="card-desc">贵州开放大学黔东南分校成人高考招生简章</text>
+      </view>
+      <view class="card-arrow">›</view>
+    </view>
+
+    <view class="card" bindtap="goToVocationalEnroll">
+      <view class="card-icon voc-icon">🏫</view>
+      <view class="card-content">
+        <text class="card-title">中职教育</text>
+        <text class="card-desc">中等职业技术学校招生简章</text>
+      </view>
+      <view class="card-arrow">›</view>
+    </view>
+
+
+  </view>
+
+  <!-- 底部 -->
+  <view class="footer">
+    <view class="divider"></view>
+    <text class="footer-text">黔东南开放大学 · 招生办</text>
+  </view>
+</view>

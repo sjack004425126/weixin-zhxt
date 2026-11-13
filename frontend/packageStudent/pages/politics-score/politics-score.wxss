@@ -1,0 +1,297 @@
+page {
+  --c-primary: #1890FF;
+  --c-primary-light: #E6F7FF;
+  --c-success: #52C41A;
+  --c-success-light: #F6FFED;
+  --c-danger: #FF4D4F;
+  --c-danger-light: #FFF1F0;
+  --c-text: #262626;
+  --c-text2: #595959;
+  --c-text3: #8C8C8C;
+  --c-border: #F0F0F0;
+  --c-bg: #F5F7FA;
+  --radius: 16rpx;
+  --shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  background: var(--c-bg);
+}
+
+/* ===== 导航栏 ===== */
+.nav-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 1rpx 8rpx rgba(24,144,255,0.1);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  gap: 16rpx;
+}
+.nav-icon-wrap {
+  width: 72rpx; height: 72rpx;
+  background: linear-gradient(135deg, #1890FF, #40A9FF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nav-title-wrap { flex: 1; }
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--c-text);
+  display: block;
+}
+.nav-sub {
+  font-size: 22rpx;
+  color: var(--c-text3);
+  letter-spacing: 1rpx;
+}
+.nav-home {
+  width: 60rpx; height: 60rpx;
+  background: var(--c-primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  cursor: pointer;
+}
+
+/* ===== 页面主体 ===== */
+.page-body {
+  padding: 140rpx 24rpx 48rpx;
+}
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+/* ===== 学生信息卡 ===== */
+.stu-card {
+  background: linear-gradient(135deg, #1890FF 0%, #096DD9 100%);
+  border-radius: var(--radius);
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 6rpx 20rpx rgba(24,144,255,0.25);
+}
+.stu-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+.stu-avatar {
+  width: 80rpx; height: 80rpx;
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 3rpx solid rgba(255,255,255,0.4);
+}
+.stu-avatar-text {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.stu-info { flex: 1; }
+.stu-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.stu-detail {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.8);
+}
+.stu-status {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+.stu-status.active {
+  background: rgba(82,196,26,0.2);
+  color: #B7EB8F;
+  border: 1rpx solid rgba(82,196,26,0.4);
+}
+
+/* ===== 统计概览 ===== */
+.stats-row {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24rpx 0;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow);
+}
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+.stat-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--c-text);
+}
+.passed-num { color: var(--c-success); }
+.failed-num { color: var(--c-danger); }
+.stat-label {
+  font-size: 22rpx;
+  color: var(--c-text3);
+}
+.stat-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: var(--c-border);
+}
+
+/* ===== 要求提示栏 ===== */
+.notice-bar {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 20rpx 24rpx;
+  margin-bottom: 28rpx;
+  box-shadow: var(--shadow);
+  border-left: 6rpx solid var(--c-primary);
+}
+.notice-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+}
+.notice-text {
+  font-size: 24rpx;
+  color: var(--c-text2);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ===== 区域标题 ===== */
+.section { margin-bottom: 28rpx; }
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx;
+  margin-bottom: 16rpx;
+}
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.section-dot {
+  width: 12rpx; height: 12rpx;
+  border-radius: 50%;
+  background: var(--c-primary);
+}
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--c-text);
+}
+.section-count {
+  font-size: 24rpx;
+  color: var(--c-text3);
+  background: var(--c-border);
+  padding: 2rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+/* ===== 成绩卡片 ===== */
+.score-card {
+  display: flex;
+  background: #fff;
+  border-radius: var(--radius);
+  margin-bottom: 16rpx;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-accent {
+  width: 8rpx;
+  flex-shrink: 0;
+}
+.accent-green { background: var(--c-success); }
+.accent-red { background: var(--c-danger); }
+.card-body {
+  flex: 1;
+  padding: 24rpx 20rpx;
+  min-width: 0;
+}
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.card-name-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--c-text);
+  display: block;
+  margin-bottom: 8rpx;
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+.tag {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+.tag-batch {
+  color: var(--c-text2);
+  background: #F5F5F5;
+}
+
+/* 成绩徽章 */
+.score-badge {
+  font-size: 28rpx;
+  font-weight: 700;
+  width: 72rpx; height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pass-badge {
+  color: var(--c-success);
+  background: var(--c-success-light);
+  border: 2rpx solid rgba(82,196,26,0.3);
+}
+.fail-badge {
+  color: var(--c-danger);
+  background: var(--c-danger-light);
+  border: 2rpx solid rgba(255,77,79,0.3);
+}
+
+/* ===== 空状态 ===== */
+.empty-wrap {
+  padding: 100rpx 0;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}

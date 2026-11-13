@@ -1,0 +1,53 @@
+<view class="container">
+  <view class="title">点击卡片测试选中效果</view>
+  <view class="info">已选: {{selectedCount}} 个</view>
+  <view class="debug">调试: {{debugInfo}}</view>
+
+  <view class="section-title">方案A: border + box-shadow 发光</view>
+  <view class="grid">
+    <view 
+      class="card {{selectedMap[item] ? 'selected-a' : ''}}" 
+      wx:for="{{items}}" wx:key="*this"
+      bindtap="toggle" data-id="{{item}}"
+    >
+      <view class="card-name">卡片 {{item}}</view>
+      <view class="card-desc">{{selectedMap[item] ? '✅已选' : '未选'}}</view>
+    </view>
+  </view>
+
+  <view class="section-title">方案B: 纯 box-shadow 光晕</view>
+  <view class="grid">
+    <view 
+      class="card {{selectedMap['b' + item] ? 'selected-b' : ''}}" 
+      wx:for="{{items}}" wx:key="*this"
+      bindtap="toggle" data-id="{{'b' + item}}"
+    >
+      <view class="card-name">卡片 {{item}}</view>
+      <view class="card-desc">{{selectedMap['b' + item] ? '✅已选' : '未选'}}</view>
+    </view>
+  </view>
+
+  <view class="section-title">方案C: 背景色 + 粗左边框</view>
+  <view class="grid">
+    <view 
+      class="card {{selectedMap['c' + item] ? 'selected-c' : ''}}" 
+      wx:for="{{items}}" wx:key="*this"
+      bindtap="toggle" data-id="{{'c' + item}}"
+    >
+      <view class="card-name">卡片 {{item}}</view>
+      <view class="card-desc">{{selectedMap['c' + item] ? '✅已选' : '未选'}}</view>
+    </view>
+  </view>
+
+  <view class="section-title">方案D: outline 描边</view>
+  <view class="grid">
+    <view 
+      class="card {{selectedMap['d' + item] ? 'selected-d' : ''}}" 
+      wx:for="{{items}}" wx:key="*this"
+      bindtap="toggle" data-id="{{'d' + item}}"
+    >
+      <view class="card-name">卡片 {{item}}</view>
+      <view class="card-desc">{{selectedMap['d' + item] ? '✅已选' : '未选'}}</view>
+    </view>
+  </view>
+</view>

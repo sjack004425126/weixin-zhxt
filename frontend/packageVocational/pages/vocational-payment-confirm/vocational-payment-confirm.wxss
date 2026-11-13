@@ -1,0 +1,380 @@
+/* 主题色彩变量 */
+page {
+  --primary-color: #1890FF;
+  --primary-light: #E6F7FF;
+  --success-color: #52C41A;
+  --warning-color: #FAAD14;
+  --error-color: #FF4D4F;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  --card-shadow-hover: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding: 0 24rpx 120rpx;
+}
+
+/* 页面头部样式 */
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  margin: 0 -24rpx 32rpx;
+  padding: 32rpx 24rpx 24rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1rpx;
+}
+
+.stats-info {
+  padding: 8rpx 16rpx;
+  background: var(--primary-light);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.stats-text {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* 缴费卡片样式 */
+.payment-card {
+  position: relative;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.payment-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2rpx);
+}
+
+/* 状态指示器 */
+.status-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6rpx;
+  height: 100%;
+  border-radius: 0 4rpx 4rpx 0;
+}
+
+.paid-indicator {
+  background: linear-gradient(180deg, var(--success-color) 0%, #73D13D 100%);
+}
+
+.unpaid-indicator {
+  background: linear-gradient(180deg, var(--warning-color) 0%, #FFC53D 100%);
+}
+
+.paid-card {
+  border-left: 4rpx solid var(--success-color);
+}
+
+.unpaid-card {
+  border-left: 4rpx solid var(--warning-color);
+}
+
+/* 记录头部 */
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.payment-info {
+  flex: 1;
+}
+
+.payment-title {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge.paid {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--success-color);
+  border: 1rpx solid rgba(82, 196, 26, 0.2);
+}
+
+.status-badge.unpaid {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--warning-color);
+  border: 1rpx solid rgba(250, 173, 20, 0.2);
+}
+
+/* 费用详情 */
+.record-content {
+  margin-bottom: 20rpx;
+}
+
+.fee-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.fee-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 16rpx;
+  background: #FAFAFA;
+  border-radius: 12rpx;
+  border: 1rpx solid var(--border-color);
+}
+
+.fee-label {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.fee-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 总金额 */
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border-radius: 12rpx;
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.total-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* 缴费提示 */
+.payment-notice {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  margin-top: 20rpx;
+  border-left: 4rpx solid;
+}
+
+.payment-notice.warning {
+  background: rgba(250, 173, 20, 0.1);
+  border-left-color: var(--warning-color);
+}
+
+.payment-notice.warning text {
+  color: var(--warning-color);
+  font-size: 24rpx;
+}
+
+.payment-notice.success {
+  background: rgba(82, 196, 26, 0.1);
+  border-left-color: var(--success-color);
+}
+
+.payment-notice.success text {
+  color: var(--success-color);
+  font-size: 24rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  margin-top: 32rpx;
+}
+
+.button-group {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+}
+
+.single-button {
+  display: flex;
+  justify-content: center;
+}
+
+/* 按钮自定义样式 */
+.back-button {
+  flex: 1 !important;
+  background: #6c757d !important;
+  border-color: #6c757d !important;
+  color: white !important;
+}
+
+.pay-button {
+  flex: 2 !important;
+  min-width: 240rpx !important;
+}
+
+.back-button-single {
+  width: auto !important;
+  min-width: 200rpx !important;
+  padding: 0 32rpx !important;
+}
+
+/* 加载和错误状态 */
+.loading-container {
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+.error-container {
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+/* Vant组件样式覆盖 */
+.van-button--primary {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.3) !important;
+  transition: all 0.3s ease !important;
+  border-radius: 12rpx !important;
+}
+
+.van-button--primary:active {
+  transform: translateY(1rpx) !important;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.3) !important;
+}
+
+.van-empty__description {
+  color: var(--text-disabled) !important;
+  font-size: 28rpx !important;
+}
+
+.van-loading__text {
+  color: var(--text-secondary) !important;
+  font-size: 28rpx !important;
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.payment-card {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.action-buttons {
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .container {
+    padding: 0 16rpx 120rpx;
+  }
+
+  .page-header {
+    margin: 0 -16rpx 24rpx;
+    padding: 24rpx 16rpx 16rpx;
+  }
+
+  .fee-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .total-amount {
+    flex-direction: column;
+    gap: 12rpx;
+    text-align: center;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 12rpx;
+  }
+
+  .back-button, .pay-button {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16rpx;
+    align-items: flex-start;
+  }
+
+  .stats-info {
+    align-self: flex-end;
+  }
+}

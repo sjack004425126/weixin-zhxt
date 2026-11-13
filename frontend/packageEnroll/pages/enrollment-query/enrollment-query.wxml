@@ -1,0 +1,389 @@
+<!-- 顶部消息提示 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面主容器 -->
+<view class="page-root">
+
+  <!-- ===== 第1区：固定头部 ===== -->
+  <view class="page-header">
+    <view class="header-inner">
+      <view class="header-badge">
+        <van-icon name="shield-o" size="36rpx" color="#fff" />
+      </view>
+      <view class="header-text">
+        <view class="header-title">开放教育新生报名</view>
+        <view class="header-subtitle">全程加密 · 官方认证 · 防伪保障</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 第2区：查询入口（未查到时展示） ===== -->
+  <block wx:if="{{!showResult}}">
+
+    <!-- 方式切换标签 -->
+    <view class="query-section">
+      <view class="query-tabs">
+        <view
+          class="tab-item {{queryMode === 'code' ? 'active' : ''}}"
+          data-mode="code"
+          bindtap="onSwitchQueryMode"
+        >
+          <view class="tab-icon-wrap">
+            <van-icon name="description" size="28rpx" color="{{queryMode === 'code' ? '#fff' : '#1890FF'}}" />
+          </view>
+          <text class="tab-label">查询码</text>
+          <text class="tab-desc">无需验证</text>
+        </view>
+
+        <view class="tab-divider"></view>
+
+        <view
+          class="tab-item {{queryMode === 'phone_self' ? 'active' : ''}}"
+          data-mode="phone_self"
+          bindtap="onSwitchQueryMode"
+        >
+          <view class="tab-icon-wrap">
+            <van-icon name="phone-o" size="28rpx" color="{{queryMode === 'phone_self' ? '#fff' : '#1890FF'}}" />
+          </view>
+          <text class="tab-label">本人验证</text>
+          <text class="tab-desc">手机验证</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 查询表单卡片 -->
+    <view class="query-card">
+      <!-- 方式标题 -->
+      <view class="card-intro">
+        <view class="card-intro-icon">
+          <van-icon name="{{queryModeIcon}}" size="32rpx" color="#1890FF" />
+        </view>
+        <view class="card-intro-text">
+          <view class="card-intro-title">{{queryModeTitle}}</view>
+          <view class="card-intro-desc">{{queryModeDesc}}</view>
+        </view>
+      </view>
+
+      <!-- 方式一：查询码 -->
+      <view class="form-body" wx:if="{{queryMode === 'code'}}">
+        <view class="input-row">
+          <view class="input-prefix">
+            <van-icon name="qr" size="32rpx" color="#0369A1" />
+          </view>
+          <input
+            class="main-input"
+            type="text"
+            placeholder="请输入查询码（8位以上字母数字组合）"
+            maxlength="32"
+            value="{{queryCode}}"
+            bindinput="onQueryCodeInput"
+            placeholder-class="input-placeholder"
+          />
+        </view>
+        <button class="primary-btn" bindtap="onCheckPayment">
+          <van-icon name="search" size="28rpx" color="#fff" />
+          <text>查询报名信息</text>
+        </button>
+      </view>
+
+      <!-- 方式二/三：手机号验证 -->
+      <view class="form-body" wx:if="{{queryMode === 'phone_self' || queryMode === 'phone_parent'}}">
+        <view class="phone-verify-section">
+          <view class="phone-verify-header">
+            <view class="phone-verify-title">
+              <van-icon name="shield-o" size="22rpx" color="#059669" />
+              <text>手机快捷身份认证</text>
+            </view>
+          <view class="phone-verify-tip-text">
+            <text>使用本人微信绑定手机验证本人身份</text>
+          </view>
+          </view>
+
+          <button
+            class="phone-btn {{verifiedPhoneToken ? 'verified' : ''}}"
+            open-type="getPhoneNumber"
+            bindgetphonenumber="onVerifyByPhone"
+          >
+            <view wx:if="{{!verifiedPhoneToken}}" class="phone-btn-inner">
+              <van-icon name="phone-o" size="28rpx" color="#059669" />
+              <text>快捷手机号验证</text>
+            </view>
+            <view wx:else class="phone-btn-inner verified-inner">
+              <van-icon name="passed" size="28rpx" color="#fff" />
+              <text>{{verifiedPhoneMasked}}</text>
+              <text class="reverify" bindtap="clearVerifiedPhone">重选</text>
+            </view>
+          </button>
+        </view>
+
+        <button
+          class="primary-btn {{!verifiedPhoneToken ? 'btn-disabled' : ''}}"
+          bindtap="onCheckPayment"
+          disabled="{{!verifiedPhoneToken}}"
+        >
+          <van-icon name="search" size="28rpx" color="#fff" />
+          <text>{{verifiedPhoneToken ? '查询报名信息' : '请先完成身份验证'}}</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 防伪说明 -->
+    <view class="trust-strip">
+      <view class="trust-item">
+        <van-icon name="shield-o" size="24rpx" color="#059669" />
+        <text>防伪金额</text>
+      </view>
+      <view class="trust-sep"></view>
+      <view class="trust-item">
+        <van-icon name="certificate" size="24rpx" color="#059669" />
+        <text>官方认证</text>
+      </view>
+      <view class="trust-sep"></view>
+      <view class="trust-item">
+        <van-icon name="passed" size="24rpx" color="#059669" />
+        <text>信息加密</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 第3区：查询结果 ===== -->
+  <block wx:if="{{showResult}}">
+
+    <!-- 报名信息卡片 -->
+    <view class="result-card enrollment-card" wx:if="{{zyxx}}">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon">
+            <van-icon name="friends-o" size="26rpx" />
+          </view>
+          <text>报名信息</text>
+        </view>
+        <view class="card-badge enrollment-badge">
+          <van-icon name="star" size="18rpx" />
+          <text>已报名</text>
+        </view>
+      </view>
+
+      <view class="info-grid">
+        <view class="info-cell cell-full-width" wx:if="{{zyxx.major_name}}">
+          <view class="cell-label">
+            <van-icon name="flag-o" size="20rpx" />
+            <text>报名专业</text>
+          </view>
+          <view class="cell-value">{{zyxx.major_type}} · {{zyxx.major_level}} · {{zyxx.major_name}}</view>
+        </view>
+
+        <view class="info-cell" wx:if="{{zyxx.cooperation_school}}">
+          <view class="cell-label">
+            <van-icon name="friends-o" size="20rpx" />
+            <text>贯通院校</text>
+          </view>
+          <view class="cell-value">{{zyxx.cooperation_school}}</view>
+        </view>
+
+        <view class="info-cell" wx:if="{{zyxx.cooperation_major}}">
+          <view class="cell-label">
+            <van-icon name="bookmark-o" size="20rpx" />
+            <text>贯通专业</text>
+          </view>
+          <view class="cell-value">{{zyxx.cooperation_major}}</view>
+        </view>
+
+        <view class="info-cell is-remark" wx:if="{{zyxx.remark}}">
+          <view class="cell-label">
+            <van-icon name="info-o" size="20rpx" />
+            <text>备注</text>
+          </view>
+          <view class="cell-value remark">{{zyxx.remark}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 费用明细卡片 -->
+    <view class="result-card fee-card" wx:if="{{jfxx}}">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon">
+            <van-icon name="gold-coin-o" size="26rpx" />
+          </view>
+          <text>费用明细</text>
+        </view>
+        <view class="card-badge" wx:if="{{paidTip}}">
+          <view class="paid-pulse-dot"></view>
+          <text>已缴费</text>
+        </view>
+        <view class="card-badge unpaid-badge" wx:else>
+          <text>待缴费</text>
+        </view>
+      </view>
+
+      <!-- 已缴费成功提示 -->
+      <view wx:if="{{paidTip}}" class="paid-success-banner">
+        <view class="paid-success-icon">
+          <van-icon name="passed" size="40rpx" color="#fff" />
+        </view>
+        <view class="paid-success-text">
+          <view class="paid-success-title">缴费成功</view>
+          <view class="paid-success-sub">您已完成学费缴纳，感谢您的信任</view>
+        </view>
+      </view>
+
+      <!-- 费用列表 -->
+      <view class="fee-list">
+        <view class="fee-row">
+          <view class="fee-label-row">
+            <van-icon name="book-o" size="22rpx" color="#334155" />
+            <text class="fee-name">学费</text>
+          </view>
+          <text class="fee-amount">¥{{jfxx.xfStr}}</text>
+          <view wx:if="{{paidTip}}" class="fee-check">
+            <van-icon name="passed" size="18rpx" color="#059669" />
+          </view>
+        </view>
+
+        <view class="fee-row">
+          <view class="fee-label-row">
+            <van-icon name="orders-o" size="22rpx" color="#334155" />
+            <text class="fee-name">书费</text>
+          </view>
+          <text class="fee-amount">¥{{jfxx.sfStr}}</text>
+          <view wx:if="{{paidTip}}" class="fee-check">
+            <van-icon name="passed" size="18rpx" color="#059669" />
+          </view>
+        </view>
+
+        <view class="fee-divider"></view>
+
+        <view class="fee-row total-row">
+          <view class="fee-label-row">
+            <van-icon name="balance-pay" size="26rpx" color="#1890FF" />
+            <text class="fee-name total-name">总计</text>
+          </view>
+          <text class="fee-amount total-amount">¥{{jfxx.totalStr}}</text>
+        </view>
+      </view>
+
+      <!-- 缴费按钮 -->
+      <view class="payment-area" wx:if="{{!paidTip && jfxx}}">
+        <button class="primary-btn pay-btn" bindtap="showPayConfirmBox">
+          <van-icon name="balance-pay" size="28rpx" color="#fff" />
+          <text>立即缴费 ¥{{jfxx.totalStr}}</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 缴费记录 -->
+    <view class="result-card record-card" wx:if="{{payorder_xx && payorder_xx.o_status == 1}}">
+      <view class="card-header-row">
+        <view class="card-section-title">
+          <view class="section-title-icon">
+            <van-icon name="records" size="26rpx" />
+          </view>
+          <text>缴费记录</text>
+        </view>
+        <view class="card-badge">
+          <van-icon name="clock-o" size="18rpx" />
+          <text>已完成</text>
+        </view>
+      </view>
+
+      <view class="record-list">
+        <view class="record-row">
+          <text class="record-key">身份证号</text>
+          <text class="record-val">{{payorder_xx.o_sfzh}}</text>
+        </view>
+        <view class="record-row">
+          <text class="record-key">缴费金额</text>
+          <text class="record-val record-money">¥{{payorder_xx.moneyStr}}</text>
+        </view>
+        <view class="record-row">
+          <text class="record-key">支付方式</text>
+          <text class="record-val">{{payorder_xx.o_paytype}}</text>
+        </view>
+        <view class="record-row">
+          <text class="record-key">支付时间</text>
+          <text class="record-val">{{payorder_xx.o_payment_time}}</text>
+        </view>
+        <view class="record-row">
+          <text class="record-key">交易号</text>
+          <text class="record-val record-trade">{{payorder_xx.o_trade_no}}</text>
+        </view>
+      </view>
+
+      <view class="parent-notify" wx:if="{{parentNotifySent}}">
+        <view class="notify-icon success">
+          <van-icon name="bell" size="24rpx" color="#fff" />
+        </view>
+        <view class="notify-body">
+          <view class="notify-title">家长已收到学校官方通知</view>
+          <view class="notify-sub">{{parentNotifyMsg}}</view>
+        </view>
+      </view>
+      <view class="parent-notify warning-state" wx:elif="{{parentNotifyMsg}}">
+        <view class="notify-icon warning-icon">
+          <van-icon name="warning-o" size="24rpx" color="#fff" />
+        </view>
+        <view class="notify-body">
+          <view class="notify-title">家长通知发送失败</view>
+          <view class="notify-sub">{{parentNotifyMsg}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 重新查询按钮 -->
+    <view class="requery-section">
+      <button class="requery-btn" bindtap="onReQuery">
+        <van-icon name="search" size="24rpx" />
+        <text>重新查询</text>
+      </button>
+    </view>
+
+  </block>
+
+  <!-- ===== 防伪页脚 ===== -->
+  <view class="page-footer">
+    <view class="footer-row">
+      <van-icon name="info-o" size="20rpx" color="#94A3B8" />
+      <text>如有疑问请联系学校招生办电话：{{schoolPhone || '请至学校官网查询'}}</text>
+    </view>
+  </view>
+
+</view>
+
+<!-- 整页文字水印（防伪 canvas） -->
+<canvas type="2d" id="page-watermark" class="page-watermark-canvas"></canvas>
+
+<!-- 缴费确认弹窗 -->
+<van-popup
+  show="{{showPayConfirm}}"
+  bind:close="hidePayConfirmBox"
+  position="center"
+  custom-style="padding:0;width:85vw;max-width:600rpx;overflow:visible;background:transparent;"
+>
+  <view class="pay-popup">
+    <view class="popup-head">
+      <view class="popup-head-icon">
+        <van-icon name="balance-pay" size="40rpx" color="#fff" />
+      </view>
+      <view class="popup-head-title">确认缴费</view>
+    </view>
+    <view class="popup-fee-list" wx:if="{{jfxx}}">
+      <view class="popup-fee-item">
+        <text>学费</text>
+        <text>¥{{jfxx.xfStr}}</text>
+      </view>
+      <view class="popup-fee-item">
+        <text>书费</text>
+        <text>¥{{jfxx.sfStr}}</text>
+      </view>
+    </view>
+    <view class="popup-total" wx:if="{{jfxx}}">
+      <text>总计</text>
+      <text class="popup-total-amount">¥{{jfxx.totalStr}}</text>
+    </view>
+    <view class="popup-actions">
+      <button class="popup-cancel" bindtap="hidePayConfirmBox">取消</button>
+      <button class="popup-confirm" bindtap="onStartPayment">确认支付</button>
+    </view>
+  </view>
+</van-popup>

@@ -1,0 +1,117 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="container">
+  <!-- 头像提示条 + 处理中遮罩 -->
+  <include src="/utils/avatar-components.wxml" />
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <view class="avatar-container">
+        <view class="avatar-wrapper" bindtap="onAvatarTap">
+          <image class="avatar" src="{{avatarUrl || defaultAvatar}}" mode="aspectFill" binderror="onAvatarError"></image>
+          <view class="avatar-badge" wx:if="{{!hasAvatar}}">!</view>
+        </view>
+      </view>
+      <view class="info-wrap">
+        <view class="name-row">
+          <text class="name">{{userInfo.t_xm || '教师'}}</text>
+          <view class="status-tags">
+            <view class="status-tag teacher">中职教师</view>
+            <view class="status-tag role" wx:if="{{userInfo.role_name}}">{{userInfo.role_name}}</view>
+          </view>
+        </view>
+        <view class="user-detail">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;"></text>
+          <text>工号：{{userInfo.t_yhm || '-'}}</text>
+        </view>
+        <view class="user-detail" wx:if="{{userInfo.class_name}}">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;"></text>
+          <text>班级：{{userInfo.class_name}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="function-list">
+    <!-- 审批管理 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">审批管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="请假审批"
+          is-link
+          bind:click="navigateTo"
+          data-url="/packageTeacher/pages/vocational-teacher-leave/vocational-teacher-leave">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+          <van-tag type="danger" wx:if="{{pendingLeaveCount > 0}}">{{pendingLeaveCount}}</van-tag>
+        </van-cell>
+      </van-cell-group>
+    </view>
+
+    <!-- 学生管理 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">学生管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="照片管理"
+          is-link
+          data-url="/packageTeacher/pages/vocational-teacher-photo/vocational-teacher-photo"
+          bind:click="navigateTo">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+          <van-tag type="warning" wx:if="{{pendingPhotoCount > 0}}">{{pendingPhotoCount}}</van-tag>
+        </van-cell>
+        <van-cell
+          title="社团课选课统计"
+          is-link
+          data-url="/packageTeacher/pages/vocational-teacher-club-stats/vocational-teacher-club-stats"
+          bind:click="navigateTo">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+        </van-cell>
+        <van-cell
+          title="宿舍管理"
+          is-link
+          data-url="/packageTeacher/pages/vocational-teacher-dormitory/vocational-teacher-dormitory"
+          bind:click="navigateTo">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+        </van-cell>
+        <van-cell
+          title="留宿管理"
+          is-link
+          data-url="/packageTeacher/pages/vocational-teacher-stay/vocational-teacher-stay"
+          bind:click="navigateTo">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+        </van-cell>
+        <van-cell
+          wx:if="{{canCounsel}}"
+          title="心理咨询管理"
+          is-link
+          data-url="/packageTeacher/pages/vocational-teacher-counsel-detail/vocational-teacher-counsel-detail"
+          bind:click="navigateTo">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+        </van-cell>
+      </van-cell-group>
+    </view>
+
+    <!-- 设置 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">设置</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="退出登录"
+          is-link
+          bindtap="handleLogout"
+          title-class="logout-text">
+          <text slot="icon" class="vi cell-vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#FF4D4F;"></text>
+        </van-cell>
+      </van-cell-group>
+    </view>
+  </view>
+</view>

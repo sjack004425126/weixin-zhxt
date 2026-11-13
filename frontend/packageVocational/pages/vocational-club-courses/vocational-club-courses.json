@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "社团课程",
+  "usingComponents": {
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "/components/vant-icon/index"
+  }
+}

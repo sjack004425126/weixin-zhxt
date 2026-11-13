@@ -1,0 +1,75 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部导航 -->
+<view class="page-header-nav">
+  <view class="header-nav-content">
+    <view class="header-nav-icon">
+      <van-icon name="balance-pay" size="40rpx" />
+    </view>
+    <view class="header-nav-text">
+      <view class="header-nav-title">确认报考</view>
+      <view class="header-nav-subtitle">Confirm Payment</view>
+    </view>
+    <view class="header-nav-action">
+      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <view class="header">
+    <view class="title">
+      <text class="title-text">确认报考信息</text>
+      <text class="title-desc">请仔细核对以下报考课程信息</text>
+    </view>
+  </view>
+
+  <view class="courses-list" wx:if="{{!loading}}">
+    <view class="course-item" wx:for="{{selectedCourses}}" wx:key="id">
+      <view class="course-info">
+        <view class="course-name-wrapper">
+          <view class="course-icon">
+            <van-icon name="{{item.is_free ? 'gift-o' : 'balance-pay'}}" size="24rpx" color="white" />
+          </view>
+          <text class="course-name">{{item.course_name}}</text>
+        </view>
+        <text class="course-type">{{item.exam_unit}}</text>
+        <text class="course-id">课程ID: {{item.course_id}}</text>
+      </view>
+      <view class="course-right">
+        <text class="course-price {{item.is_free ? 'free-price' : ''}}">
+          {{item.is_free ? '免费' : '¥' + item.fee}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <van-loading type="spinner" size="48rpx" text-size="28rpx">加载中...</van-loading>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && selectedCourses.length === 0}}">
+    <van-empty description="暂无报考课程" />
+  </view>
+
+  <view class="footer" wx:if="{{selectedCourses.length > 0}}">
+    <view class="total-info">
+      <text class="total-label">共{{selectedCourses.length}}门课程</text>
+      <text class="total-price">¥{{totalFee}}</text>
+    </view>
+    <view class="action-buttons">
+      <van-button 
+        custom-class="cancel-btn" 
+        bind:click="handleCancel" 
+        plain
+        round
+      >返回</van-button>
+      <van-button 
+        custom-class="confirm-btn" 
+        bind:click="handleConfirm"
+        round
+      >确认报考</van-button>
+    </view>
+  </view>
+</view> 

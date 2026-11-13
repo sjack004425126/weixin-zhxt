@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "身份选择",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

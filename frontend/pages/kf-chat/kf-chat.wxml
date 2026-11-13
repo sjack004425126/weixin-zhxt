@@ -1,0 +1,73 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page">
+  <scroll-view
+    class="chat-list"
+    scroll-y="true"
+    scroll-with-animation="true"
+    scroll-top="{{scrollTop}}"
+    show-scrollbar="false"
+  >
+    <view class="chat-body">
+      <block wx:for="{{messages}}" wx:key="id">
+
+        <!-- 用户消息 -->
+        <view wx:if="{{item.direction === 'outgoing'}}" class="segment segment-user" id="{{item.id}}">
+          <view class="segment-content-box">
+            <view class="user-content">{{item.text}}</view>
+          </view>
+        </view>
+
+        <!-- AI消息 -->
+        <view wx:else class="segment segment-assistant" id="{{item.id}}">
+          <view class="segment-avatar">
+            <image class="avatar-img" src="{{defaultAvatar}}" mode="aspectFill" />
+          </view>
+          <view class="segment-container">
+            <view class="markdown-container">
+              <md-render content="{{item.text}}" />
+            </view>
+          </view>
+        </view>
+
+      </block>
+
+      <!-- AI 正在思考 -->
+      <view wx:if="{{isTyping}}" class="segment segment-assistant">
+        <view class="segment-avatar">
+          <image class="avatar-img" src="{{defaultAvatar}}" mode="aspectFill" />
+        </view>
+        <view class="segment-container">
+          <view class="typing-indicator">
+            <view class="typing-dot"></view>
+            <view class="typing-dot"></view>
+            <view class="typing-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+
+  <!-- 输入框 -->
+  <view class="chat-input-wrapper">
+    <view class="chat-input-container">
+      <input
+        class="chat-input-field"
+        value="{{inputValue}}"
+        placeholder="有问题尽管问我..."
+        placeholder-style="color:#999"
+        maxlength="500"
+        focus="{{inputFocus}}"
+        bindinput="handleInputChange"
+        confirm-type="send"
+        bindconfirm="handleSend"
+        bindblur="handleInputBlur"
+      />
+      <view class="send-btn {{inputValue ? 'active' : ''}}" bindtap="handleSend">
+        <text class="send-icon">↑</text>
+      </view>
+    </view>
+  </view>
+</view>

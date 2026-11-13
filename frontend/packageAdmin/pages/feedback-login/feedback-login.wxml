@@ -1,0 +1,76 @@
+<include src="/utils/common-components.wxml" />
+<view class="page">
+  <!-- 顶部品牌区：大留白、居中 -->
+  <view class="hero">
+    <view class="logo">
+      <van-icon name="comment-o" size="72rpx" color="#fff" />
+    </view>
+    <view class="title">校园反馈</view>
+    <view class="subtitle">您身边的问题，我们认真聆听</view>
+  </view>
+
+  <!-- 特性介绍：3 条核心收益，icon + 文字，无多余卡片 -->
+  <view class="features">
+    <view class="feat-item">
+      <view class="feat-icon blue">
+        <van-icon name="shop-o" size="36rpx" />
+      </view>
+      <view class="feat-text">
+        <view class="feat-title">场景全覆盖</view>
+        <view class="feat-desc">食堂 · 宿舍 · 教室 · 超市</view>
+      </view>
+    </view>
+    <view class="feat-item">
+      <view class="feat-icon green">
+        <van-icon name="chat-o" size="36rpx" />
+      </view>
+      <view class="feat-text">
+        <view class="feat-title">办结短信通知</view>
+        <view class="feat-desc">维修工单处理完成后自动推送</view>
+      </view>
+    </view>
+    <view class="feat-item">
+      <view class="feat-icon orange">
+        <van-icon name="eye-o" size="36rpx" />
+      </view>
+      <view class="feat-text">
+        <view class="feat-title">支持匿名建议</view>
+        <view class="feat-desc">姓名不会对外展示，放心表达</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 登录区：单 CTA 聚焦 -->
+  <view class="login-area">
+    <button
+      class="phone-btn {{!isAgree ? 'phone-btn-disabled' : ''}}"
+      open-type="getPhoneNumber"
+      bindgetphonenumber="onGetPhoneNumber"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+    >
+      <van-icon name="phone-o" size="36rpx" color="#fff" custom-style="margin-right:8rpx;" />
+      手机号快捷登录
+    </button>
+
+    <view class="tip">
+      <van-icon name="info-o" size="24rpx" color="#8C8C8C" />
+      <text>仅本校在册师生、工作人员可登录使用</text>
+    </view>
+
+    <!-- 协议同意：checkbox 与链接同一行，不换行错乱 -->
+    <view class="agreement">
+      <checkbox-group class="agree-group" bindchange="handleAgreeChange">
+        <label class="agree-label">
+          <checkbox value="agree" checked="{{isAgree}}" color="#1890FF" />
+          <text class="agree-txt">我已阅读并同意</text>
+        </label>
+      </checkbox-group>
+      <text class="link" bindtap="navigateToUserAgreement">《用户协议》</text>
+      <text class="agree-and">和</text>
+      <text class="link" bindtap="navigateToPrivacyPolicy">《隐私政策》</text>
+    </view>
+  </view>
+
+  <view class="footer">登录即表示您愿意以本人真实身份提交反馈</view>
+</view>

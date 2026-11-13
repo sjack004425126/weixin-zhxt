@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "确认报名",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#E6F7FF",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "/components/vant-icon/index",
+    "van-empty": "@vant/weapp/empty/index"
+  }
+}

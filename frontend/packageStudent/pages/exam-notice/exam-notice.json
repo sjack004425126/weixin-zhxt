@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "考试通知",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#E6F7FF",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-empty": "@vant/weapp/empty/index"
+  }
+}

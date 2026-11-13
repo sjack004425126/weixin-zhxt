@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "本学期课程",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-icon": "/components/vant-icon/index"
+  },
+  "enablePullDownRefresh": true
+}

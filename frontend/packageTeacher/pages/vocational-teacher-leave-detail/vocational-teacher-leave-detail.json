@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "请假详情",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

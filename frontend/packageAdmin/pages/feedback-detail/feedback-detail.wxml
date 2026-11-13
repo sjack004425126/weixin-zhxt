@@ -1,0 +1,118 @@
+<include src="/utils/common-components.wxml" />
+<van-dialog id="van-dialog" />
+<view class="page" wx:if="{{ticket}}">
+  <!-- 状态卡片 -->
+  <view class="status-card status-bg-{{ticket.status}}">
+    <view class="status-icon">
+      <van-icon name="{{statusIcon[ticket.status]}}" size="56rpx" color="#fff" />
+    </view>
+    <view class="status-meta">
+      <view class="status-text">{{statusLabels[ticket.status]}}</view>
+      <view class="status-sub">工单号 {{ticket.ticket_no}}</view>
+    </view>
+  </view>
+
+  <!-- 内容卡片 -->
+  <view class="card">
+    <view class="head-row">
+      <view class="cat-tag {{ticket.category==='repair' ? 'cat-repair' : 'cat-suggest'}}">
+        {{ticket.category==='repair' ? '维修报修' : '意见建议'}}
+      </view>
+      <view wx:if="{{ticket.urgency==='urgent'}}" class="urgent-tag">紧急</view>
+    </view>
+    <view class="title">{{ticket.title}}</view>
+    <view class="content">{{ticket.content}}</view>
+
+    <view class="meta-row" wx:if="{{ticket.item_label}}">
+      <text wx:if="{{ticket.item_label}}" class="meta-tag">对象:{{ticket.item_label}}</text>
+    </view>
+    <!-- 2026-09-27 重构：地点/维修类型只读新字段 location_text_fuzzy / repair_type_text -->
+    <view class="meta-row" wx:if="{{ticket.location_text_fuzzy || ticket.location_text}}">
+      <van-icon name="location-o" size="26rpx" color="#1890FF" />
+      <text class="loc">{{ticket.location_text_fuzzy || ticket.location_text}}</text>
+    </view>
+    <view class="meta-row" wx:if="{{ticket.repair_type_text}}">
+      <van-icon name="setting-o" size="26rpx" color="#FA8C16" />
+      <text class="loc">维修类型:{{ticket.repair_type_text}}</text>
+    </view>
+
+    <view class="img-grid" wx:if="{{ticket.images.length>0}}">
+      <view wx:for="{{ticket.images}}" wx:key="key" class="img-wrap"
+            bindtap="previewImage" data-list="reporter" data-index="{{index}}">
+        <view wx:if="{{item.type==='video'}}" class="img video-thumb">
+          <image wx:if="{{item.poster}}" src="{{baseUrl}}{{item.poster}}" mode="aspectFill" class="video-poster" />
+          <van-icon name="play-circle" size="56rpx" color="#fff" custom-style="position:relative;z-index:1;filter:drop-shadow(0 2rpx 6rpx rgba(0,0,0,0.4));" />
+          <view class="video-tag">视频</view>
+        </view>
+        <image wx:else src="{{baseUrl}}{{item.url}}" mode="aspectFill" class="img" />
+      </view>
+    </view>
+
+    <view class="reporter">
+      <van-icon name="user-o" size="26rpx" color="#8C8C8C" />
+      <text>{{ticket.is_anonymous ? '匿名用户' : ticket.reporter_name}}</text>
+      <text class="dot-sep">·</text>
+      <text>{{ticket.reporter_dept || '-'}}</text>
+      <text class="dot-sep">·</text>
+      <text>{{ticket.created_at}}</text>
+    </view>
+  </view>
+
+  <!-- 处理结果 -->
+  <view wx:if="{{ticket.status==='done' || ticket.status==='processing'}}" class="card">
+    <view class="card-title">
+      <van-icon name="passed" size="32rpx" color="#52C41A" />
+      <text>处理结果</text>
+    </view>
+    <view class="content" wx:if="{{ticket.handle_remark}}">{{ticket.handle_remark}}</view>
+    <view class="content muted" wx:else>暂无处理意见</view>
+    <view class="img-grid" wx:if="{{ticket.handle_images.length>0}}">
+      <view wx:for="{{ticket.handle_images}}" wx:key="key" class="img-wrap"
+            bindtap="previewImage" data-list="handle" data-index="{{index}}">
+        <view wx:if="{{item.type==='video'}}" class="img video-thumb">
+          <image wx:if="{{item.poster}}" src="{{baseUrl}}{{item.poster}}" mode="aspectFill" class="video-poster" />
+          <van-icon name="play-circle" size="56rpx" color="#fff" custom-style="position:relative;z-index:1;filter:drop-shadow(0 2rpx 6rpx rgba(0,0,0,0.4));" />
+          <view class="video-tag">视频</view>
+        </view>
+        <image wx:else src="{{baseUrl}}{{item.url}}" mode="aspectFill" class="img" />
+      </view>
+    </view>
+    <view class="handler-meta" wx:if="{{ticket.handler_name}}">
+      处理人:{{ticket.handler_name}}<text wx:if="{{ticket.handle_at}}"> · {{ticket.handle_at}}</text>
+    </view>
+  </view>
+
+  <!-- 驳回原因 -->
+  <view wx:if="{{ticket.status==='rejected'}}" class="card reject-card">
+    <view class="card-title">
+      <van-icon name="close" size="32rpx" color="#FF4D4F" />
+      <text>已驳回</text>
+    </view>
+    <view class="content">{{ticket.reject_reason || '-'}}</view>
+    <view class="handler-meta" wx:if="{{ticket.handler_name}}">
+      操作人:{{ticket.handler_name}}<text wx:if="{{ticket.handle_at}}"> · {{ticket.handle_at}}</text>
+    </view>
+  </view>
+
+  <!-- 时间线 -->
+  <view class="card">
+    <view class="card-title">
+      <van-icon name="clock-o" size="32rpx" color="#1890FF" />
+      <text>处理进度</text>
+    </view>
+    <view class="timeline">
+      <view wx:for="{{timeline}}" wx:key="created_at" class="tl-item">
+        <view class="tl-dot tl-dot-{{item.action}}"></view>
+        <view class="tl-body">
+          <view class="tl-action">{{actionLabels[item.action] || item.action}}</view>
+          <view class="tl-meta">{{item.operator_name || '-'}} · {{item.created_at}}</view>
+          <view class="tl-remark" wx:if="{{item.remark}}">{{item.remark}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions" wx:if="{{ticket.status==='pending' && isOwner}}">
+    <van-button block plain type="danger" bind:click="onCancel">撤回反馈</van-button>
+  </view>
+</view>

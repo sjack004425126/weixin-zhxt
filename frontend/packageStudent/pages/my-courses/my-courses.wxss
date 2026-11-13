@@ -1,0 +1,291 @@
+page {
+  --c-primary: #1890FF;
+  --c-primary-light: #E6F7FF;
+  --c-success: #52C41A;
+  --c-success-light: #F6FFED;
+  --c-danger: #FF4D4F;
+  --c-danger-light: #FFF1F0;
+  --c-warning: #FAAD14;
+  --c-warning-light: #FFFBE6;
+  --c-text: #262626;
+  --c-text2: #595959;
+  --c-text3: #8C8C8C;
+  --c-border: #F0F0F0;
+  --c-bg: #F5F7FA;
+  --radius: 16rpx;
+  --shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  background: var(--c-bg);
+}
+
+/* ===== 导航栏 ===== */
+.nav-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 1rpx 8rpx rgba(24,144,255,0.1);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  gap: 16rpx;
+}
+.nav-icon-wrap {
+  width: 72rpx; height: 72rpx;
+  background: linear-gradient(135deg, #1890FF, #40A9FF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nav-title-wrap { flex: 1; }
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--c-text);
+  display: block;
+}
+.nav-sub {
+  font-size: 22rpx;
+  color: var(--c-text3);
+  letter-spacing: 1rpx;
+}
+.nav-home {
+  width: 60rpx; height: 60rpx;
+  background: var(--c-primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-primary);
+  cursor: pointer;
+}
+
+/* ===== 页面主体 ===== */
+.page-body { padding: 140rpx 24rpx 48rpx; }
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+/* ===== 统计概览 ===== */
+.stats-row {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24rpx 0;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow);
+}
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+.stat-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--c-text);
+}
+.learned-num { color: var(--c-primary); }
+.passed-num { color: var(--c-success); }
+.failed-num { color: var(--c-danger); }
+.stat-label {
+  font-size: 22rpx;
+  color: var(--c-text3);
+}
+.stat-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: var(--c-border);
+}
+
+/* ===== 区域标题 ===== */
+.section { margin-bottom: 28rpx; }
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx;
+  margin-bottom: 16rpx;
+}
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.section-dot {
+  width: 12rpx; height: 12rpx;
+  border-radius: 50%;
+}
+.failed-dot { background: var(--c-danger); }
+.passed-dot { background: var(--c-success); }
+.unlearned-dot { background: var(--c-text3); }
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--c-text);
+}
+.section-count {
+  font-size: 24rpx;
+  color: var(--c-text3);
+  background: var(--c-border);
+  padding: 2rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+/* ===== 课程卡片 ===== */
+.course-card {
+  display: flex;
+  background: #fff;
+  border-radius: var(--radius);
+  margin-bottom: 16rpx;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-accent {
+  width: 8rpx;
+  flex-shrink: 0;
+}
+.accent-red { background: var(--c-danger); }
+.accent-green { background: var(--c-success); }
+.accent-gray { background: var(--c-text3); }
+.card-body {
+  flex: 1;
+  padding: 20rpx 20rpx 16rpx;
+  min-width: 0;
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
+}
+.card-name-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--c-text);
+  display: block;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.passed-name { color: var(--c-text2); }
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+.tag {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+.tag-id {
+  color: var(--c-primary);
+  background: var(--c-primary-light);
+}
+.tag-type {
+  color: var(--c-text2);
+  background: #F5F5F5;
+}
+.tag-xf {
+  color: var(--c-warning);
+  background: var(--c-warning-light);
+}
+.card-bottom {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+.meta-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.meta-item {
+  font-size: 20rpx;
+  color: var(--c-text3);
+  background: #FAFAFA;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+}
+
+/* 成绩徽章 */
+.score-badge {
+  font-size: 28rpx;
+  font-weight: 700;
+  width: 72rpx; height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pass-badge {
+  color: var(--c-success);
+  background: var(--c-success-light);
+  border: 2rpx solid rgba(82,196,26,0.3);
+}
+.fail-badge {
+  color: var(--c-danger);
+  background: var(--c-danger-light);
+  border: 2rpx solid rgba(255,77,79,0.3);
+}
+
+/* 未学习状态 */
+.status-pill {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  color: var(--c-text3);
+  background: #F5F5F5;
+  flex-shrink: 0;
+}
+
+/* 详细成绩 */
+.score-detail {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 10rpx;
+  padding-top: 10rpx;
+  border-top: 1rpx solid var(--c-border);
+}
+.score-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+.score-detail-label {
+  font-size: 22rpx;
+  color: var(--c-text3);
+}
+.score-detail-val {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.fail-val { color: var(--c-danger); }
+
+/* ===== 空状态 ===== */
+.empty-wrap {
+  padding: 100rpx 0;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}

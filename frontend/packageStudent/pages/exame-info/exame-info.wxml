@@ -1,0 +1,103 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="back-button" bindtap="goToExameList">
+      <van-icon name="arrow-left" size="32rpx" />
+    </view>
+    <view class="header-icon">
+      <van-icon name="description" size="40rpx" />
+    </view>
+    <view class="header-text">
+      <view class="header-title">考试详情</view>
+      <view class="header-subtitle">Exam Details</view>
+    </view>
+    <view class="header-action">
+      <van-icon name="orders-o" size="32rpx" bindtap="goToExameList" />
+    </view>
+  </view>
+</view>
+
+<view class="container" wx:if="{{exam}}">
+  <!-- 状态横幅 -->
+  <view wx:if="{{exam.time_status === 'ended'}}" class="exam-status-tip status-ended">
+    <van-icon name="warning-o" size="36rpx" color="#FF5252" />
+    <text>本次考试已结束</text>
+  </view>
+  <view wx:elif="{{exam.time_status === 'not_started'}}" class="exam-status-tip status-pending">
+    <van-icon name="clock-o" size="36rpx" color="#FAAD14" />
+    <text>本次考试尚未开始</text>
+  </view>
+  <view wx:elif="{{!exam.has_permission}}" class="exam-status-tip status-noauth">
+    <van-icon name="lock" size="36rpx" color="#FF5252" />
+    <text>您没有参加此考试的权限</text>
+  </view>
+
+  <!-- 考试信息卡 -->
+  <view class="exam-card">
+    <view class="exam-title">{{exam.title}}</view>
+    <view wx:if="{{exam.description}}" class="exam-desc">{{exam.description}}</view>
+
+    <view class="exam-meta">
+      <view class="meta-row">
+        <text class="meta-label">时长</text>
+        <text class="meta-value">{{exam.duration}} 分钟</text>
+      </view>
+      <view class="meta-row">
+        <text class="meta-label">总分</text>
+        <text class="meta-value">{{exam.total_score}}</text>
+      </view>
+      <view class="meta-row">
+        <text class="meta-label">及格分</text>
+        <text class="meta-value">{{exam.pass_score}}</text>
+      </view>
+      <view class="meta-row" wx:if="{{exam.start_date || exam.end_date}}">
+        <text class="meta-label">开放时间</text>
+        <text class="meta-value">
+          {{exam.start_date || '不限'}} ~ {{exam.end_date || '不限'}}
+        </text>
+      </view>
+      <view class="meta-row" wx:if="{{exam.max_attempts > 0}}">
+        <text class="meta-label">次数限制</text>
+        <text class="meta-value">最多 {{exam.max_attempts}} 次</text>
+      </view>
+    </view>
+
+    <view class="exam-action">
+      <block wx:if="{{exam.active_record_id}}">
+        <button class="btn-primary" data-id="{{exam.id}}" data-record="{{exam.active_record_id}}" bindtap="goToResume">继续考试</button>
+      </block>
+      <block wx:elif="{{exam.can_attempt}}">
+        <button class="btn-primary" data-id="{{exam.id}}" bindtap="goToStart">开始考试</button>
+      </block>
+      <block wx:else>
+        <button class="btn-disabled" disabled>不可开始</button>
+      </block>
+    </view>
+  </view>
+
+  <!-- 历史成绩 -->
+  <view wx:if="{{records.length > 0}}" class="records-card">
+    <view class="card-title">历史成绩</view>
+    <view wx:for="{{records}}" wx:key="id" class="record-row" data-record="{{item.id}}" bindtap="goToRecord">
+      <view class="record-row-left">
+        <text class="record-score" style="color: {{item.is_passed ? '#52c41a' : '#ff4d4f'}}">
+          {{item.score != null ? item.score : '-'}}
+        </text>
+        <text class="record-score-total">/{{item.total_score || exam.total_score}}</text>
+      </view>
+      <view class="record-row-mid">
+        <text class="record-status">{{item.grading_status === 'pending' ? '待评阅' : (item.is_passed ? '通过' : '未通过')}}</text>
+        <text class="record-time">{{item.submitted_at || item.started_at}}</text>
+      </view>
+      <van-icon name="arrow" />
+    </view>
+  </view>
+</view>
+
+<view wx:else class="loading-tip">
+  <van-icon name="loading" size="36rpx" color="#1890FF" />
+  <text>加载中...</text>
+</view>

@@ -1,0 +1,291 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-content">
+      <view class="title-section">
+        <van-icon name="contact" size="48rpx" color="#1890FF" />
+        <text class="title">学生信息</text>
+      </view>
+      <view class="stats-info">
+        <text class="stats-text">个人档案</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学生基本信息卡片 -->
+  <view wx:if="{{studentInfo}}" class="info-card">
+    <!-- 卡片状态指示器 -->
+    <view class="status-indicator info-indicator"></view>
+
+    <!-- 卡片头部 -->
+    <view class="card-header">
+      <view class="header-left">
+        <van-icon name="user-o" size="28rpx" />
+        <text class="card-title">基本信息</text>
+      </view>
+      <view class="status-badge active">
+        <van-icon name="passed" size="20rpx" />
+        <text>在校</text>
+      </view>
+    </view>
+
+    <!-- 基本信息网格 -->
+    <view class="card-content">
+      <view class="info-grid">
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="user-o" size="20rpx" />
+            <text>姓名</text>
+          </view>
+          <text class="info-value">{{studentInfo.xm}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="idcard" size="20rpx" />
+            <text>学号</text>
+          </view>
+          <text class="info-value">{{studentInfo.xh}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="{{studentInfo.xb === '男' ? 'friends-o' : 'user-circle-o'}}" size="20rpx" />
+            <text>性别</text>
+          </view>
+          <text class="info-value">{{studentInfo.xb}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="flag-o" size="20rpx" />
+            <text>民族</text>
+          </view>
+          <text class="info-value">{{studentInfo.mzText}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="certificate" size="20rpx" />
+            <text>身份证号</text>
+          </view>
+          <text class="info-value long-text">{{studentInfo.sfzh}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="phone-o" size="20rpx" />
+            <text>联系电话</text>
+          </view>
+          <text class="info-value">{{studentInfo.xsdh}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="medal-o" size="20rpx" />
+            <text>政治面貌</text>
+          </view>
+          <text class="info-value long-text">{{studentInfo.zzmmText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学籍信息卡片 -->
+  <view wx:if="{{studentInfo}}" class="info-card">
+    <!-- 卡片状态指示器 -->
+    <view class="status-indicator academic-indicator"></view>
+
+    <!-- 卡片头部 -->
+    <view class="card-header">
+      <view class="header-left">
+        <van-icon name="bookmark-o" size="28rpx" />
+        <text class="card-title">学籍信息</text>
+      </view>
+    </view>
+
+    <!-- 学籍信息网格 -->
+    <view class="card-content">
+      <view class="info-grid">
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="calendar-o" size="20rpx" />
+            <text>入学年度</text>
+          </view>
+          <text class="info-value">20{{studentInfo.nd}}年</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="home-o" size="20rpx" />
+            <text>班级</text>
+          </view>
+          <text class="info-value">{{studentInfo.bjmc || '班级ID: ' + studentInfo.bj_id}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="bookmark-o" size="20rpx" />
+            <text>专业</text>
+          </view>
+          <text class="info-value">{{studentInfo.zymc || '专业ID: ' + studentInfo.zy_id}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="{{studentInfo.xjztIcon}}" size="20rpx" />
+            <text>学籍状态</text>
+          </view>
+          <text class="info-value status-{{studentInfo.xjzt}}">{{studentInfo.xjztText}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="location-o" size="20rpx" />
+            <text>学生来源</text>
+          </view>
+          <text class="info-value">{{studentInfo.xsly}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="user-circle-o" size="20rpx" />
+            <text>招生对象</text>
+          </view>
+          <text class="info-value">{{studentInfo.zsdx}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 家庭信息卡片 -->
+  <view wx:if="{{studentInfo}}" class="info-card">
+    <!-- 卡片状态指示器 -->
+    <view class="status-indicator family-indicator"></view>
+
+    <!-- 卡片头部 -->
+    <view class="card-header">
+      <view class="header-left">
+        <van-icon name="friends-o" size="28rpx" />
+        <text class="card-title">家庭信息</text>
+      </view>
+    </view>
+
+    <!-- 家庭信息网格 -->
+    <view class="card-content">
+      <view class="info-grid">
+        <view class="info-item full-width">
+          <view class="info-label">
+            <van-icon name="location" size="20rpx" />
+            <text>家庭地址</text>
+          </view>
+          <text class="info-value long-text">{{studentInfo.jtxxdz}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="home-o" size="20rpx" />
+            <text>户口性质</text>
+          </view>
+          <text class="info-value">{{studentInfo.hkxzText}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="location-o" size="20rpx" />
+            <text>居住地类型</text>
+          </view>
+          <text class="info-value">{{studentInfo.jzdlxText}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="contact" size="20rpx" />
+            <text>监护人姓名</text>
+          </view>
+          <text class="info-value">{{studentInfo.jzxm}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="friends-o" size="20rpx" />
+            <text>监护人关系</text>
+          </view>
+          <text class="info-value">{{studentInfo.jzgxText}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="phone-o" size="20rpx" />
+            <text>监护人电话</text>
+          </view>
+          <text class="info-value">{{studentInfo.jzdh}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 毕业学校信息卡片 -->
+  <view wx:if="{{studentInfo}}" class="info-card">
+    <!-- 卡片状态指示器 -->
+    <view class="status-indicator school-indicator"></view>
+
+    <!-- 卡片头部 -->
+    <view class="card-header">
+      <view class="header-left">
+        <van-icon name="school-o" size="28rpx" />
+        <text class="card-title">毕业学校</text>
+      </view>
+    </view>
+
+    <!-- 毕业学校信息网格 -->
+    <view class="card-content">
+      <view class="info-grid">
+        <view class="info-item full-width">
+          <view class="info-label">
+            <van-icon name="school-o" size="20rpx" />
+            <text>毕业学校</text>
+          </view>
+          <text class="info-value long-text">{{studentInfo.byxxmc}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="location-o" size="20rpx" />
+            <text>所属省份</text>
+          </view>
+          <text class="info-value">{{studentInfo.byxxssx1}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="location-o" size="20rpx" />
+            <text>所属地市</text>
+          </view>
+          <text class="info-value">{{studentInfo.byxxssx2}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="location-o" size="20rpx" />
+            <text>所属区县</text>
+          </view>
+          <text class="info-value">{{studentInfo.byxxssx3}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核对入口按钮 -->
+  <view wx:if="{{studentInfo}}" class="action-bar">
+    <view class="action-btn-primary" bindtap="goToInfoVerify">
+      <van-icon name="edit" size="32rpx" />
+      <text>信息核对</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <van-loading size="24px" color="#1890FF">加载中...</van-loading>
+  </view>
+
+  <!-- 错误信息 -->
+  <view wx:if="{{errorMsg}}" class="error-container">
+    <van-empty
+      image="error"
+      description="{{errorMsg}}"
+    >
+      <van-button
+        round
+        type="primary"
+        color="#1890FF"
+        bind:click="retry"
+      >
+        重试
+      </van-button>
+    </van-empty>
+  </view>
+</view>

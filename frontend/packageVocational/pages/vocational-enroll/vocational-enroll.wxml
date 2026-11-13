@@ -1,0 +1,126 @@
+<include src="/utils/common-components.wxml" />
+<view class="enroll-container">
+  <!--
+    浮光掠影动态背景（中职蓝色主题：蓝/青/紫）
+  -->
+  <view class="light-bg light-bg--vocational" aria-hidden="true">
+    <view class="light-bg__blob light-bg__blob--a"></view>
+    <view class="light-bg__blob light-bg__blob--b"></view>
+    <view class="light-bg__blob light-bg__blob--c"></view>
+    <view class="light-bg__blob light-bg__blob--d"></view>
+    <view class="light-bg__sweep"></view>
+  </view>
+
+  <!-- 全屏图片轮播 -->
+  <swiper
+    class="swiper"
+    bindchange="swiperChange"
+    current="{{currentIndex}}"
+    indicator-dots="{{false}}"
+    vertical="{{false}}"
+    circular="{{true}}"
+    duration="{{400}}"
+    display-multiple-items="{{1}}"
+  >
+    <swiper-item wx:for="{{imageList}}" wx:key="index" class="swiper-item">
+      <block wx:if="{{item.url}}">
+        <image
+          src="{{item.url}}"
+          mode="widthFix"
+          class="brochure-image"
+          bindload="onImageLoad"
+          binderror="onImageError"
+          data-index="{{index}}"
+          bindtap="onPreviewImage"
+          show-menu-by-longpress="{{false}}"
+        />
+      </block>
+      <view wx:else class="image-placeholder">
+        <view class="placeholder-spinner"></view>
+        <text class="placeholder-text">第{{index + 1}}页加载中...</text>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 浮动顶栏 - 第 1 层：标题（与微信胶囊同行，左对齐） -->
+  <view class="page-title" style="top: {{capsuleTop}}px; height: {{capsuleHeight}}px; padding-left: {{titlePadLeft}}px; padding-right: {{titlePadRight}}px;">
+    <text class="page-title__text">2026年中职招生简章</text>
+  </view>
+
+  <!-- 浮动顶栏 - 第 2 层：操作行（左页码 + 右 home + 音乐按钮） -->
+  <view class="floating-top" style="top: {{topBarTop}}px;">
+    <view class="page-counter" wx:if="{{totalCount > 0}}" hover-class="page-counter-hover" hover-stay-time="120">
+      <text class="current">{{currentIndex + 1}}</text>
+      <text class="separator">/</text>
+      <text class="total">{{totalCount}}</text>
+    </view>
+
+    <view class="floating-top__spacer"></view>
+
+    <view class="actions">
+      <view
+        wx:if="{{totalCount > 1 && currentIndex !== 0}}"
+        class="action-btn action-btn--ghost {{atLastPage ? 'action-btn--pulse' : ''}}"
+        hover-class="action-btn-hover"
+        hover-stay-time="120"
+        bindtap="goToFirstPage"
+      >
+        <image
+          wx:if="{{homeIconUrl}}"
+          src="{{homeIconUrl}}"
+          class="action-btn__icon-img"
+          mode="aspectFit"
+          aria-label="返回第一页"
+        ></image>
+        <view wx:else class="action-btn__icon icon-home" aria-hidden="true"></view>
+      </view>
+
+      <view
+        class="music-btn {{isPlaying ? 'is-playing' : ''}} {{musicReady ? '' : 'is-loading is-disabled'}}"
+        hover-class="{{musicReady ? 'music-btn-hover' : ''}}"
+        bindtap="toggleMusic"
+      >
+        <view class="music-btn__glow"></view>
+        <view class="music-btn__spin {{isPlaying ? 'is-spin' : ''}}">
+          <image
+            wx:if="{{musicIconUrl}}"
+            src="{{musicIconUrl}}"
+            class="music-btn__icon"
+            mode="aspectFit"
+            aria-label="背景音乐"
+          ></image>
+          <view wx:else class="music-btn__placeholder">
+            <text class="music-btn__placeholder-text">♪</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 首次进入提示 -->
+  <view wx:if="{{showHint}}" class="hint-bubble">
+    <view class="hint-bubble__dot"></view>
+    <text class="hint-bubble__text">{{hintText}}</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-overlay" wx:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!isLoading && totalCount === 0}}">
+    <van-empty description="暂无招生简章" />
+  </view>
+
+  <!-- 左下角：返回上一页（跳转到引导页） -->
+  <view
+    class="back-btn"
+    hover-class="back-btn-hover"
+    hover-stay-time="120"
+    bindtap="goBackToGuide"
+  >
+    <text class="back-btn__arrow" style="font-family:vant-icon,sans-serif;"></text>
+  </view>
+</view>

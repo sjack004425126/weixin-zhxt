@@ -1,0 +1,84 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><van-icon name="edit" size="40rpx" /></view>
+    <view class="header-text">
+      <view class="header-title">
+        <block wx:if="{{view === 'courses'}}">评阅管理</block>
+        <block wx:else>{{currentCourse.kcmc}}</block>
+      </view>
+      <view class="header-subtitle">
+        <block wx:if="{{view === 'courses'}}">Review Management</block>
+        <block wx:else>待评阅 {{currentCourse.pending}} 人</block>
+      </view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 固定头部占位 -->
+  <view class="header-placeholder"></view>
+
+  <!-- ===== 课程列表 ===== -->
+  <block wx:if="{{view === 'courses'}}">
+    <van-loading wx:if="{{loadingCourses}}" size="24px" vertical custom-style="margin-top:120rpx;">加载中...</van-loading>
+    <view wx:elif="{{courseList.length === 0}}" class="empty-state"><van-empty description="暂无需要评阅的课程" /></view>
+    <view wx:else class="course-list">
+      <view
+        class="course-card"
+        wx:for="{{courseList}}"
+        wx:key="kc_id"
+        bindtap="onCourseClick"
+        data-course="{{item}}"
+      >
+        <view class="course-icon"><van-icon name="records" size="44rpx" color="#1890FF" /></view>
+        <view class="course-info">
+          <view class="course-name">{{item.kcmc}}</view>
+          <view class="course-meta">批次 {{item.pc}} · 共 {{item.total}} 份</view>
+        </view>
+        <view class="course-badge {{item.pending > 0 ? 'pending' : 'done'}}">
+          <text wx:if="{{item.pending > 0}}">待评 {{item.pending}}</text>
+          <text wx:else>已完成</text>
+        </view>
+        <van-icon name="arrow" size="28rpx" color="#ccc" />
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 题目列表 ===== -->
+  <block wx:elif="{{view === 'questions'}}">
+    <van-loading wx:if="{{loadingQuestions}}" size="24px" vertical custom-style="margin-top:120rpx;">加载中...</van-loading>
+    <view wx:elif="{{questionList.length === 0}}" class="empty-state"><van-empty description="暂无主观题" /></view>
+    <view wx:else class="question-list">
+      <view
+        class="question-card"
+        wx:for="{{questionList}}"
+        wx:key="tm_id"
+        bindtap="onQuestionClick"
+        data-question="{{item}}"
+        data-index="{{index}}"
+      >
+        <view class="q-index">第 {{index + 1}} 题</view>
+        <view class="q-meta">
+          <text class="q-fz">{{item.fz}} 分</text>
+          <text class="q-sep">·</text>
+          <text class="q-total">共 {{item.total}} 人</text>
+        </view>
+        <view class="q-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{item.total > 0 ? (item.reviewed / item.total * 100) : 0}}%"></view>
+          </view>
+          <text class="progress-text">{{item.reviewed}}/{{item.total}}</text>
+        </view>
+        <view class="q-status {{item.pending > 0 ? 'pending' : 'done'}}">
+          <text wx:if="{{item.pending > 0}}">待评 {{item.pending}}</text>
+          <text wx:else>已完成</text>
+        </view>
+        <van-icon name="arrow" size="28rpx" color="#ccc" />
+      </view>
+    </view>
+
+  </block>
+</view>

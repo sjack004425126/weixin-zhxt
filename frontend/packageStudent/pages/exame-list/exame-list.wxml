@@ -1,0 +1,107 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <van-icon name="completed" size="40rpx" />
+    </view>
+    <view class="header-text">
+      <view class="header-title">考试列表</view>
+      <view class="header-subtitle">Exam List</view>
+    </view>
+    <view class="header-action">
+      <view class="header-action-row">
+        <van-icon name="records" size="32rpx" bindtap="goToRecords" />
+        <van-icon name="home-o" size="32rpx" bindtap="goToMyCenter" style="margin-left: 24rpx;" />
+      </view>
+    </view>
+  </view>
+</view>
+
+<view class="exam-list-container">
+  <!-- 分类 Tab -->
+  <view class="exam-tabs">
+    <view class="exam-tab {{activeTab === 0 ? 'active' : ''}}" data-idx="0" bindtap="onTabChange">全部</view>
+    <view class="exam-tab {{activeTab === 1 ? 'active' : ''}}" data-idx="1" bindtap="onTabChange">在线考试</view>
+    <view class="exam-tab {{activeTab === 2 ? 'active' : ''}}" data-idx="2" bindtap="onTabChange">模拟考试</view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-tip">
+    <van-icon name="loading" size="36rpx" color="#1890FF" />
+    <text>加载中...</text>
+  </view>
+
+  <!-- 列表 -->
+  <view wx:else class="exam-list">
+    <block wx:for="{{exams}}" wx:key="id">
+      <view
+        class="exam-item"
+        bindtap="goToDetail"
+        data-id="{{item.id}}"
+        data-canattempt="{{item.can_attempt}}"
+        data-timestatus="{{item.time_status}}"
+        data-activerecord="{{item.active_record_id}}"
+      >
+        <view class="exam-card-top">
+          <view class="exam-title">{{item.title}}</view>
+          <view class="exam-status">
+            <text class="status-tag status-{{item.time_status}}">{{timeStatusText[item.time_status] || '未知'}}</text>
+          </view>
+        </view>
+
+        <view class="exam-card-mid" wx:if="{{item.description}}">
+          <text class="exam-desc">{{item.description}}</text>
+        </view>
+
+        <view class="exam-card-info">
+          <view class="info-row">
+            <text class="info-label">时长：</text>
+            <text class="info-value">{{item.duration}} 分钟</text>
+          </view>
+          <view class="info-row">
+            <text class="info-label">总分：</text>
+            <text class="info-value">{{item.total_score}}</text>
+            <text class="info-label" style="margin-left: 24rpx;">及格：</text>
+            <text class="info-value">{{item.pass_score}}</text>
+          </view>
+          <view class="info-row" wx:if="{{item.start_date || item.end_date}}">
+            <text class="info-label">开放时间：</text>
+            <text class="info-value">
+              {{item.start_date || '不限'}} ~ {{item.end_date || '不限'}}
+            </text>
+          </view>
+          <view class="info-row" wx:if="{{item.max_attempts > 0}}">
+            <text class="info-label">次数限制：</text>
+            <text class="info-value">最多 {{item.max_attempts}} 次（已完成 {{item.attempt_count}} 次）</text>
+          </view>
+        </view>
+
+        <view class="exam-card-bottom">
+          <block wx:if="{{item.active_record_id}}">
+            <view class="btn-resume">继续考试</view>
+          </block>
+          <block wx:elif="{{item.can_attempt}}">
+            <view class="btn-start">开始考试</view>
+          </block>
+          <block wx:elif="{{!item.has_permission}}">
+            <view class="btn-disabled">无权参加</view>
+          </block>
+          <block wx:elif="{{item.max_attempts > 0 && item.attempt_count >= item.max_attempts}}">
+            <view class="btn-disabled">已达上限</view>
+          </block>
+          <block wx:else>
+            <view class="btn-disabled">{{timeStatusText[item.time_status] || '不可考'}}</view>
+          </block>
+          <van-icon name="arrow" />
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{!loading && exams.length === 0}}" class="empty-tip">
+      <van-icon name="info-o" size="48rpx" color="#909399" />
+      <view style="margin-top: 16rpx;">暂无考试</view>
+    </view>
+  </view>
+</view>

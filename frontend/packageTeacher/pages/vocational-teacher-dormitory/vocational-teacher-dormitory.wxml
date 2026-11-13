@@ -1,0 +1,317 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:inherit;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">宿舍管理</view>
+      <view class="header-subtitle">Dormitory Management</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 班级选择和筛选 -->
+  <view class="filter-bar">
+    <van-dropdown-menu>
+      <van-dropdown-item value="{{ selectedClassId }}" bind:change="onClassChange" options="{{ classOptions }}" />
+      <van-dropdown-item value="{{ filterType }}" bind:change="onFilterChange" options="{{ filterOptions }}" />
+    </van-dropdown-menu>
+  </view>
+
+  <!-- 前端搜索框（按姓名/学号/宿舍号等） -->
+  <view class="search-bar" wx:if="{{!loading && studentList.length > 0}}">
+    <view class="search-input-wrap">
+      <text class="vi search-icon" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#999;"></text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索姓名/学号/楼栋/宿舍号"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchInput"
+        confirm-type="search"
+      />
+      <view class="search-clear" wx:if="{{searchKeyword}}" bindtap="onSearchClear">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#999;"></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-bar" wx:if="{{!loading && studentList.length > 0}}">
+    <view class="stats-item">
+      <text class="stats-label">共</text>
+      <text class="stats-value">{{total}}</text>
+      <text class="stats-label">人</text>
+    </view>
+    <view class="stats-item has">
+      <text class="stats-label">已分配</text>
+      <text class="stats-value">{{assigned}}</text>
+      <text class="stats-label">人</text>
+    </view>
+    <view class="stats-item no">
+      <text class="stats-label">未分配</text>
+      <text class="stats-value">{{unassigned}}</text>
+      <text class="stats-label">人</text>
+    </view>
+  </view>
+
+  <!-- 性别图例 -->
+  <view class="gender-legend" wx:if="{{!loading && studentList.length > 0}}">
+    <view class="legend-pill legend-male">
+      <view class="legend-dot legend-dot-male"></view>
+      <text>男生</text>
+    </view>
+    <view class="legend-pill legend-female">
+      <view class="legend-dot legend-dot-female"></view>
+      <text>女生</text>
+    </view>
+  </view>
+
+  <!-- 学生列表 -->
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+    <view wx:elif="{{filteredList.length === 0}}" class="empty-state">
+      <van-empty description="暂无学生数据" />
+    </view>
+
+    <view wx:else class="group-list">
+      <view class="room-group" wx:for="{{groupedList}}" wx:key="ss_label">
+        <view class="room-group-title">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#1890ff;"></text>
+          <text>{{item.ss_label}}</text>
+          <text class="room-group-count">({{item.students.length}}人)</text>
+        </view>
+        <view class="dorm-wall">
+          <view
+            class="dorm-item {{stu.dorm_info ? 'has-dorm' : 'no-dorm'}} gender-{{stu.genderClass}}"
+            wx:for="{{item.students}}" wx:for-item="stu" wx:key="id"
+          >
+            <view class="dorm-index">{{index + 1}}</view>
+            <view class="dorm-avatar">
+              <view class="avatar-placeholder">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:60rpx;color:{{stu.dorm_info ? '#52c41a' : '#999'}};"></text>
+              </view>
+              <view class="dorm-status-badge {{stu.dorm_info ? 'status-yes' : 'status-no'}}">
+                <block wx:if="{{stu.dorm_info}}">
+                  <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;"></text>
+                </block>
+                <block wx:else>
+                  <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;"></text>
+                </block>
+              </view>
+            </view>
+            <view class="dorm-info">
+
+              <view class="dorm-detail" wx:if="{{stu.dorm_info}}">
+                <!-- <text class="vi" style="font-family:vant-icon,sans-serif;font-size:22rpx;color:#1890ff;"></text> -->
+                <text class="dorm-location">{{stu.dorm_info.ld_mc}} {{stu.dorm_info.lc}}层 {{stu.dorm_info.ssh}}室{{stu.dorm_info.cwh}}床</text>
+              </view>
+              <view class="dorm-detail" wx:else>
+                <text class="dorm-unassigned">未分配宿舍</text>
+              </view>
+            </view>
+            <view class="dorm-name">
+              <text>{{stu.xm}}</text>
+              <text wx:if="{{stu.genderClass === 'male'}}" class="gender-tag gender-tag-male">男</text>
+              <text wx:if="{{stu.genderClass === 'female'}}" class="gender-tag gender-tag-female">女</text>
+            </view>
+            <view class="edit-btn" catchtap="onEditTap" data-student="{{stu}}">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#1890ff;"></text>
+            </view>
+            <view class="call-btn" catchtap="callStudent" data-phone="{{stu.xsdh}}" data-name="{{stu.xm}}">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#52c41a;"></text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- ========== 分配宿舍弹窗 ========== -->
+<van-popup
+  show="{{ showAssignPopup }}"
+  position="bottom"
+  round
+  closeable
+  bind:close="onClosePopup"
+  custom-style="height: 80vh;"
+>
+  <view class="popup-content">
+    <view class="popup-title">分配宿舍 - {{currentStudent.xm}}</view>
+
+    <!-- 当前住宿信息 -->
+    <view class="current-dorm" wx:if="{{currentStudent.dorm_info}}">
+      <text class="current-label">当前宿舍：</text>
+      <text class="current-value">{{currentStudent.dorm_info.full_name}}</text>
+      <van-button size="mini" type="danger" plain bindtap="onClearDorm">取消分配</van-button>
+    </view>
+
+    <!-- 楼栋选择 -->
+    <view class="select-section">
+      <view class="select-label">选择楼栋</view>
+      <view class="select-options">
+        <view
+          class="select-option {{popupBuilding === item.id ? 'active' : ''}}"
+          wx:for="{{buildings}}" wx:key="id"
+          bindtap="onSelectBuilding" data-id="{{item.id}}"
+        >{{item.mc}}</view>
+      </view>
+    </view>
+
+    <!-- 楼层选择 -->
+    <view class="select-section" wx:if="{{popupFloors.length > 0}}">
+      <view class="select-label">选择楼层</view>
+      <view class="select-options">
+        <view
+          class="select-option {{popupFloor === item.id ? 'active' : ''}}"
+          wx:for="{{popupFloors}}" wx:key="id"
+          bindtap="onSelectFloor" data-id="{{item.id}}"
+        >{{item.lc}}层</view>
+      </view>
+    </view>
+
+    <!-- ===== 宿舍网格（2列走廊布局） ===== -->
+    <view class="select-section" wx:if="{{popupRooms.length > 0 && !popupCurrentRoom}}">
+      <view class="select-label">选择宿舍</view>
+      <view class="corridor-layout">
+        <!-- 左侧宿舍 -->
+        <view class="corridor-side">
+          <view
+            class="room-cell {{item ? (item.used_count > 0 ? 'has-people' : 'empty-room') : 'room-placeholder'}}"
+            wx:for="{{leftRooms}}" wx:key="index"
+            bindtap="{{item ? 'onSelectRoom' : ''}}" data-room="{{item}}"
+          >
+            <block wx:if="{{item}}">
+              <view class="room-cell-idx">{{item._idx}}</view>
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:{{item.used_count > 0 ? '#1890ff' : '#bbb'}};"></text>
+              <view class="room-cell-name">{{item.ssh}}</view>
+              <view class="room-cell-count">{{item.used_count}}/{{item.bed_count}}</view>
+            </block>
+          </view>
+        </view>
+        <!-- 走廊 -->
+        <view class="corridor-center">
+          <view class="corridor-line"></view>
+          <view class="corridor-text">走 廊</view>
+          <view class="corridor-line"></view>
+        </view>
+        <!-- 右侧宿舍 -->
+        <view class="corridor-side">
+          <view
+            class="room-cell {{item ? (item.used_count > 0 ? 'has-people' : 'empty-room') : 'room-placeholder'}}"
+            wx:for="{{rightRooms}}" wx:key="index"
+            bindtap="{{item ? 'onSelectRoom' : ''}}" data-room="{{item}}"
+          >
+            <block wx:if="{{item}}">
+              <view class="room-cell-idx">{{item._idx}}</view>
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:{{item.used_count > 0 ? '#1890ff' : '#bbb'}};"></text>
+              <view class="room-cell-name">{{item.ssh}}</view>
+              <view class="room-cell-count">{{item.used_count}}/{{item.bed_count}}</view>
+            </block>
+          </view>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- ===== 床位纵向视图 ===== -->
+    <view class="select-section" wx:if="{{popupCurrentRoom}}">
+      <view class="bed-room-header">
+        <view class="bed-room-back" bindtap="onBackToRooms">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#1890ff;"></text>
+          <text>返回</text>
+        </view>
+        <view class="bed-room-title">{{popupCurrentRoom.ssh}}室</view>
+        <van-tag type="{{popupCurrentRoom.used_count >= popupCurrentRoom.bed_count ? 'danger' : 'primary'}}">
+          {{popupCurrentRoom.used_count}}/{{popupCurrentRoom.bed_count}}
+        </van-tag>
+      </view>
+
+      <!-- 加载床位中 -->
+      <view class="bed-loading" wx:if="{{bedLoading}}">
+        <view class="bed-loading-spinner"></view>
+        <text>加载床位中...</text>
+      </view>
+
+      <!-- 床位两列 -->
+      <view class="bunk-rows">
+        <view class="bunk-row" wx:for="{{bedRows}}" wx:key="index">
+          <!-- 左列 -->
+          <view
+            class="bed-card {{item.left ? (item.left.student ? 'occupied' : 'free') : 'placeholder'}}"
+            bindtap="{{item.left && !item.left.student ? 'onPickBed' : ''}}"
+            data-bed-id="{{item.left.id || 0}}"
+          >
+            <block wx:if="{{item.left}}">
+              <view class="bed-card-top">
+                <view class="bed-card-name">{{item.left.cwh}}号床</view>
+                <van-icon
+                  wx:if="{{item.left.student && (item.left.student.xsdh || item.left.student.jzdh)}}"
+                  class="bed-phone-icon"
+                  name="phone-o"
+                  size="28rpx"
+                  color="#1890ff"
+                  data-phone="{{item.left.student.xsdh || item.left.student.jzdh}}"
+                  catchtap="onCallPhone"
+                />
+              </view>
+              <view class="bed-card-status {{item.left.student ? 'has-student' : ''}}">
+                <text wx:if="{{item.left.student}}">{{item.left.student.xm}}</text>
+                <text wx:else>空闲</text>
+              </view>
+              <view class="bed-card-class" wx:if="{{item.left.student}}">
+                {{item.left.student.bj_mc || '未分班'}}
+              </view>
+            </block>
+          </view>
+          <!-- 右列 -->
+          <view
+            class="bed-card {{item.right ? (item.right.student ? 'occupied' : 'free') : 'placeholder'}}"
+            bindtap="{{item.right && !item.right.student ? 'onPickBed' : ''}}"
+            data-bed-id="{{item.right.id || 0}}"
+          >
+            <block wx:if="{{item.right}}">
+              <view class="bed-card-top">
+                <view class="bed-card-name">{{item.right.cwh}}号床</view>
+                <van-icon
+                  wx:if="{{item.right.student && (item.right.student.xsdh || item.right.student.jzdh)}}"
+                  class="bed-phone-icon"
+                  name="phone-o"
+                  size="28rpx"
+                  color="#1890ff"
+                  data-phone="{{item.right.student.xsdh || item.right.student.jzdh}}"
+                  catchtap="onCallPhone"
+                />
+              </view>
+              <view class="bed-card-status {{item.right.student ? 'has-student' : ''}}">
+                <text wx:if="{{item.right.student}}">{{item.right.student.xm}}</text>
+                <text wx:else>空闲</text>
+              </view>
+              <view class="bed-card-class" wx:if="{{item.right.student}}">
+                {{item.right.student.bj_mc || '未分班'}}
+              </view>
+            </block>
+          </view>
+        </view>
+      </view>
+
+      <!-- 入户门 -->
+      <view class="door-section">
+        <view class="door-line"></view>
+        <view class="door-label">入户门</view>
+        <view class="door-line"></view>
+      </view>
+    </view>
+  </view>
+</van-popup>

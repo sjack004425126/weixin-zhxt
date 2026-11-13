@@ -1,0 +1,18 @@
+<!-- 简单测试页面 -->
+<view class="container">
+  <text>测试页面</text>
+  <text>当前学期：{{currentTerm}}</text>
+  <text>学生姓名：{{studentInfo.xm}}</text>
+  <text>学期数量：{{semesterPayments.length}}</text>
+  
+  <view wx:if="{{semesterPayments && semesterPayments.length}}">
+    <text>有学期数据</text>
+    <view wx:for="{{semesterPayments}}" wx:key="term_number">
+      <text>{{item.term_desc}} - {{item.status}}</text>
+    </view>
+  </view>
+  
+  <view wx:else>
+    <text>无学期数据</text>
+  </view>
+</view>

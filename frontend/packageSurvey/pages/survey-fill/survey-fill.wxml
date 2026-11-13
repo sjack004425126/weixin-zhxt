@@ -1,0 +1,558 @@
+<!-- 问卷填写页 - 精准线性风格重构版 (zhpt-new/design) -->
+<include src="/utils/common-components.wxml" />
+<wxs module="wxsUtil">
+module.exports = {
+  letter: function(idx) {
+    var arr = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    return idx < 26 ? arr[idx] : String(idx + 1);
+  },
+  // 安全获取嵌套数组元素，避免 WXML 模板中 answers[qid][index] 报错
+  arrGet: function(arr, idx) {
+    if (!arr) return '';
+    return arr[idx] !== undefined ? arr[idx] : '';
+  },
+  // 题型枚举 -> 中文标签（统一在这里维护，避免 WXML 三元表达式漏写）
+  qtypeLabel: function(qtype) {
+    var map = {
+      'SINGLE': '单选题',
+      'MULTI': '多选题',
+      'TEXT': '填空题',
+      'TEXT_MULTI': '多项填空',
+      'RATE': '星级评分',
+      'SCORE': '评分题',
+      'SLIDER': '滑动条',
+      'SCALE': '量表题',
+      'NPS': '推荐值',
+      'DATE': '日期题',
+      'MATRIX_SINGLE': '矩阵题'
+    };
+    return map[qtype] || ('其他:' + (qtype || '?'));
+  }
+};
+</wxs>
+
+<view class="container">
+
+
+  <!-- ========== 内容区 ========== -->
+  <view class="content">
+
+    <!-- 加载中 -->
+    <view wx:if="{{loading}}" class="loading-wrap">
+      <van-loading size="48rpx" color="#2563EB">加载中...</van-loading>
+      <text class="loading-text">正在加载问卷...</text>
+    </view>
+
+    <!-- 错误状态 -->
+    <view wx:elif="{{error_msg}}" class="error-wrap">
+      <view class="error-icon">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;line-height:1;color:#DC2626;"></text>
+      </view>
+      <text class="error-text">{{error_msg}}</text>
+      <van-button type="primary" size="small" bind:click="_loadSurvey">重新加载</van-button>
+    </view>
+
+    <!-- 已提交状态 -->
+    <view wx:elif="{{already_submitted && !survey}}" class="submitted-wrap">
+      <view class="submitted-icon">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;line-height:1;color:#059669;"></text>
+      </view>
+      <text class="submitted-text">您已经提交过该问卷</text>
+      <van-button type="default" size="small" bind:click="onBack">返回</van-button>
+    </view>
+
+    <!-- ========== 问卷主体 (主内容 + 侧边数字导航) ========== -->
+    <block wx:else>
+    <view class="survey-layout">
+    <view class="survey-main">
+      <!-- 标题卡片 - sticky 固定在顶部 -->
+      <view class="survey-meta-card survey-meta-card-sticky">
+        <view class="survey-meta-row">
+          <view class="survey-meta-left">
+            <view class="survey-category-tag">{{survey.survey_type === 'SURVEY' ? '问卷' : survey.survey_type === 'REGISTRATION' ? '报名' : survey.survey_type === 'VOTE' ? '投票' : survey.survey_type === 'EXAM' ? '测评' : survey.survey_type}}</view>
+            <view class="survey-dept-tag" wx:if="{{survey.department || survey.dept_name}}">{{survey.department || survey.dept_name}}</view>
+          </view>
+          <view class="survey-meta-right">
+            <view class="survey-timer-tag">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:16px;line-height:1;color:#475569;"></text>
+              <text>DURATION: {{_durationText || '00:00'}}</text>
+            </view>
+            <view class="answer-card-btn" bindtap="_toggleAnswerCard" hover-class="answer-card-btn-hover">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:16px;line-height:1;color:#2563EB;"></text>
+              <text>答题卡</text>
+              <view wx:if="{{_answeredCount > 0 || _totalQuestionCount > 0}}" class="answer-card-badge">
+                <text>{{_answeredCount}}/{{_totalQuestionCount}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="survey-title">{{survey.title}}</view>
+        <view class="survey-desc" wx:if="{{survey.description}}">{{survey.description}}</view>
+      </view>
+
+      <!-- ========== 题目列表 ========== -->
+      <view class="questions-wrap">
+        <block wx:for="{{questions}}" wx:key="qid">
+          <view
+            class="question-item {{errors[item.qid] ? 'has-error' : ''}}"
+            id="q-{{index}}"
+          >
+            <!-- 题目头部 -->
+            <view class="question-header">
+              <!-- 编号 -->
+              <view class="q-no">{{index < 9 ? '0' : ''}}{{index + 1}}</view>
+              <!-- 必填/选填 -->
+              <view class="required-tag {{item.required ? 'required' : 'optional'}}">
+                {{item.required ? '* 必填' : '选填'}}
+              </view>
+              <!-- 类型 -->
+              <view class="qtype-tag">{{wxsUtil.qtypeLabel(item.qtype)}}</view>
+              <!-- 多选计数 -->
+              <view wx:if="{{item.qtype === 'MULTI' && _multiLengths[item.qid] > 0}}" class="multi-count-tag">
+                已选 {{_multiLengths[item.qid]}} 项
+              </view>
+            </view>
+
+            <!-- 题目标题 -->
+            <view class="question-title-wrap">
+              <view class="question-title">{{item.title}}</view>
+              <view class="question-desc" wx:if="{{item.description}}">{{item.description}}</view>
+            </view>
+
+            <!-- ===================== SINGLE 单选题 ===================== -->
+            <block wx:if="{{item.qtype === 'SINGLE'}}">
+              <view class="question-options">
+                <view
+                  wx:for="{{item.options}}"
+                  wx:for-item="opt"
+                  wx:for-index="optIdx"
+                  wx:key="id"
+                  class="option-item {{answers[item.qid] === opt.id ? 'selected' : ''}}"
+                  data-optid="{{opt.id}}"
+                  data-qid="{{item.qid}}"
+                  bindtap="onOptionTap"
+                >
+                  <view class="option-letter">{{wxsUtil.letter(optIdx)}}</view>
+                  <text class="option-label">{{opt.label}}</text>
+                  <view class="option-check">
+                    <view class="option-check-inner"></view>
+                  </view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== MULTI 多选题 ===================== -->
+            <block wx:if="{{item.qtype === 'MULTI'}}">
+              <view class="question-options">
+                <!-- 计数行 -->
+                <view wx:if="{{_multiLengths[item.qid] > 0}}" class="multi-counter">
+                  <text>已选 <text class="count">{{_multiLengths[item.qid]}}</text> 项</text>
+                  <text class="clear-btn" data-qid="{{item.qid}}" bindtap="onClearMulti">清空</text>
+                </view>
+                <view
+                  wx:for="{{item.options}}"
+                  wx:for-item="opt"
+                  wx:for-index="optIdx"
+                  wx:key="id"
+                  class="option-item {{_selectedOptions[item.qid] && _selectedOptions[item.qid][opt.id] ? 'selected' : ''}}"
+                  data-optid="{{opt.id}}"
+                  data-qid="{{item.qid}}"
+                  bindtap="onMultiOptionTap"
+                >
+                  <view class="option-letter">{{wxsUtil.letter(optIdx)}}</view>
+                  <text class="option-label">{{opt.label}}</text>
+                  <view class="option-check checkbox-check">
+                    <view class="option-check-inner"></view>
+                  </view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== TEXT 单行/多行填空 ===================== -->
+            <block wx:if="{{item.qtype === 'TEXT'}}">
+              <view class="question-options">
+                <textarea
+                  class="text-input"
+                  placeholder="请输入您的反馈与建议..."
+                  id="txt-{{item.qid}}"
+                  value="{{_textValues[item.qid] !== undefined ? _textValues[item.qid] : (answers[item.qid] || '')}}"
+                  data-qid="{{item.qid}}"
+                  bindinput="onTextInput"
+                  bindblur="onTextBlur"
+                  maxlength="{{item.options[0].max_len || 500}}"
+                  rows="4"
+                ></textarea>
+                <view class="char-counter">
+                  <text>已输入 <text class="count">{{_charCounts[item.qid] || 0}}</text> / {{item.options[0].max_len || 500}} 字</text>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== TEXT_MULTI 多项填空 ===================== -->
+            <block wx:if="{{item.qtype === 'TEXT_MULTI'}}">
+              <view class="question-options">
+                <view wx:for="{{item.options}}" wx:for-item="opt" wx:key="id" class="text-multi-item">
+                  <text class="opt-label">{{opt.label}}</text>
+                  <textarea
+                    class="text-input"
+                    placeholder="{{opt.placeholder || '请输入'}}"
+                    id="txtm-{{item.qid}}-{{index}}"
+                    value="{{_textMultiValues[item.qid + '_' + index] !== undefined ? _textMultiValues[item.qid + '_' + index] : wxsUtil.arrGet(answers[item.qid], index)}}"
+                    data-qid="{{item.qid}}"
+                    data-index="{{index}}"
+                    bindinput="onTextMultiInput"
+                    bindblur="onTextMultiBlur"
+                    maxlength="{{opt.max_len || 200}}"
+                    rows="2"
+                  ></textarea>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== RATE / SCORE 评分/星级 ===================== -->
+            <block wx:if="{{item.qtype === 'RATE' || item.qtype === 'SCORE'}}">
+              <view class="question-options rate-wrap">
+                <view class="rate-labels">
+                  <text>01 MIN</text>
+                  <view class="rate-value-badge">
+                    <text wx:if="{{answers[item.qid]}}" class="rate-badge-glyph">★</text>
+                    <text wx:else class="rate-badge-glyph">☆</text>
+                    <text wx:if="{{answers[item.qid]}}">[ {{answers[item.qid]}}分 ]</text>
+                    <text wx:else>[ 未评分 ]</text>
+                  </view>
+                  <text>{{item.score_max || 5}} MAX</text>
+                </view>
+                <view class="rate-stars">
+                  <view
+                    wx:for="{{item.score_max || 5}}"
+                    wx:for-item="star"
+                    wx:key="*this"
+                    wx:for-index="starIdx"
+                    class="rate-star {{answers[item.qid] >= starIdx + 1 ? 'active' : ''}}"
+                  >
+                    <text
+                      class="rate-star-glyph {{answers[item.qid] >= starIdx + 1 ? 'rate-star-on' : 'rate-star-off'}}"
+                      data-qid="{{item.qid}}"
+                      data-score="{{starIdx + 1}}"
+                      bindtap="onRateTap"
+                    >{{answers[item.qid] >= starIdx + 1 ? '★' : '☆'}}</text>
+                  </view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== SLIDER 滑动条 ===================== -->
+            <block wx:if="{{item.qtype === 'SLIDER'}}">
+              <view class="question-options slider-wrap">
+                <view class="slider-header">
+                  <text>当前值:</text>
+                  <view class="slider-value-box">
+                    <text class="slider-value-num">{{answers[item.qid] !== null && answers[item.qid] !== undefined ? answers[item.qid] : (item.slider_min !== undefined ? item.slider_min : 0)}}</text>
+                    <text class="slider-value-unit">{{item.slider_unit || '分'}}</text>
+                  </view>
+                </view>
+                <view class="slider-component-wrap">
+                  <van-slider
+                    value="{{ answers[item.qid] !== null && answers[item.qid] !== undefined ? answers[item.qid] : (item.slider_min !== undefined ? item.slider_min : 0) }}"
+                    min="{{ item.slider_min !== undefined ? item.slider_min : 0 }}"
+                    max="{{ item.slider_max !== undefined ? item.slider_max : 100 }}"
+                    step="{{ item.slider_step !== undefined ? item.slider_step : 1 }}"
+                    bar-height="6rpx"
+                    active-color="#2563EB"
+                    inactive-color="#E2E8F0"
+                    data-qid="{{item.qid}}"
+                    bind:change="_onVanSliderChange"
+                    bind:drag-end="_onVanSliderDragEnd"
+                  />
+                </view>
+                <view class="slider-presets">
+                  <text class="slider-preset-label">快捷:</text>
+                  <view
+                    wx:for="{{[0, 25, 50, 75, 100]}}"
+                    wx:for-item="p"
+                    wx:key="*this"
+                    class="slider-preset-btn {{answers[item.qid] === p ? 'active' : ''}}"
+                    data-value="{{p}}"
+                    data-qid="{{item.qid}}"
+                    bindtap="_onSliderPreset"
+                  >{{p}}</view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== SCALE 量表题 ===================== -->
+            <block wx:if="{{item.qtype === 'SCALE'}}">
+              <view class="question-options scale-wrap">
+                <view class="scale-labels">
+                  <text>[ 1 {{item.scale_left_label || '极差'}} ]</text>
+                  <text>5级李克特满意度量表</text>
+                  <text>[ 5 {{item.scale_right_label || '极优'}} ]</text>
+                </view>
+                <view class="scale-grid">
+                  <view
+                    wx:for="{{scaleEmojiLevels}}"
+                    wx:for-item="level"
+                    wx:key="level"
+                    class="scale-item {{answers[item.qid] === level.level ? 'selected' : ''}}"
+                    data-qid="{{item.qid}}"
+                    data-level="{{level.level}}"
+                    bindtap="onScaleEmojiTap"
+                  >
+                    <view class="scale-code">{{level.level < 10 ? '0' : ''}}{{level.level}}</view>
+                    <text class="scale-label">{{level.icon}}</text>
+                    <view class="scale-dot"></view>
+                  </view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== NPS 推荐值 ===================== -->
+            <block wx:if="{{item.qtype === 'NPS'}}">
+              <view class="question-options nps-wrap">
+                <view class="nps-labels">
+                  <text>0 绝不推荐</text>
+                  <text class="nps-feedback" wx:if="{{answers[item.qid] !== undefined && answers[item.qid] !== null}}">[ {{answers[item.qid]}}分 · {{_npsFeedbackText(answers[item.qid])}} ]</text>
+                  <text wx:else>请选择 0-10</text>
+                  <text>10 极力推荐</text>
+                </view>
+                <view class="nps-strip">
+                  <view
+                    wx:for="{{11}}"
+                    wx:for-item="n"
+                    wx:key="*this"
+                    class="nps-num {{answers[item.qid] === n - 1 ? 'selected' : ''}} {{n <= 7 ? 'low' : n <= 9 ? 'mid' : 'high'}}"
+                    data-score="{{n - 1}}"
+                    data-qid="{{item.qid}}"
+                    bindtap="onNpsSelect"
+                  >{{n - 1}}</view>
+                </view>
+                <view class="nps-indicator">
+                  <view class="nps-indicator-bar">
+                    <view class="nps-indicator-segment" style="background:#EF4444;flex:7"></view>
+                    <view class="nps-indicator-segment" style="background:#F59E0B;flex:2"></view>
+                    <view class="nps-indicator-segment" style="background:#10B981;flex:2"></view>
+                  </view>
+                  <view
+                    class="nps-na-btn {{answers[item.qid] === -1 ? 'selected' : ''}}"
+                    data-qid="{{item.qid}}"
+                    data-score="-1"
+                    bindtap="onNpsSelect"
+                  >[ 不适用 ]</view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== DATE 日期题 ===================== -->
+            <block wx:if="{{item.qtype === 'DATE'}}">
+              <view class="question-options">
+                <van-field
+                  value="{{answers[item.qid]}}"
+                  placeholder="请选择日期"
+                  readonly
+                  is-link
+                  bind:tap="onDateTap"
+                  data-qid="{{item.qid}}"
+                  data-format="{{item.options[0].format || 'YYYY-MM-DD'}}"
+                />
+              </view>
+            </block>
+
+            <!-- ===================== MATRIX_SINGLE 矩阵单选 ===================== -->
+            <block wx:if="{{item.qtype === 'MATRIX_SINGLE'}}">
+              <view class="matrix-table">
+                <view class="matrix-row matrix-header">
+                  <view class="matrix-cell matrix-row-label"></view>
+                  <view wx:for="{{item.options}}" wx:for-item="col" wx:key="id" class="matrix-cell">{{col.label}}</view>
+                </view>
+                <view wx:for="{{item.options[0].rows || []}}" wx:for-item="row" wx:key="id" class="matrix-row">
+                  <view class="matrix-cell matrix-row-label">{{row.label}}</view>
+                  <view wx:for="{{item.options}}" wx:for-item="col" wx:key="id" class="matrix-cell">
+                    <van-radio-group value="{{answers[item.qid] && answers[item.qid][row.id]}}" bind:change="onMatrixRadioChange" data-qid="{{item.qid}}" data-row="{{row.id}}">
+                      <van-radio name="{{col.id}}" checked-color="#2563EB"></van-radio>
+                    </van-radio-group>
+                  </view>
+                </view>
+              </view>
+            </block>
+
+            <!-- ===================== 不支持的题型 ===================== -->
+            <!-- 注意：wx:if/wx:elif 链官方最多 8 个,所以本文件拆成多组独立 wx:if -->
+            <block wx:if="{{item.qtype !== 'SINGLE' && item.qtype !== 'MULTI' && item.qtype !== 'TEXT' && item.qtype !== 'TEXT_MULTI' && item.qtype !== 'RATE' && item.qtype !== 'SCORE' && item.qtype !== 'SLIDER' && item.qtype !== 'SCALE' && item.qtype !== 'NPS' && item.qtype !== 'DATE' && item.qtype !== 'MATRIX_SINGLE'}}">
+              <view class="question-options">
+                <view class="text-input" style="color:#94A3B8; text-align:center; padding:40rpx;">（题型 {{item.qtype}} 暂不支持，请联系管理员）</view>
+              </view>
+            </block>
+
+            <!-- 错误提示 -->
+            <view wx:if="{{errors[item.qid]}}" class="error-hint">
+              <text>请完善必填项</text>
+            </view>
+
+          </view>
+        </block>
+      </view>
+
+      <!-- ========== Fixed 底部操作栏 ========== -->
+      <view class="bottom-dock">
+        <view class="dock-inner">
+          <view
+            class="submit-btn {{submitting ? 'submit-btn-loading' : ''}}"
+            bindtap="onSubmitTap"
+            wx:if="{{!already_submitted && submit_can_submit && submit_remaining > 0}}"
+          >
+            <text class="vi submit-btn-icon" style="font-family:vant-icon,sans-serif;font-size:20px;line-height:1;color:#FFFFFF;"></text>
+            <text>提交问卷</text>
+          </view>
+          <view
+            class="submit-btn"
+            wx:elif="{{already_submitted || !submit_can_submit || submit_remaining <= 0}}"
+            style="background: var(--slate-300); color: var(--slate-500);"
+          >
+            <text>{{already_submitted ? '已提交' : '已达上限'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ========== 提交确认弹窗（自定义，绕开 van-dialog 样式问题） ========== -->
+      <view wx:if="{{show_confirm}}" class="confirm-mask" bindtap="onCancelSubmit" catchtouchmove="noop">
+        <view class="confirm-dialog" catchtap="noop">
+          <view class="confirm-dialog__title">确认提交</view>
+          <view class="confirm-dialog__message">提交后将无法修改，确定要提交吗？</view>
+          <view class="confirm-dialog__footer">
+            <view class="confirm-dialog__btn confirm-dialog__btn--cancel" bindtap="onCancelSubmit" hover-class="confirm-dialog__btn--hover">
+              再想想
+            </view>
+            <view class="confirm-dialog__btn confirm-dialog__btn--confirm" bindtap="onConfirmSubmit" hover-class="confirm-dialog__btn--hover">
+              确认提交
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- ========== 日期选择弹窗 ========== -->
+      <van-popup show="{{showDatePicker}}" position="bottom" bind:close="onDatePickerClose">
+        <van-datetime-picker
+          type="{{datePickerType}}"
+          value="{{datePickerValue}}"
+          min-date="{{datePickerMin}}"
+          max-date="{{datePickerMax}}"
+          bind:confirm="onDatePickerConfirm"
+          bind:cancel="onDatePickerClose"
+        />
+      </van-popup>
+
+      <!-- ========== 提交成功弹窗 ========== -->
+      <view wx:if="{{showSuccessModal}}" class="success-overlay" catchtap="">
+        <view class="success-modal">
+          <view class="success-header">
+            <view class="success-icon">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;line-height:1;color:#059669;"></text>
+            </view>
+            <view>
+              <view class="success-title">问卷已成功提交</view>
+              <view class="success-subtitle">提交成功 · 数据已同步</view>
+            </view>
+          </view>
+          <view class="success-receipt">
+            <view class="receipt-row">
+              <text class="receipt-label">问卷标题</text>
+              <text class="receipt-value">{{survey.title}}</text>
+            </view>
+            <view class="receipt-row">
+              <text class="receipt-label">作答用时</text>
+              <text class="receipt-value blue">{{_durationText}}</text>
+            </view>
+            <view class="receipt-row">
+              <text class="receipt-label">积分奖励</text>
+              <text class="receipt-value green">+10 积分 / 0.5 实践学时</text>
+            </view>
+            <view class="receipt-footer">
+              <text>凭据编号</text>
+              <text>R-{{_receiptId}}</text>
+            </view>
+          </view>
+          <view class="success-actions">
+            <view class="success-primary-btn" bindtap="onSuccessBackToList">
+              <text>返回问卷列表</text>
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:18px;line-height:1;color:#FFFFFF;"></text>
+            </view>
+            <view class="success-secondary-btn" bindtap="onSuccessRetake">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:16px;line-height:1;color:#334155;"></text>
+              <text>重新录入作答</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      </view>
+      <!-- survey-main end -->
+    </view>
+    <!-- survey-layout end -->
+
+    <!-- ========== 返回顶部悬浮按钮 ========== -->
+    <view class="back-to-top {{_showBackToTop ? 'visible' : ''}}" bindtap="_scrollToTop" hover-class="back-to-top-hover">
+      <text class="vi back-to-top-icon" style="font-family:vant-icon,sans-serif;font-size:22px;line-height:1;color:#FFFFFF;"></text>
+    </view>
+
+    <!-- ========== 答题卡弹层 ========== -->
+    <view class="answer-card-mask {{_showAnswerCard ? 'visible' : ''}}" catchtap="_toggleAnswerCard">
+      <view class="answer-card-panel" catchtouchmove="noop">
+        <view class="answer-card-header">
+          <view class="answer-card-title">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:18px;line-height:1;color:#2563EB;"></text>
+            <text>答题卡</text>
+          </view>
+          <view class="answer-card-stats">
+            <text class="stat-answered">已答 {{_answeredCount}}</text>
+            <text class="stat-divider">/</text>
+            <text class="stat-total">共 {{_totalQuestionCount}} 题</text>
+          </view>
+        </view>
+
+        <view class="answer-card-legend">
+          <view class="legend-item"><view class="legend-dot answered"></view><text>已答</text></view>
+          <view class="legend-item"><view class="legend-dot unanswered"></view><text>未答</text></view>
+          <view class="legend-item"><view class="legend-dot active"></view><text>当前</text></view>
+          <view class="legend-item"><view class="legend-dot error"></view><text>错误</text></view>
+        </view>
+
+        <scroll-view scroll-y="true" class="answer-card-scroll" enhanced="true" show-scrollbar="false">
+          <view class="answer-card-grid">
+            <view
+              wx:for="{{questions}}"
+              wx:key="qid"
+              wx:for-index="idx"
+              class="ac-item {{_answeredMap[item.qid] ? 'answered' : 'unanswered'}} {{_currentNavIdx === idx ? 'active' : ''}} {{errors[item.qid] ? 'has-error' : ''}}"
+              data-idx="{{idx}}"
+              data-qid="{{item.qid}}"
+              bindtap="_onNavItemTap"
+              hover-class="ac-item-hover"
+            >
+              <text class="ac-num">{{idx < 9 ? '0' : ''}}{{idx + 1}}</text>
+              <view wx:if="{{_answeredMap[item.qid]}}" class="ac-mark answered-mark">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:12px;line-height:1;color:#FFFFFF;"></text>
+              </view>
+              <view wx:elif="{{errors[item.qid]}}" class="ac-mark error-mark">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:12px;line-height:1;color:#FFFFFF;"></text>
+              </view>
+              <view wx:else class="ac-mark dot-mark"></view>
+            </view>
+          </view>
+        </scroll-view>
+
+        <view class="answer-card-footer">
+          <view class="ac-footer-btn ac-footer-secondary" catchtap="_toggleAnswerCard" hover-class="none">
+            <text>关闭</text>
+          </view>
+          <view class="ac-footer-btn ac-footer-primary" catchtap="_scrollToFirstUnanswered" hover-class="none">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:16px;line-height:1;color:#FFFFFF;"></text>
+            <text>跳到未答</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    </block>
+  </view>
+</view>

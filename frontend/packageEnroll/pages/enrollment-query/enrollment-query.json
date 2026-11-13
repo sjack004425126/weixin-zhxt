@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "开放教育新生报名",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#E6F7FF",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "van-popup": "@vant/weapp/popup/index"
+  }
+}

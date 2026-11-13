@@ -1,0 +1,131 @@
+/* ============================================================
+ * 个人中心头像通用样式（4 个页面共用）
+ * 由 utils/avatar-components.wxml 引入
+ * ============================================================ */
+
+/* 未上传头像提示条 */
+.avatar-tip-bar {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin: 0 30rpx 20rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 16rpx;
+  background: #fff7ed;
+  border: 1rpx solid #ffd8b5;
+  font-size: 26rpx;
+  color: #ff976a;
+}
+
+.avatar-tip-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* 头像处理中遮罩层 */
+.avatar-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-overlay-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.avatar-overlay-content {
+  position: relative;
+  width: 560rpx;
+  padding: 50rpx 40rpx 40rpx;
+  border-radius: 24rpx;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.18);
+}
+
+.avatar-overlay-icon-wrap {
+  position: relative;
+  width: 110rpx;
+  height: 110rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+
+.avatar-overlay-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 4rpx solid rgba(24, 144, 255, 0.25);
+  border-top-color: #1890ff;
+  animation: avatar-overlay-spin 1s linear infinite;
+}
+
+@keyframes avatar-overlay-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.avatar-overlay-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.avatar-overlay-step {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.avatar-overlay-bar-wrap {
+  width: 100%;
+  margin-bottom: 16rpx;
+}
+
+.avatar-overlay-bar {
+  width: 100%;
+  height: 12rpx;
+  border-radius: 6rpx;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.avatar-overlay-bar-fill {
+  height: 100%;
+  border-radius: 6rpx;
+  background: linear-gradient(90deg, #1890ff, #36cfc9);
+  transition: width 0.3s ease;
+}
+
+.avatar-overlay-percent {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #999;
+  text-align: right;
+}
+
+.avatar-overlay-tip {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+}

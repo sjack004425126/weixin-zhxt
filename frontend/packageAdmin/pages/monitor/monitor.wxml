@@ -1,0 +1,274 @@
+<view class="monitor-page">
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === 'realtime' ? 'active' : ''}}" data-tab="realtime" bindtap="switchTab">
+      <text>实时</text>
+    </view>
+    <view class="tab-item {{currentTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">
+      <text>历史</text>
+    </view>
+    <view class="tab-item {{currentTab === 'ranking' ? 'active' : ''}}" data-tab="ranking" bindtap="switchTab">
+      <text>排行</text>
+    </view>
+  </view>
+
+  <!-- 实时Tab内容 -->
+  <view wx:if="{{currentTab === 'realtime'}}">
+  <!-- 概览卡片 -->
+  <view class="overview-section">
+    <view class="overview-card active">
+      <view class="card-value">{{activeRequests}}</view>
+      <view class="card-label">活跃请求</view>
+    </view>
+    <view class="overview-card total">
+      <view class="card-value">{{totalToday}}</view>
+      <view class="card-label">今日总请求</view>
+    </view>
+    <view class="overview-card response">
+      <view class="card-value">{{avgResponseTime}}ms</view>
+      <view class="card-label">平均响应</view>
+    </view>
+  </view>
+
+  <!-- 请求趋势 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">请求趋势（实时更新）</text>
+      <view class="live-badge">
+        <view class="live-dot"></view>
+        <text>LIVE</text>
+      </view>
+    </view>
+    <view class="trend-chart">
+      <!-- Y轴 -->
+      <view class="trend-y-axis">
+        <text>{{maxCount}}</text>
+        <text>{{halfMaxCount}}</text>
+        <text>0</text>
+      </view>
+      <!-- 图表主体 -->
+      <view class="trend-body">
+        <view class="trend-grid">
+          <view class="grid-h-line"></view>
+          <view class="grid-h-line"></view>
+        </view>
+        <view class="trend-bars">
+          <block wx:for="{{minuteData}}" wx:key="time">
+            <view class="trend-bar-wrap">
+              <view class="trend-bar {{index === minuteData.length - 1 ? 'current' : ''}}" 
+                style="height: {{item.percent}}%"></view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+    <!-- X轴标签 -->
+    <view class="trend-x-axis">
+      <text>30分钟前</text>
+      <text>15分钟前</text>
+      <text>现在</text>
+    </view>
+    <!-- 统计提示 -->
+    <view class="trend-stats">
+      <view class="stat-item">
+        <text class="stat-label">当前</text>
+        <text class="stat-value">{{currentMinuteCount}} 次/分</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">峰值</text>
+        <text class="stat-value highlight">{{maxCount}} 次/分</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">平均</text>
+        <text class="stat-value">{{avgMinuteCount}} 次/分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门接口 -->
+  <view class="section">
+    <view class="section-title">
+      <text>热门接口（本小时）</text>
+    </view>
+    <view class="path-list">
+      <view class="path-item" wx:for="{{pathStats}}" wx:key="path">
+        <view class="path-rank">{{index + 1}}</view>
+        <view class="path-info">
+          <view class="path-name">{{item.path}}</view>
+          <view class="path-bar">
+            <view class="path-bar-fill" style="width: {{pathStats[0] ? (item.count / pathStats[0].count * 100) : 0}}%"></view>
+          </view>
+        </view>
+        <view class="path-count">{{item.count}}</view>
+      </view>
+      <view class="empty-tip" wx:if="{{pathStats.length === 0}}">
+        暂无数据
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态码分布 -->
+  <view class="section">
+    <view class="section-title">
+      <text>状态码分布</text>
+    </view>
+    <view class="status-grid">
+      <view class="status-item {{item.type}}" wx:for="{{statusStats}}" wx:key="code">
+        <view class="status-code">{{item.code}}</view>
+        <view class="status-count">{{item.count}}</view>
+      </view>
+      <view class="empty-tip" wx:if="{{statusStats.length === 0}}">
+        暂无数据
+      </view>
+    </view>
+  </view>
+
+  <!-- 慢请求 -->
+  <view class="section" wx:if="{{slowRequests.length > 0}}">
+    <view class="section-title warning">
+      <text>⚠ 慢请求（>1秒）</text>
+    </view>
+    <view class="slow-list">
+      <view class="slow-item" wx:for="{{slowRequests}}" wx:key="index">
+        <text class="slow-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+  </view>
+
+  <!-- 历史Tab内容 -->
+  <view wx:if="{{currentTab === 'history'}}">
+    <!-- 每日趋势图 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">每日请求趋势</text>
+        <picker mode="selector" range="{{['1天', '3天', '7天', '14天', '30天']}}" bindchange="changeHistoryDays">
+          <view class="picker-btn">{{historyDays}}天 ▼</view>
+        </picker>
+      </view>
+      <view class="history-chart">
+        <view class="trend-y-axis">
+          <text>{{historyMaxCount}}</text>
+          <text>{{historyHalfMax}}</text>
+          <text>0</text>
+        </view>
+        <view class="trend-body">
+          <view class="trend-grid">
+            <view class="grid-h-line"></view>
+            <view class="grid-h-line"></view>
+          </view>
+          <view class="history-bars">
+            <block wx:for="{{dailyData}}" wx:key="date">
+              <view class="history-bar-wrap" bindtap="onDailyBarTap" data-date="{{item.date}}" data-count="{{item.count}}">
+                <view class="history-bar" style="height: {{item.percent}}%"></view>
+                <view class="history-bar-label">{{item.shortDate}}</view>
+              </view>
+            </block>
+          </view>
+        </view>
+      </view>
+      <view class="history-stats">
+        <view class="stat-item">
+          <text class="stat-label">总请求</text>
+          <text class="stat-value">{{historyTotalCount}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">日均</text>
+          <text class="stat-value">{{historyAvgCount}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">峰值日</text>
+          <text class="stat-value highlight">{{historyMaxCount}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 高峰时段 -->
+    <view class="section">
+      <view class="section-title">
+        <text>🔥 高峰时段 Top 10</text>
+      </view>
+      <view class="peak-list">
+        <view class="peak-item" wx:for="{{peakHours}}" wx:key="hour">
+          <view class="peak-rank {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
+          <view class="peak-time">{{item.hour}}</view>
+          <view class="peak-count">{{item.count}} 次</view>
+        </view>
+        <view class="empty-tip" wx:if="{{peakHours.length === 0}}">暂无数据</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排行Tab内容 -->
+  <view wx:if="{{currentTab === 'ranking'}}">
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">API 访问排行</text>
+        <picker mode="selector" range="{{['1小时', '6小时', '12小时', '24小时', '48小时', '7天']}}" bindchange="changeRankingHours">
+          <view class="picker-btn">
+            {{rankingHours < 24 ? rankingHours + '小时' : (rankingHours === 24 ? '24小时' : (rankingHours === 48 ? '48小时' : '7天'))}} ▼
+          </view>
+        </picker>
+      </view>
+      <view class="ranking-list">
+        <view class="ranking-item" wx:for="{{apiRanking}}" wx:key="path">
+          <view class="ranking-rank {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
+          <view class="ranking-info">
+            <view class="ranking-path">{{item.path}}</view>
+            <view class="ranking-bar">
+              <view class="ranking-bar-fill" style="width: {{apiRanking[0] ? (item.count / apiRanking[0].count * 100) : 0}}%"></view>
+            </view>
+          </view>
+          <view class="ranking-count">{{item.count}}</view>
+        </view>
+        <view class="empty-tip" wx:if="{{apiRanking.length === 0}}">暂无数据</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部控制栏 -->
+  <view class="control-bar">
+    <view class="control-item" bindtap="toggleAutoRefresh">
+      <text class="control-icon">{{autoRefresh ? '⏸' : '▶'}}</text>
+      <text class="control-label">{{autoRefresh ? '暂停' : '开始'}}</text>
+    </view>
+    <view class="control-item">
+      <picker mode="selector" range="{{['3秒', '5秒', '10秒', '30秒']}}" bindchange="changeInterval">
+        <view class="picker-content">
+          <text class="control-icon">⏱</text>
+          <text class="control-label">{{refreshInterval}}秒</text>
+        </view>
+      </picker>
+    </view>
+    <view class="control-item danger" bindtap="clearStats">
+      <text class="control-icon">🗑</text>
+      <text class="control-label">清空</text>
+    </view>
+    <view class="control-status">
+      <text class="status-dot {{autoRefresh ? 'active' : ''}}"></text>
+      <text class="status-text">{{updatedAt}}</text>
+    </view>
+  </view>
+
+  <!-- 日期排行弹窗 -->
+  <view class="daily-ranking-modal" wx:if="{{showDailyRanking}}" bindtap="closeDailyRanking">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">{{dailyRankingDate}} 接口排行</text>
+        <text class="modal-close" bindtap="closeDailyRanking">✕</text>
+      </view>
+      <view class="modal-summary">
+        <text>总请求：{{dailyRankingTotal}} 次</text>
+        <text>接口数：{{dailyRankingApis}} 个</text>
+      </view>
+      <scroll-view class="modal-list" scroll-y>
+        <view class="ranking-item" wx:for="{{dailyRankingList}}" wx:key="path">
+          <view class="ranking-rank {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
+          <view class="ranking-path">{{item.path}}</view>
+          <view class="ranking-count">{{item.count}}</view>
+        </view>
+        <view class="empty-tip" wx:if="{{dailyRankingList.length === 0}}">暂无数据</view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

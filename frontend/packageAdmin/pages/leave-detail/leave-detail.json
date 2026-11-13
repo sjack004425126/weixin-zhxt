@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "请假详情",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-icon": "/components/vant-icon/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-loading": "@vant/weapp/loading/index"
+  }
+}

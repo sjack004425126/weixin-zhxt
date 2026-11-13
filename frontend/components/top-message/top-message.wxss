@@ -1,0 +1,146 @@
+/* ===== 容器 ===== */
+@import "../vant-icon/index.wxss";
+
+.top-message-wrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.top-message-wrapper.position-top {
+  top: 0;
+}
+
+.top-message-wrapper.position-bottom {
+  bottom: 0;
+}
+
+/* ===== 消息卡片 ===== */
+.message-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin: 20rpx;
+  padding: 22rpx 28rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+  position: relative;
+  pointer-events: auto;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out;
+  will-change: transform;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* 顶部高光，提升质感 */
+.message-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+/* 滑动中 - 无过渡，跟随手指 */
+.message-content.swiping {
+  transition: none;
+}
+
+/* 滑出动画 - 向左滑出并淡出 */
+.message-content.swiping-out {
+  transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+  opacity: 0;
+}
+
+/* ===== 图标 ===== */
+/* vi 类：直接用 text 渲染 vant-icon 字体的 unicode 字符（INCIDENTS/001，绕过 van-icon 组件 view+::before） */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+
+.message-icon {
+  flex-shrink: 0;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== 文案 ===== */
+.message-text {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+/* ===== 关闭按钮 ===== */
+.message-close {
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.message-close:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ===== 类型：成功 ===== */
+.message-content.success {
+  background: linear-gradient(135deg, #51cf66 0%, #2f9e44 100%);
+}
+
+/* ===== 类型：失败 / 错误 ===== */
+.message-content.error {
+  background: linear-gradient(135deg, #ff6b6b 0%, #e03131 100%);
+}
+
+/* ===== 类型：警告 ===== */
+.message-content.warning {
+  background: linear-gradient(135deg, #ffd43b 0%, #f59f00 100%);
+  color: #5c3a00;
+}
+
+.message-content.warning .message-icon {
+  background: rgba(92, 58, 0, 0.15);
+}
+
+.message-content.warning .message-close {
+  color: #5c3a00;
+}
+
+.message-content.warning .message-close:active {
+  background: rgba(92, 58, 0, 0.12);
+}
+
+/* ===== 类型：信息 ===== */
+.message-content.info {
+  background: linear-gradient(135deg, #74c0fc 0%, #1971c2 100%);
+}
+
+/* ===== 背景遮罩 ===== */
+.message-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  background: transparent;
+}

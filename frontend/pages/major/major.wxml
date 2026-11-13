@@ -1,0 +1,61 @@
+<view class="container">
+  <van-loading wx:if="{{ loading }}" />
+  
+  <block wx:if="{{ !loading }}">
+    <view class="header">
+      <view class="title">院校介绍</view>
+      <view class="subtitle">学校设有{{ undergraduate.length }}个本科专业，{{ specialist.length }}个专科专业</view>
+    </view>
+
+    <!-- 本科专业 -->
+    <view class="major-section">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="dot"></view>
+          <text class="section-title">本科专业</text>
+        </view>
+        <navigator url="/pages/department/department" class="department-link">院系介绍 ></navigator>
+      </view>
+      <view class="major-list">
+        <view class="major-tag" 
+          wx:for="{{ undergraduate }}" 
+          wx:key="id"
+          bindtap="showFeeInfo"
+          data-major="{{ item }}">
+          {{ item.name }}
+        </view>
+      </view>
+    </view>
+
+    <!-- 专科专业 -->
+    <view class="major-section">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="dot"></view>
+          <text class="section-title">专科专业</text>
+        </view>
+        <navigator url="/pages/department/department" class="department-link">院系介绍 ></navigator>
+      </view>
+      <view class="major-list">
+        <view class="major-tag" 
+          wx:for="{{ specialist }}" 
+          wx:key="id"
+          bindtap="showFeeInfo"
+          data-major="{{ item }}">
+          {{ item.name }}
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <van-empty wx:if="{{ !loading && (!undergraduate.length && !specialist.length) }}" description="暂无专业信息" />
+
+  <!-- 费用提示组件 -->
+  <fee-toast
+    show="{{ showFeeToast }}"
+    majorName="{{ selectedMajor.name }}"
+    tuition="{{ selectedMajor.tuition }}"
+    books="{{ selectedMajor.books }}"
+    total="{{ selectedMajor.tuition + selectedMajor.books }}"
+  />
+</view> 

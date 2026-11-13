@@ -1,0 +1,520 @@
+@import "../../../components/vant-icon/index.wxss";
+
+/* vi 类：用于直接用 text 渲染 vant-icon 字体的 unicode 字符 */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+
+page {
+  --primary-color: #EB2F96;
+  --primary-light: #FFF0F6;
+  --primary-gradient: linear-gradient(135deg, #EB2F96 0%, #F759AB 100%);
+  --xsk-color: #722ED1;
+  --xsk-light: #F9F0FF;
+  --xsk-gradient: linear-gradient(135deg, #722ED1 0%, #9254DE 100%);
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(235, 47, 150, 0.08);
+  --border-radius: 16rpx;
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding-top: 140rpx;
+}
+
+.page-header {
+  padding: 32rpx 0 24rpx;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2rpx 8rpx rgba(235, 47, 150, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 24rpx;
+}
+
+.header-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4rpx 16rpx rgba(235, 47, 150, 0.3);
+}
+
+.header-text {
+  flex: 1;
+  margin-left: 8rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+.header-nav-action {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(235, 47, 150, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  border: 2rpx solid rgba(235, 47, 150, 0.2);
+}
+
+/* 模式切换 */
+.mode-switch {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  background: white;
+}
+
+.mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 0;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  background: #F5F5F5;
+  border: 2rpx solid transparent;
+}
+
+.mode-active {
+  color: var(--primary-color);
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.mode-active-xsk {
+  color: var(--xsk-color);
+  background: var(--xsk-light);
+  border-color: var(--xsk-color);
+}
+
+/* 模式提示 */
+.mode-hint {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
+  background: var(--xsk-light);
+  font-size: 24rpx;
+  color: var(--xsk-color);
+}
+
+/* 列表内容 */
+.list-content {
+  padding: 24rpx;
+}
+
+.empty-state {
+  padding: 60rpx 0;
+}
+
+.leave-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.leave-item {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.leave-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6rpx;
+  background: var(--primary-gradient);
+}
+
+.leave-item-xsk::before {
+  background: var(--xsk-gradient);
+}
+
+.leave-item-xsk {
+  box-shadow: 0 4rpx 12rpx rgba(114, 46, 209, 0.08);
+}
+
+/* ============================================ */
+/* 新版卡片头部：照片 + 姓名学号班级 + 时长徽标 */
+/* ============================================ */
+.leave-top {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid var(--border-color);
+  position: relative;
+}
+
+.student-photo {
+  flex-shrink: 0;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: #F0F2F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid var(--border-color);
+  /* 暗示可点击：头像区有可点击反馈 */
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.student-photo:active {
+  transform: scale(0.94);
+  box-shadow: 0 0 0 4rpx rgba(235, 47, 150, 0.15);
+}
+
+.photo-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFE0EC 0%, #FFF0F6 100%);
+}
+
+.placeholder-text {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.student-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.meta-row-sub {
+  gap: 10rpx;
+}
+
+.student-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.student-id {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  background: #F5F5F5;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+
+.class-name {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  background: var(--primary-light);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  max-width: 320rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 时长徽标：右上角独立悬挂 */
+.duration-chip {
+  position: absolute;
+  top: -4rpx;
+  right: -4rpx;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 6rpx 14rpx;
+  background: var(--primary-gradient);
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 0 12rpx 0 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(235, 47, 150, 0.25);
+}
+
+.leave-item-xsk .duration-chip {
+  background: var(--xsk-gradient);
+  box-shadow: 0 2rpx 8rpx rgba(114, 46, 209, 0.25);
+}
+
+.duration-text {
+  font-size: 22rpx;
+  font-weight: 600;
+  letter-spacing: 0.5rpx;
+}
+
+/* ============================================ */
+/* 请假原因（醒目浅色块） */
+/* ============================================ */
+.reason-block {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFFBE6 100%);
+  border: 1rpx solid #FFE58F;
+  border-radius: 12rpx;
+  padding: 16rpx 18rpx;
+  margin-bottom: 16rpx;
+}
+
+.reason-label {
+  font-size: 22rpx;
+  color: #B45309;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.reason-text {
+  font-size: 28rpx;
+  color: #5C2E00;
+  line-height: 1.6;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+/* ============================================ */
+/* 请假时间：起 / 止 两行对齐 */
+/* ============================================ */
+.time-block {
+  background: #F8FAFC;
+  border: 1rpx solid #E2E8F0;
+  border-radius: 12rpx;
+  padding: 14rpx 18rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.time-label {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  background: var(--primary-color);
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leave-item-xsk .time-label {
+  background: var(--xsk-color);
+}
+
+.time-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-weight: 500;
+}
+
+/* ============================================ */
+/* 离校线路 + 交通工具（合并一行） */
+/* ============================================ */
+.route-block {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-wrap: wrap;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  padding: 12rpx 18rpx;
+  background: #F0F8FF;
+  border: 1rpx solid #BAE0FF;
+  border-radius: 10rpx;
+  margin-bottom: 16rpx;
+}
+
+.route-text {
+  font-size: 26rpx;
+  color: #1890FF;
+  word-break: break-all;
+}
+
+.route-divider {
+  color: #BFBFBF;
+  margin: 0 4rpx;
+}
+
+/* 学生科额外信息 */
+.xsk-extra-info {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 12rpx;
+  padding: 12rpx 16rpx;
+  background: var(--xsk-light);
+  border-radius: 8rpx;
+}
+
+.extra-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--xsk-color);
+}
+
+.leave-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--border-color);
+}
+
+.leave-actions .van-button {
+  min-width: 120rpx !important;
+  max-width: 180rpx !important;
+  padding: 0 24rpx !important;
+}
+
+.leave-footer {
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--border-color);
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-cancel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #FFFBE6;
+  border-radius: 8rpx;
+  border: 1rpx solid #FFE58F;
+}
+
+.footer-cancel .van-button {
+  min-width: 120rpx !important;
+  max-width: 160rpx !important;
+  padding: 0 20rpx !important;
+}
+
+.cancel-status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.cancel-text {
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.cancel-done {
+  color: #52C41A;
+}
+
+.cancel-pending {
+  color: #FAAD14;
+}
+
+.apply-time {
+  font-size: 24rpx;
+  color: var(--text-disabled);
+}
+
+.view-detail-hint {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 24rpx;
+  color: #1890FF;
+}
+
+/* 分页加载提示 */
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: 30rpx 0;
+}
+
+.no-more {
+  display: flex;
+  justify-content: center;
+  padding: 30rpx 0;
+  font-size: 24rpx;
+  color: var(--text-disabled);
+}

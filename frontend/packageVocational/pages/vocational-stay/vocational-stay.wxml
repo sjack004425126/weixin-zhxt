@@ -1,0 +1,90 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:inherit;"></text></view>
+    <view class="header-text">
+      <view class="header-title">留宿管理</view>
+      <view class="header-subtitle">Stay Management</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text></view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 提示栏 -->
+  <view class="notice-bar {{canApply ? '' : 'notice-warning'}}">
+    <view class="notice-content">
+      <text wx:if="{{canApply}}" class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#1890FF;"></text><text wx:else class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#FAAD14;"></text>
+      <text wx:if="{{canApply}}">如需留宿，请点击下方按钮申请</text>
+      <text wx:else>您有未完成的留宿申请，请等待处理后再申请</text>
+    </view>
+  </view>
+
+  <!-- 申请按钮 -->
+  <view class="apply-btn-wrapper">
+    <van-button type="primary" block icon="plus" disabled="{{!canApply}}" bind:click="showApplyForm">申请留宿</van-button>
+  </view>
+
+  <!-- 留宿记录 -->
+  <view class="list-section">
+    <view class="section-title">
+      <text>留宿记录</text>
+      <text class="record-count">共 {{stayList.length}} 条</text>
+    </view>
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+    <view wx:elif="{{stayList.length === 0}}" class="empty-state"><van-empty description="暂无留宿记录" /></view>
+    <view wx:else class="stay-list">
+      <view class="stay-item" wx:for="{{stayList}}" wx:key="id">
+        <view class="stay-header">
+          <van-tag type="{{item.ls_type === 'weekend' ? 'primary' : item.ls_type === 'holiday' ? 'warning' : 'default'}}">
+            {{item.ls_type === 'weekend' ? '周末' : item.ls_type === 'holiday' ? '假期' : '其他'}}
+          </van-tag>
+          <view class="stay-status status-{{item.status}}">
+            {{statusMap[item.status]}}
+          </view>
+        </view>
+        <view class="stay-content">
+          <view class="stay-reason">{{item.ls_reason}}</view>
+          <view class="stay-time">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+            <text>{{item.start_date}} 至 {{item.end_date}}</text>
+          </view>
+          <!-- 拒绝备注 -->
+          <view class="stay-remark" wx:if="{{item.status === 2 && item.approve_remark}}">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#ff4d4f;"></text>
+            <text>拒绝原因：{{item.approve_remark}}</text>
+          </view>
+          <!-- 审批时间 -->
+          <view class="stay-approve-time" wx:if="{{item.approve_time && (item.status === 1 || item.status === 2)}}">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#999;"></text>
+            <text>审批时间：{{item.approve_time}}</text>
+          </view>
+        </view>
+        <view class="stay-footer">
+          <text class="apply-time">申请时间：{{item.cjsj}}</text>
+          <van-button wx:if="{{item.status === 0}}" size="mini" type="danger" plain catchtap="cancelStay" data-id="{{item.id}}">取消</van-button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 申请表单弹窗 -->
+<van-popup show="{{showForm}}" position="bottom" round closeable bind:close="hideApplyForm" custom-style="height: 65vh;">
+  <view class="form-popup">
+    <view class="form-title">留宿申请</view>
+    <van-field label="留宿类型" value="{{typeText}}" readonly is-link clickable bindtap="showTypePicker" placeholder="请选择" required />
+    <van-field label="留宿日期" value="{{dateDisplay}}" readonly is-link clickable bindtap="showCalendar" placeholder="请选择日期范围" required />
+    <van-field label="留宿原因" type="textarea" value="{{formData.ls_reason}}" bind:change="onReasonChange" placeholder="请填写留宿原因" maxlength="200" show-word-limit required />
+    <view class="form-btn">
+      <van-button type="primary" block round loading="{{submitting}}" disabled="{{submitting}}" bind:click="submitApply">提交申请</van-button>
+    </view>
+  </view>
+</van-popup>
+
+<van-popup show="{{showTypePicker}}" position="bottom" bind:close="hideTypePicker">
+  <van-picker show-toolbar title="选择留宿类型" columns="{{typeColumns}}" bind:confirm="onTypeConfirm" bind:cancel="hideTypePicker" />
+</van-popup>
+
+<van-calendar show="{{showCalendar}}" type="range" color="#1890FF" min-date="{{minDate}}" max-date="{{maxDate}}" allow-same-day max-range="30" range-prompt="最多选择30天" bind:confirm="onCalendarConfirm" bind:close="hideCalendar" />

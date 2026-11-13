@@ -1,0 +1,59 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="container">
+  <!-- 顶部Logo区域 -->
+  <view class="logo-section">
+    <view class="logo-icon">
+      <van-icon name="certificate" size="80rpx" color="white" />
+    </view>
+    <view class="logo-title">智慧教务平台</view>
+    <view class="logo-subtitle">请选择您的身份进入系统</view>
+  </view>
+
+  <!-- 角色选择网格 -->
+  <view class="role-grid">
+    <!-- 开放教育学生 -->
+    <view class="role-block student" bindtap="goToRole" data-role="open-student">
+      <view class="block-icon">
+        <van-icon name="friends-o" size="80rpx" />
+      </view>
+      <view class="block-title">开放教育</view>
+      <view class="block-subtitle">学生端</view>
+    </view>
+
+    <!-- 开放教育教师 -->
+    <view class="role-block teacher" bindtap="goToRole" data-role="open-teacher">
+      <view class="block-icon">
+        <van-icon name="manager-o" size="80rpx" />
+      </view>
+      <view class="block-title">开放教育</view>
+      <view class="block-subtitle">教师端</view>
+    </view>
+
+    <!-- 中职教育学生 -->
+    <view class="role-block vocational-student" bindtap="goToRole" data-role="vocational-student">
+      <view class="block-icon">
+        <van-icon name="contact" size="80rpx" />
+      </view>
+      <view class="block-title">中职教育</view>
+      <view class="block-subtitle">学生端</view>
+    </view>
+
+    <!-- 中职教育教师 -->
+    <view class="role-block vocational-teacher" bindtap="goToRole" data-role="vocational-teacher">
+      <view class="block-icon">
+        <van-icon name="user-circle-o" size="80rpx" />
+      </view>
+      <view class="block-title">中职教育</view>
+      <view class="block-subtitle">教师端</view>
+    </view>
+  </view>
+
+  <!-- 底部版本信息 -->
+  <view class="footer">
+    <text>黔东南开放大学</text>
+    <text class="footer-divider">|</text>
+    <text>黔东南中等职业技术学校</text>
+  </view>
+</view>

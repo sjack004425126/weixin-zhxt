@@ -1,0 +1,451 @@
+
+@import "../../../components/vant-icon/index.wxss";
+
+/* vi类: 直接用text渲染vant-icon字体unicode字符，绕过view+::before伪元素兼容性问题 */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+/* 蓝色主题色彩变量 */
+page {
+  --primary-color: #1890FF;
+  --primary-light: #E6F7FF;
+  --primary-gradient: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+  --secondary-color: #52C41A;
+  --warning-color: #FAAD14;
+  --error-color: #FF4D4F;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.08);
+  --card-shadow-hover: 0 8rpx 24rpx rgba(24, 144, 255, 0.15);
+  --border-radius: 16rpx;
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding: 24rpx;
+  padding-top: 160rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 页面头部样式 */
+.page-header {
+  padding: 32rpx 0 24rpx;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 24rpx;
+  position: relative;
+}
+
+.header-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
+}
+
+.header-text {
+  flex: 1;
+  margin-left: 8rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+.header-nav-action {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+/* 状态卡片 */
+.status-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 40rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+}
+
+.status-card.status-pending::before {
+  background: var(--warning-color);
+}
+
+.status-card.status-approved::before {
+  background: var(--secondary-color);
+}
+
+.status-card.status-rejected::before {
+  background: var(--error-color);
+}
+
+.status-card.status-completed::before {
+  background: var(--primary-gradient);
+}
+
+.status-icon {
+  margin-bottom: 16rpx;
+}
+
+.status-card.status-pending .status-icon {
+  color: var(--warning-color);
+}
+
+.status-card.status-approved .status-icon {
+  color: var(--secondary-color);
+}
+
+.status-card.status-rejected .status-icon {
+  color: var(--error-color);
+}
+
+.status-card.status-completed .status-icon {
+  color: var(--primary-color);
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+
+.status-card.status-pending .status-text {
+  color: var(--warning-color);
+}
+
+.status-card.status-approved .status-text {
+  color: var(--secondary-color);
+}
+
+.status-card.status-rejected .status-text {
+  color: var(--error-color);
+}
+
+.status-card.status-completed .status-text {
+  color: var(--primary-color);
+}
+
+.status-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+/* 信息卡片 */
+.info-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3rpx;
+  background: var(--primary-gradient);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.card-title van-icon {
+  color: var(--primary-color);
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12rpx 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  width: 160rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  text-align: right;
+  flex: 1;
+  word-break: break-all;
+}
+
+/* 审批列表 */
+.approval-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.approval-item {
+  background: #FAFBFC;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  border: 1rpx solid var(--border-color);
+}
+
+.approval-role {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+}
+
+.approval-status {
+  display: inline-block;
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.approval-status.status-pending {
+  background: #FFF7E6;
+  color: var(--warning-color);
+}
+
+.approval-status.status-approved {
+  background: #F6FFED;
+  color: var(--secondary-color);
+}
+
+.approval-status.status-rejected {
+  background: #FFF1F0;
+  color: var(--error-color);
+}
+
+.approval-name {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-top: 32rpx;
+}
+
+.action-buttons .van-button {
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+  border-radius: 44rpx !important;
+}
+
+.action-buttons .van-button--primary {
+  background: var(--primary-gradient) !important;
+  border: none !important;
+  box-shadow: 0 8rpx 24rpx rgba(24, 144, 255, 0.3) !important;
+}
+
+.action-buttons .van-button--default {
+  border: 2rpx solid var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+/* 销假弹窗 */
+.cancel-modal {
+  padding: 32rpx;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+/* 门禁记录验证区域 */
+.access-check-section {
+  background: #F7F9FC;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.access-check-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.access-check-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.access-check-result {
+  padding: 20rpx 0;
+}
+
+.access-result-success,
+.access-result-fail {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  padding: 20rpx;
+  border-radius: 12rpx;
+}
+
+.access-result-success {
+  background: linear-gradient(135deg, #F0FFF4 0%, #E6F7FF 100%);
+  border: 1rpx solid #B7EB8F;
+}
+
+.access-result-fail {
+  background: linear-gradient(135deg, #FFF1F0 0%, #FFEBE8 100%);
+  border: 1rpx solid #FFCCC7;
+}
+
+.access-result-info {
+  flex: 1;
+}
+
+.access-result-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.access-result-success .access-result-title {
+  color: #52C41A;
+}
+
+.access-result-fail .access-result-title {
+  color: #FF4D4F;
+}
+
+.access-result-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+  font-size: 26rpx;
+}
+
+.detail-label {
+  color: var(--text-secondary);
+  margin-right: 8rpx;
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.access-result-msg {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.modal-content {
+  margin-bottom: 32rpx;
+}
+
+.modal-footer .van-button {
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+  border-radius: 44rpx !important;
+  background: var(--primary-gradient) !important;
+  border: none !important;
+}
+
+.modal-footer .van-button--disabled {
+  background: #F5F5F5 !important;
+  color: #BFBFBF !important;
+  opacity: 1 !important;
+}

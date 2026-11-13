@@ -1,0 +1,290 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 顶部导航 -->
+<view class="nav-bar">
+  <view class="nav-inner">
+    <view class="nav-icon-wrap">
+      <van-icon name="notes-o" size="36rpx" color="#fff" />
+    </view>
+    <view class="nav-title-wrap">
+      <text class="nav-title">补考报考</text>
+      <text class="nav-sub">Makeup Exam Registration</text>
+    </view>
+    <view class="nav-home" bindtap="goHome">
+      <van-icon name="wap-home-o" size="36rpx" />
+    </view>
+  </view>
+</view>
+
+<view class="page-body">
+
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{isLoading}}">
+    <van-loading size="48rpx" color="#1890FF" vertical>加载中...</van-loading>
+  </view>
+
+  <block wx:if="{{!isLoading && student}}">
+
+    <!-- 学生信息卡 -->
+    <view class="stu-card">
+      <view class="stu-row">
+        <view class="stu-avatar">
+          <text class="stu-avatar-text">{{student.xm[0] || '学'}}</text>
+        </view>
+        <view class="stu-info">
+          <text class="stu-name">{{student.xm}}</text>
+          <text class="stu-detail">{{student.xh}} · {{student.bj_mc}}</text>
+        </view>
+        <view class="stu-status {{student.xjzt === '1' ? 'active' : 'inactive'}}">
+          {{student.xjzt_desc}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 统计概览 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{totalCount}}</text>
+        <text class="stat-label">总课程</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num passed-num">{{passedCount}}</text>
+        <text class="stat-label">已通过</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num failed-num">{{failedCount}}</text>
+        <text class="stat-label">未通过</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num reg-num">{{registeredCount}}</text>
+        <text class="stat-label">已报考</text>
+      </view>
+    </view>
+
+    <!-- 截止时间 + 报考状态 -->
+    <view class="deadline-bar">
+      <view class="deadline-left">
+        <van-icon name="clock-o" size="28rpx" color="{{registrationOpen ? '#E86433' : '#FF4D4F'}}" />
+        <text class="deadline-text">截止：{{reexamDeadline || '未设置'}}</text>
+      </view>
+      <view class="deadline-tag {{registrationOpen ? 'open' : 'closed'}}">
+        {{registrationOpen ? '报考中' : '已截止'}}
+      </view>
+    </view>
+
+    <!-- 不及格课程区域 -->
+    <view class="section" wx:if="{{failedCourses.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot failed-dot"></view>
+          <text class="section-title">未通过课程</text>
+          <text class="section-count">{{failedCount}}门</text>
+        </view>
+        <text class="section-hint" wx:if="{{registrationOpen}}">点击报考按钮选择科目</text>
+      </view>
+
+      <view class="course-card failed-card" wx:for="{{failedCourses}}" wx:key="kcid">
+        <!-- 左侧色条 -->
+        <view class="card-accent {{item.register_status === '已报考' ? 'accent-blue' : 'accent-red'}}"></view>
+        <view class="card-body">
+          <!-- 第一行：课程名 + 操作按钮 -->
+          <view class="card-top">
+            <view class="card-name-wrap">
+              <text class="card-name">{{item.kcmc}}</text>
+              <view class="card-tags">
+                <text class="tag tag-id">{{item.kcid}}</text>
+                <text class="tag tag-type">{{item.kcxz}}</text>
+                <text class="tag tag-xf">{{item.kcxf}}学分</text>
+              </view>
+            </view>
+            <!-- 操作按钮 -->
+            <view class="card-action">
+              <view wx:if="{{item.register_status === '未报考' && item.can_register}}"
+                class="btn btn-register"
+                bindtap="handleRegister"
+                data-course="{{item}}">
+                报考
+              </view>
+              <view wx:elif="{{item.register_status === '已报考' && item.pay_status !== '已支付'}}"
+                class="btn btn-cancel"
+                bindtap="handleCancel"
+                data-course="{{item}}">
+                取消
+              </view>
+              <view wx:elif="{{item.pay_status === '已支付'}}" class="btn btn-paid">
+                已支付
+              </view>
+              <view wx:elif="{{!item.can_register && item.register_status === '未报考'}}" class="btn btn-disabled">
+                不可报考
+              </view>
+            </view>
+          </view>
+          <!-- 第二行：成绩 + 状态 -->
+          <view class="card-bottom">
+            <view class="score-wrap">
+              <text class="score-label">成绩</text>
+              <text class="score-val fail-score">{{item.highest_score != null ? item.highest_score : '无'}}</text>
+            </view>
+            <view class="meta-wrap">
+              <text class="meta-item">{{item.kclx}}</text>
+              <text class="meta-item">{{item.ksdw}}</text>
+            </view>
+            <view class="status-wrap" wx:if="{{item.register_status === '已报考'}}">
+              <text class="status-tag registered">已报考</text>
+              <text class="status-tag {{item.pay_status === '已支付' ? 'paid' : item.pay_status === '待支付' ? 'pending' : 'unpaid'}}">
+                {{item.pay_status === '-' ? '未支付' : item.pay_status}}
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 补修课程-未通过 -->
+    <view class="section" wx:if="{{repairFailedCourses.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot failed-dot"></view>
+          <text class="section-title">补修课程（未通过）</text>
+          <text class="section-count">{{repairFailedCourses.length}}门</text>
+        </view>
+        <text class="section-hint" wx:if="{{registrationOpen}}">补修课免缴费</text>
+      </view>
+
+      <view class="course-card failed-card" wx:for="{{repairFailedCourses}}" wx:key="kcid">
+        <view class="card-accent {{item.register_status === '已报考' ? 'accent-blue' : 'accent-red'}}"></view>
+        <view class="card-body">
+          <view class="card-top">
+            <view class="card-name-wrap">
+              <text class="card-name">{{item.kcmc}}</text>
+              <view class="card-tags">
+                <text class="tag tag-id">{{item.kcid}}</text>
+                <text class="tag tag-repair">补修</text>
+                <text class="tag tag-xf" wx:if="{{item.xf}}">{{item.xf}}学分</text>
+              </view>
+            </view>
+            <view class="card-action">
+              <view wx:if="{{item.register_status === '未报考' && item.can_register}}"
+                class="btn btn-register"
+                bindtap="handleRepairRegister"
+                data-course="{{item}}">
+                报考
+              </view>
+              <view wx:elif="{{item.register_status === '已报考'}}"
+                class="btn btn-cancel"
+                bindtap="handleRepairCancel"
+                data-course="{{item}}">
+                取消
+              </view>
+            </view>
+          </view>
+          <view class="card-bottom">
+            <view class="score-wrap">
+              <text class="score-label">成绩</text>
+              <text class="score-val fail-score">{{item.highest_score != null ? item.highest_score : '无'}}</text>
+            </view>
+            <view class="meta-wrap">
+              <text class="meta-item">{{item.zymc}}</text>
+              <text class="meta-item">{{item.pc}}</text>
+            </view>
+            <view class="status-wrap" wx:if="{{item.register_status === '已报考'}}">
+              <text class="status-tag registered">已报考</text>
+              <text class="status-tag paid">免费</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 补修课程-已通过 -->
+    <view class="section" wx:if="{{repairPassedCourses.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot passed-dot"></view>
+          <text class="section-title">补修课程（已通过）</text>
+          <text class="section-count">{{repairPassedCourses.length}}门</text>
+        </view>
+      </view>
+
+      <view class="course-card passed-card" wx:for="{{repairPassedCourses}}" wx:key="kcid">
+        <view class="card-accent accent-green"></view>
+        <view class="card-body">
+          <view class="card-top">
+            <view class="card-name-wrap">
+              <text class="card-name passed-name">{{item.kcmc}}</text>
+              <view class="card-tags">
+                <text class="tag tag-id">{{item.kcid}}</text>
+                <text class="tag tag-repair">补修</text>
+                <text class="tag tag-xf" wx:if="{{item.xf}}">{{item.xf}}学分</text>
+              </view>
+            </view>
+            <view class="score-badge pass-badge">
+              {{item.highest_score}}
+            </view>
+          </view>
+          <view class="card-bottom">
+            <view class="meta-wrap">
+              <text class="meta-item">{{item.zymc}}</text>
+              <text class="meta-item">{{item.pc}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 缴费按钮（浮动） -->
+    <view class="pay-float" wx:if="{{registrationOpen && needPayCount > 0}}" bindtap="goToPayment">
+      <van-icon name="balance-pay" size="36rpx" color="#fff" />
+      <text class="pay-float-text">去缴费 ({{needPayCount}})</text>
+    </view>
+
+    <!-- 已通过课程区域 -->
+    <view class="section" wx:if="{{passedCourses.length > 0}}">
+      <view class="section-header" bindtap="togglePassed">
+        <view class="section-title-wrap">
+          <view class="section-dot passed-dot"></view>
+          <text class="section-title">已通过课程</text>
+          <text class="section-count">{{passedCount}}门</text>
+        </view>
+        <van-icon name="{{showPassed ? 'arrow-up' : 'arrow-down'}}" size="28rpx" color="#8C8C8C" />
+      </view>
+
+      <block wx:if="{{showPassed}}">
+        <view class="course-card passed-card" wx:for="{{passedCourses}}" wx:key="kcid">
+          <view class="card-accent accent-green"></view>
+          <view class="card-body">
+            <view class="card-top">
+              <view class="card-name-wrap">
+                <text class="card-name passed-name">{{item.kcmc}}</text>
+                <view class="card-tags">
+                  <text class="tag tag-id">{{item.kcid}}</text>
+                  <text class="tag tag-type">{{item.kcxz}}</text>
+                  <text class="tag tag-xf">{{item.kcxf}}学分</text>
+                </view>
+              </view>
+              <view class="score-badge pass-badge">
+                {{item.highest_score}}
+              </view>
+            </view>
+            <view class="card-bottom">
+              <view class="meta-wrap">
+                <text class="meta-item">{{item.kclx}}</text>
+                <text class="meta-item">{{item.ksdw}}</text>
+                <text class="meta-item">{{item.cc}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-wrap" wx:if="{{totalCount === 0}}">
+      <van-empty description="暂无课程数据" />
+    </view>
+
+  </block>
+</view>

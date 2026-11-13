@@ -1,0 +1,5 @@
+<view class="container">
+  <view class="loading">
+    <van-loading size="24px" vertical>正在打开视频号...</van-loading>
+  </view>
+</view> 

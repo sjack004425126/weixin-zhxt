@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "缴费记录",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-icon": "/components/vant-icon/index"
+  }
+}

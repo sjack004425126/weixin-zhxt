@@ -1,0 +1,39 @@
+<!--
+  个人中心头像通用片段（4 个页面共用）
+
+  使用方式（页面 wxml）：
+    <include src="/utils/avatar-components.wxml" />
+
+  约定：
+    - 页面 data 需声明 avatarUrl / hasAvatar / showAvatarTip / avatarOverlay
+      （用 utils/avatar-mixin.js 的 avatarMixinData() 初始化）
+    - 页面需引入 avatar-mixin 的方法（onAvatarTap / closeAvatarOverlay）
+    - 页面 json 需注册 "van-icon": "/components/vant-icon/index"
+-->
+
+<!-- 未上传头像提示条 -->
+<view class="avatar-tip-bar" wx:if="{{showAvatarTip}}" bindtap="onAvatarTap">
+  <van-icon name="warning-o" size="30rpx" color="#ff976a" />
+  <text class="avatar-tip-text">还没有上传头像，点击这里上传（自动抠图美化）</text>
+  <van-icon name="arrow" size="26rpx" color="#ff976a" />
+</view>
+
+<!-- 头像处理中遮罩层（进度条 + 步骤文字） -->
+<view class="avatar-overlay" wx:if="{{avatarOverlay.show}}" bindtap="closeAvatarOverlay">
+  <view class="avatar-overlay-mask"></view>
+  <view class="avatar-overlay-content">
+    <view class="avatar-overlay-icon-wrap">
+      <view class="avatar-overlay-ring"></view>
+      <van-icon name="photograph" size="56rpx" color="#fff" class="avatar-overlay-icon" />
+    </view>
+    <view class="avatar-overlay-title">{{avatarOverlay.title}}</view>
+    <view class="avatar-overlay-step" wx:if="{{avatarOverlay.step}}">{{avatarOverlay.step}}</view>
+    <view class="avatar-overlay-bar-wrap" wx:if="{{avatarOverlay.progress >= 0}}">
+      <view class="avatar-overlay-bar">
+        <view class="avatar-overlay-bar-fill" style="width: {{avatarOverlay.progress}}%"></view>
+      </view>
+      <view class="avatar-overlay-percent">{{avatarOverlay.progress}}%</view>
+    </view>
+    <view class="avatar-overlay-tip">{{avatarOverlay.tip}}</view>
+  </view>
+</view>

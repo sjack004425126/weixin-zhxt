@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "就业推荐",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-tag": "@vant/weapp/tag/index"
+  }
+}

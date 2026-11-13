@@ -1,0 +1,602 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- ==================== 招生简章弹窗 ==================== -->
+<view class="prospectus-modal" wx:if="{{showProspectus}}">
+  <view class="modal-content">
+    <view class="modal-header">
+      <view class="modal-header-title">“3+4”报名须知</view>
+      <view class="modal-header-sub">请仔细阅读以下内容后继续报名</view>
+    </view>
+    <scroll-view class="modal-body" scroll-y bindscroll="onProspectusScroll">
+      <view class="prospectus-content">
+        <block wx:for="{{prospectusSegments}}" wx:key="index">
+          <rich-text wx:if="{{item.type === 'html'}}" nodes="{{item.content}}" />
+          <image wx:elif="{{item.type === 'image'}}" src="{{item.src}}" mode="widthFix" style="width:100%;border-radius:12rpx;margin:20rpx 0;" bindtap="onProspectusImageTap" data-src="{{item.src}}" />
+        </block>
+      </view>
+    </scroll-view>
+    <view class="modal-footer">
+      <view class="scroll-tip" wx:if="{{!hasScrolledToBottom}}">
+        <van-icon name="arrow-down" size="24rpx" />
+        <text>请滑动到底部阅读完整内容</text>
+      </view>
+      <button class="confirm-btn {{hasScrolledToBottom ? 'active' : 'disabled'}}" bindtap="closeProspectus">我已阅读，开始报名</button>
+    </view>
+  </view>
+</view>
+
+<!-- ==================== 主表单 ==================== -->
+<view class="container" wx:if="{{!showProspectus}}">
+
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-badge" wx:if="{{headerBadge}}">
+      <text class="header-badge-text">{{headerBadge}}</text>
+    </view>
+    <view class="header-title" wx:for="{{headerTitles}}" wx:key="index">{{item}}</view>
+    <view class="header-subtitle" wx:if="{{headerSubtitle}}">{{headerSubtitle}}</view>
+  </view>
+
+  <!-- 进度指示 -->
+  <view class="progress-bar-wrap">
+    <view class="progress-steps">
+      <view class="progress-step {{currentStep >= 2 ? 'completed' : ''}}">
+        <view class="step-dot {{currentStep >= 2 ? 'done' : 'active'}}">{{currentStep >= 2 ? '✓' : '1'}}</view>
+        <text class="step-label {{currentStep >= 1 ? 'active' : ''}}">基本信息</text>
+      </view>
+      <view class="progress-step {{currentStep >= 3 ? 'completed' : ''}}">
+        <view class="step-dot {{currentStep >= 3 ? 'done' : currentStep >= 2 ? 'active' : ''}}">{{currentStep >= 3 ? '✓' : '2'}}</view>
+        <text class="step-label {{currentStep >= 2 ? 'active' : ''}}">籍贯联系</text>
+      </view>
+      <view class="progress-step {{currentStep >= 4 ? 'completed' : ''}}">
+        <view class="step-dot {{currentStep >= 4 ? 'done' : currentStep >= 3 ? 'active' : ''}}">{{currentStep >= 4 ? '✓' : '3'}}</view>
+        <text class="step-label {{currentStep >= 3 ? 'active' : ''}}">证件上传</text>
+      </view>
+      <view class="progress-step">
+        <view class="step-dot {{currentStep >= 4 ? 'active' : ''}}">4</view>
+        <text class="step-label {{currentStep >= 4 ? 'active' : ''}}">确认提交</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 已报名查询入口（按钮触发） ===== -->
+  <view class="query-entry-card">
+    <button class="query-btn" bindtap="openQueryCodePopup">
+      <van-icon name="search" size="32rpx" />
+      <text>报名情况查询</text>
+    </button>
+  </view>
+
+  <!-- ===== 卡片1：考生基本信息 ===== -->
+  <view class="form-card">
+    <view class="section-header">
+      <view class="section-icon">
+        <van-icon name="contact" size="32rpx" color="#1a56db" />
+      </view>
+      <view>
+        <view class="section-title">考生基本信息</view>
+        <view class="section-desc">请如实填写考生个人信息</view>
+      </view>
+    </view>
+    <view class="form-body">
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">学生姓名</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'name' ? 'focused' : ''}} {{errorField === 'name' ? 'error' : ''}}" placeholder="请输入学生姓名" value="{{formData.name}}" data-field="name" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">准考证号</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'admission_ticket_no' ? 'focused' : ''}}" placeholder="请输入准考证号" value="{{formData.admission_ticket_no}}" data-field="admission_ticket_no" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">性别</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="picker-content {{formData.gender ? 'selected' : ''}}" bindtap="showGenderPopup">
+          <text>{{selectedGenderText || '请选择性别'}}</text>
+          <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">民族</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="picker-content {{formData.nation ? 'selected' : ''}}" bindtap="showNationPopup">
+          <text>{{selectedNationText || '请选择民族'}}</text>
+          <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">身份证号码</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'id_card' ? 'focused' : ''}}" placeholder="请输入18位身份证号码" value="{{formData.id_card}}" maxlength="18" data-field="id_card" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">原初中毕业学校全称</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'junior_school_name' ? 'focused' : ''}}" placeholder="请输入学校全称" value="{{formData.junior_school_name}}" data-field="junior_school_name" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">原初中毕业学校所在县份</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'junior_school_county' ? 'focused' : ''}}" placeholder="请输入所在县份" value="{{formData.junior_school_county}}" data-field="junior_school_county" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">是否黔东南州2026年应届初中毕业生</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="picker-content {{formData.is_qdn_graduate !== null ? 'selected' : ''}}" bindtap="showIsQdnGraduatePopup">
+          <text>{{selectedIsQdnGraduateText || '请选择'}}</text>
+          <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- ===== 卡片2：籍贯与联系方式 ===== -->
+  <view class="form-card">
+    <view class="section-header">
+      <view class="section-icon">
+        <van-icon name="location-o" size="32rpx" color="#1a56db" />
+      </view>
+      <view>
+        <view class="section-title">籍贯与联系方式</view>
+        <view class="section-desc">户籍信息及联系人信息</view>
+      </view>
+    </view>
+    <view class="form-body">
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">户口性质</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="picker-content {{formData.household_type ? 'selected' : ''}}" bindtap="showHouseholdTypePopup">
+          <text>{{selectedHouseholdTypeText || '请选择户口性质'}}</text>
+          <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">户籍地址（省/市/区）</text>
+          <text class="required-mark">*</text>
+        </view>
+        <picker mode="region" value="{{householdRegion}}" bindchange="onHouseholdRegionChange">
+          <view class="picker-content {{formData.household_province ? 'selected' : ''}}">
+            <text>{{formData.household_province ? formData.household_province + ' / ' + formData.household_city + ' / ' + formData.household_district : '请选择省/市/区'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">户籍详细地址</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'household_address' ? 'focused' : ''}}" placeholder="请输入详细地址（街道/门牌号）" value="{{formData.household_address}}" data-field="household_address" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">实际居住地址（省/市/区）</text>
+          <text class="required-mark">*</text>
+        </view>
+        <picker mode="region" value="{{residenceRegion}}" bindchange="onResidenceRegionChange">
+          <view class="picker-content {{formData.residence_province ? 'selected' : ''}}">
+            <text>{{formData.residence_province ? formData.residence_province + ' / ' + formData.residence_city + ' / ' + formData.residence_district : '请选择省/市/区'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">实际居住详细地址</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'residence_address' ? 'focused' : ''}}" placeholder="请输入详细地址" value="{{formData.residence_address}}" data-field="residence_address" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">手机号</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'phone' ? 'focused' : ''}}" placeholder="请输入11位手机号" type="number" maxlength="11" value="{{formData.phone}}" data-field="phone" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">面试当天是否驾车及车牌信息</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'interview_car_plate' ? 'focused' : ''}}" placeholder="不驾车请填“无”，驾车请填车牌号" maxlength="50" value="{{formData.interview_car_plate}}" data-field="interview_car_plate" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+    </view>
+  </view>
+
+  <!-- ===== 卡片3：监护人信息 ===== -->
+  <view class="form-card">
+    <view class="section-header">
+      <view class="section-icon">
+        <van-icon name="friends-o" size="32rpx" color="#1a56db" />
+      </view>
+      <view>
+        <view class="section-title">监护人信息</view>
+        <view class="section-desc">请填写考生监护人联系信息</view>
+      </view>
+    </view>
+    <view class="form-body">
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">监护人姓名</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'guardian_name' ? 'focused' : ''}}" placeholder="请输入监护人姓名" value="{{formData.guardian_name}}" data-field="guardian_name" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">监护人联系方式</text>
+          <text class="required-mark">*</text>
+        </view>
+        <input class="form-input {{focusField === 'guardian_phone' ? 'focused' : ''}}" placeholder="请输入监护人手机号" type="number" maxlength="11" value="{{formData.guardian_phone}}" data-field="guardian_phone" bindinput="onInputChange" bindfocus="onInputFocus" bindblur="onInputBlur" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">监护人身份</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="picker-content {{formData.guardian_relation ? 'selected' : ''}}" bindtap="showGuardianRelationPopup">
+          <text>{{selectedGuardianRelationText || '请选择监护人身份'}}</text>
+          <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- ===== 卡片4：证件照片上传 ===== -->
+  <view class="form-card">
+    <view class="section-header">
+      <view class="section-icon">
+        <van-icon name="photograph" size="32rpx" color="#1a56db" />
+      </view>
+      <view>
+        <view class="section-title">证件照片上传</view>
+        <view class="section-desc">请上传清晰、完整的证件照片</view>
+      </view>
+    </view>
+    <view class="form-body">
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">身份证正面</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="upload-box" bindtap="{{formData.id_card_front_url ? '' : 'chooseImage'}}" data-field="id_card_front_url">
+          <view class="upload-placeholder" wx:if="{{!formData.id_card_front_url}}">
+            <van-icon name="photograph" size="56rpx" color="#c5cee0" />
+            <text class="upload-placeholder-text">点击上传身份证正面</text>
+          </view>
+          <block wx:else>
+            <image class="upload-preview" src="{{formData.id_card_front_url}}" mode="aspectFill" catchtap="previewUploadedImage" data-src="{{formData.id_card_front_url}}" />
+            <view class="upload-delete" catchtap="deleteImage" data-field="id_card_front_url">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+            <view class="upload-redo" catchtap="chooseImage" data-field="id_card_front_url">
+              <van-icon name="replay" size="24rpx" color="#fff" />
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">身份证反面</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="upload-box" bindtap="{{formData.id_card_back_url ? '' : 'chooseImage'}}" data-field="id_card_back_url">
+          <view class="upload-placeholder" wx:if="{{!formData.id_card_back_url}}">
+            <van-icon name="photograph" size="56rpx" color="#c5cee0" />
+            <text class="upload-placeholder-text">点击上传身份证反面</text>
+          </view>
+          <block wx:else>
+            <image class="upload-preview" src="{{formData.id_card_back_url}}" mode="aspectFill" catchtap="previewUploadedImage" data-src="{{formData.id_card_back_url}}" />
+            <view class="upload-delete" catchtap="deleteImage" data-field="id_card_back_url">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+            <view class="upload-redo" catchtap="chooseImage" data-field="id_card_back_url">
+              <van-icon name="replay" size="24rpx" color="#fff" />
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">标准证件照</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="upload-box" bindtap="{{formData.photo_url ? '' : 'chooseImage'}}" data-field="photo_url">
+          <view class="upload-placeholder" wx:if="{{!formData.photo_url}}">
+            <van-icon name="photograph" size="56rpx" color="#c5cee0" />
+            <text class="upload-placeholder-text">标准电子照或拍照，须清晰不变形</text>
+          </view>
+          <block wx:else>
+            <image class="upload-preview" src="{{formData.photo_url}}" mode="aspectFill" catchtap="previewUploadedImage" data-src="{{formData.photo_url}}" />
+            <view class="upload-delete" catchtap="deleteImage" data-field="photo_url">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+            <view class="upload-redo" catchtap="chooseImage" data-field="photo_url">
+              <van-icon name="replay" size="24rpx" color="#fff" />
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">监护人知情同意书</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="template-section">
+          <view class="template-box" bindtap="previewTemplate" data-src="{{consentTemplateUrl}}">
+            <view class="template-badge">
+              <van-icon name="info-o" size="20rpx" />
+              <text>参考模板</text>
+            </view>
+            <image class="template-img" src="{{consentTemplateUrl}}" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="upload-box" style="margin-top: 20rpx;" bindtap="{{formData.consent_letter_url ? '' : 'chooseImage'}}" data-field="consent_letter_url">
+          <view class="upload-placeholder" wx:if="{{!formData.consent_letter_url}}">
+            <van-icon name="photograph" size="56rpx" color="#c5cee0" />
+            <text class="upload-placeholder-text">参照模板手写并签名按手印后拍照上传</text>
+          </view>
+          <block wx:else>
+            <image class="upload-preview" src="{{formData.consent_letter_url}}" mode="aspectFill" catchtap="previewUploadedImage" data-src="{{formData.consent_letter_url}}" />
+            <view class="upload-delete" catchtap="deleteImage" data-field="consent_letter_url">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+            <view class="upload-redo" catchtap="chooseImage" data-field="consent_letter_url">
+              <van-icon name="replay" size="24rpx" color="#fff" />
+            </view>
+          </block>
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- ===== 卡片5：知情确认与签名 ===== -->
+  <view class="confirm-card">
+    <view class="section-header">
+      <view class="section-icon">
+        <van-icon name="edit" size="32rpx" color="#1a56db" />
+      </view>
+      <view>
+        <view class="section-title">知情确认与签名</view>
+        <view class="section-desc">请仔细阅读后勾选确认并完成签名</view>
+      </view>
+    </view>
+
+    <view class="confirm-content">
+      <view class="confirm-title">考生承诺事项</view>
+      <view class="confirm-item">所提供的个人基本信息真实有效。</view>
+      <view class="confirm-item">知晓面试要求以及录取条件。</view>
+      <view class="confirm-item">本人郑重声明，已理解第一批（"3+4"中本贯通培养试点招生）的录取政策，并承诺若被黔东南中等职业技术学校（舞蹈表演）录取后，绝不反悔。</view>
+      <view class="confirm-item">本人确认已了解上述注意事项，并按照相关规定严格遵守。</view>
+    </view>
+
+    <view class="confirm-checkbox-wrap">
+      <van-checkbox value="{{formData.is_confirmed == 1}}" bind:change="onConfirmChange" checked-color="#1a56db">我已阅读并同意以上全部内容</van-checkbox>
+    </view>
+
+    <view class="form-body">
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">考生本人签名</text>
+          <text class="required-mark">*</text>
+        </view>
+        <view class="upload-box" bindtap="{{formData.signature_base64 ? '' : 'openSignature'}}" data-field="signature_base64">
+          <view class="upload-placeholder" wx:if="{{!formData.signature_base64}}">
+            <van-icon name="edit" size="56rpx" color="#c5cee0" />
+            <text class="upload-placeholder-text">点击开始手写签名</text>
+          </view>
+          <block wx:else>
+            <image class="upload-preview" src="{{formData.signature_base64}}" mode="aspectFit" style="background:#fff;" />
+            <view class="upload-delete" catchtap="deleteSignature">
+              <van-icon name="cross" size="24rpx" color="#fff" />
+            </view>
+            <view class="upload-redo" catchtap="openSignature">
+              <van-icon name="edit" size="24rpx" color="#fff" />
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 提交按钮 ===== -->
+  <view class="submit-section">
+    <button
+      class="submit-btn {{canSubmit ? 'active' : 'disabled'}}"
+      bindtap="submitForm"
+      disabled="{{!(canSubmit || isEditMode) || isSubmitting}}"
+    >{{isSubmitting ? '提交中...' : (isEditMode ? '保存修改' : '提交报名')}}</button>
+    <view class="submit-hint" wx:if="{{!canSubmit}}">请完整填写所有必填项、上传所有证件照片、勾选知情确认并完成签名后提交</view>
+  </view>
+
+</view>
+
+<!-- ==================== 弹窗 ==================== -->
+
+<!-- 性别选择 -->
+<van-popup show="{{showGenderPopup}}" position="bottom" bind:close="closeGenderPopup" round>
+  <view class="popup-header">
+    <text class="popup-title">选择性别</text>
+    <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeGenderPopup" />
+  </view>
+  <scroll-view class="popup-content" scroll-y style="height: 400rpx;">
+    <van-radio-group value="{{formData.gender}}" bind:change="onGenderSelect">
+      <van-cell-group>
+        <van-cell wx:for="{{genderList}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onGenderCellClick">
+          <view slot="title">{{item.label}}</view>
+          <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+  </scroll-view>
+</van-popup>
+
+<!-- 民族选择 -->
+<van-popup show="{{showNationPopup}}" position="bottom" bind:close="closeNationPopup" round>
+  <view class="popup-header">
+    <text class="popup-title">选择民族</text>
+    <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeNationPopup" />
+  </view>
+  <scroll-view class="popup-content" scroll-y style="height: 800rpx;">
+    <van-radio-group value="{{formData.nation}}" bind:change="onNationSelect">
+      <van-cell-group>
+        <van-cell wx:for="{{nationList}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onNationCellClick">
+          <view slot="title">{{item.label}}</view>
+          <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+  </scroll-view>
+</van-popup>
+
+<!-- 是否黔东南州应届毕业生 -->
+<van-popup show="{{showIsQdnGraduatePopup}}" position="bottom" bind:close="closeIsQdnGraduatePopup" round>
+  <view class="popup-header">
+    <text class="popup-title">是否黔东南州2025年应届初中毕业生</text>
+    <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeIsQdnGraduatePopup" />
+  </view>
+  <scroll-view class="popup-content" scroll-y style="height: 400rpx;">
+    <van-radio-group value="{{formData.is_qdn_graduate}}" bind:change="onIsQdnGraduateSelect">
+      <van-cell-group>
+        <van-cell wx:for="{{isQdnGraduateList}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onIsQdnGraduateCellClick">
+          <view slot="title">{{item.label}}</view>
+          <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+  </scroll-view>
+</van-popup>
+
+<!-- 户口性质选择 -->
+<van-popup show="{{showHouseholdTypePopup}}" position="bottom" bind:close="closeHouseholdTypePopup" round>
+  <view class="popup-header">
+    <text class="popup-title">选择户口性质</text>
+    <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeHouseholdTypePopup" />
+  </view>
+  <scroll-view class="popup-content" scroll-y style="height: 400rpx;">
+    <van-radio-group value="{{formData.household_type}}" bind:change="onHouseholdTypeSelect">
+      <van-cell-group>
+        <van-cell wx:for="{{householdTypeList}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onHouseholdTypeCellClick">
+          <view slot="title">{{item.label}}</view>
+          <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+  </scroll-view>
+</van-popup>
+
+<!-- 监护人身份选择 -->
+<van-popup show="{{showGuardianRelationPopup}}" position="bottom" bind:close="closeGuardianRelationPopup" round>
+  <view class="popup-header">
+    <text class="popup-title">选择监护人身份</text>
+    <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeGuardianRelationPopup" />
+  </view>
+  <scroll-view class="popup-content" scroll-y style="height: 400rpx;">
+    <van-radio-group value="{{formData.guardian_relation}}" bind:change="onGuardianRelationSelect">
+      <van-cell-group>
+        <van-cell wx:for="{{guardianRelationList}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onGuardianRelationCellClick">
+          <view slot="title">{{item.label}}</view>
+          <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+  </scroll-view>
+</van-popup>
+
+
+<!-- ===== 报名成功弹窗 ===== -->
+<view class="success-modal-mask" wx:if="{{showSuccessModal}}" catchtouchmove="true">
+  <view class="success-modal-card">
+    <view class="success-modal-icon">✓</view>
+    <view class="success-modal-title">报名成功</view>
+    <view class="success-modal-desc" wx:if="{{successSerialNumber}}">报名序号：{{successSerialNumber}}</view>
+    
+    <view class="success-modal-code-section" wx:if="{{successQueryCode}}">
+      <view class="success-modal-code-label">您的查询码</view>
+      <view class="success-modal-code-value">{{successQueryCode}}</view>
+      <view class="success-modal-code-hint">已通过短信发送至您手机，凭此码可查看和修改报名信息</view>
+    </view>
+    
+    <view class="success-modal-actions">
+      <button class="success-modal-copy-btn" bindtap="copySuccessQueryCode" wx:if="{{successQueryCode}}">复制查询码</button>
+      <button class="success-modal-close-btn" bindtap="closeSuccessModal">关闭</button>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 查询码输入弹窗 ===== -->
+<van-popup show="{{showQueryCodePopup}}" position="bottom" round bind:close="closeQueryCodePopup">
+  <view class="query-popup">
+    <view class="query-popup-header">
+      <view class="query-popup-title">查询报名信息</view>
+      <view class="query-popup-close" bindtap="closeQueryCodePopup">
+        <van-icon name="cross" size="36rpx" color="#999" />
+      </view>
+    </view>
+      <view class="query-popup-body">
+        <view class="query-popup-tip">请输入您收到的查询码</view>
+        <input
+          class="query-popup-input"
+          placeholder="输入查询码"
+          value="{{queryCodeInput}}"
+          bindinput="onQueryCodeInput"
+          maxlength="12"
+          focus="{{showQueryCodePopup}}"
+        />
+        <view class="query-popup-hint">查询码为8位字符，报名成功后会以短信形式发送</view>
+        <view class="query-popup-hint query-popup-hint-extra">查询后可修改信息并重新提交</view>
+      </view>
+    <view class="query-popup-footer">
+      <button class="query-popup-btn" bindtap="verifyQueryCode" loading="{{isQuerying}}" disabled="{{isQuerying || queryCodeInput.length < 8}}">
+        确认查询
+      </button>
+    </view>
+  </view>
+</van-popup>

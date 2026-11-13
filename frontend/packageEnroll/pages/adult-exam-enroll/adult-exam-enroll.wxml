@@ -1,0 +1,274 @@
+<view class="container">
+  <!-- ==================== 招生简章弹窗 ==================== -->
+  <view class="prospectus-modal" wx:if="{{showProspectus}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <view class="modal-header-title">招生简章</view>
+        <view class="modal-header-sub">请仔细阅读以下内容后继续报名</view>
+      </view>
+      <scroll-view class="modal-body" scroll-y bindscroll="onProspectusScroll" scroll-top="{{scrollTop}}">
+        <view class="prospectus-content">
+          <block wx:for="{{prospectusSegments}}" wx:key="index">
+            <rich-text wx:if="{{item.type === 'html'}}" nodes="{{item.content}}" />
+            <image wx:elif="{{item.type === 'image'}}" src="{{item.src}}" mode="widthFix" style="width:100%;border-radius:12rpx;margin:20rpx 0;" bindtap="onProspectusImageTap" data-src="{{item.src}}" />
+          </block>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="scroll-tip" wx:if="{{!hasScrolledToBottom}}">
+          <van-icon name="arrow-down" size="24rpx" />
+          <text>请滑动到底部阅读完整内容</text>
+        </view>
+        <button class="confirm-btn {{hasScrolledToBottom ? 'active' : 'disabled'}}" bindtap="closeProspectus" disabled="{{!hasScrolledToBottom}}">我已阅读，开始报名</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ==================== 主表单 ==================== -->
+  <view class="form-container" wx:if="{{!showProspectus}}">
+
+    <!-- 页面头部 -->
+    <view class="page-header">
+      <view class="header-badge" wx:if="{{headerBadge}}">
+        <text class="header-badge-text">{{headerBadge}}</text>
+      </view>
+      <view class="header-title" wx:for="{{headerTitles}}" wx:key="index">{{item}}</view>
+      <view class="header-subtitle" wx:if="{{headerSubtitle}}">{{headerSubtitle}}</view>
+    </view>
+
+    <!-- ===== 已报名查询入口（按钮触发） ===== -->
+    <view class="query-entry-card">
+      <button class="query-btn" bindtap="openQueryCodePopup">
+        <van-icon name="search" size="32rpx" />
+        <text>报名情况查询</text>
+      </button>
+    </view>
+
+    <!-- ===== 卡片：报名信息 ===== -->
+    <view class="form-card">
+      <view class="section-header">
+        <view class="section-icon">
+          <van-icon name="edit" size="32rpx" color="#1a56db" />
+        </view>
+        <view>
+          <view class="section-title">报名信息</view>
+          <view class="section-desc">请填写个人信息及意向专业</view>
+        </view>
+      </view>
+      <view class="form-body">
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">姓名</text>
+            <text class="required-mark">*</text>
+          </view>
+          <input class="form-input {{focusField === 'name' ? 'focused' : ''}}" placeholder="请输入姓名" value="{{formData.name}}" bindinput="onNameInput" bindfocus="onInputFocus" bindblur="onInputBlur" data-field="name" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">手机号</text>
+            <text class="required-mark">*</text>
+          </view>
+          <input class="form-input {{focusField === 'phone' ? 'focused' : ''}}" placeholder="请输入11位手机号" type="number" maxlength="11" value="{{formData.phone}}" bindinput="onPhoneInput" bindfocus="onInputFocus" bindblur="onInputBlur" data-field="phone" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">意向专业及费用明细</text>
+            <text class="required-mark">*</text>
+          </view>
+          <view class="picker-content {{formData.major_code ? 'selected' : ''}}" bindtap="showMajorPopup">
+            <text>{{selectedMajorText || '请选择意向专业'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">入学后的学习中心</text>
+            <text class="required-mark">*</text>
+          </view>
+          <view class="picker-content {{formData.learning_center_code ? 'selected' : ''}}" bindtap="showLearningCenterPopup">
+            <text>{{selectedLearningCenterText || '请选择学习中心'}}</text>
+            <van-icon name="arrow-down" size="28rpx" color="#9ca3af" />
+          </view>
+        </view>
+
+        <!-- 招生老师 -->
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">招生老师</text>
+          </view>
+          <view class="recruiter-input-row">
+            <input
+              class="form-input recruiter-input {{focusField === 'recruiter' ? 'focused' : ''}}"
+              placeholder="可直接输入或点右侧选择"
+              value="{{formData.recruiter}}"
+              bindinput="onRecruiterInput"
+              bindfocus="onInputFocus"
+              bindblur="onInputBlur"
+              data-field="recruiter"
+            />
+            <view class="recruiter-pick-btn" bindtap="showRecruiterPopup">
+              <van-icon name="friends-o" size="32rpx" color="#1a56db" />
+            </view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn {{canSubmit ? 'active' : 'disabled'}}" bindtap="submitForm" disabled="{{!canSubmit || isSubmitting}}">{{isSubmitting ? '提交中...' : (isEditMode ? '保存修改' : '提交报名')}}</button>
+      <view class="submit-hint" wx:if="{{!canSubmit}}">请填写完所有必填项后提交</view>
+    </view>
+  </view>
+
+  <!-- ==================== 弹窗 ==================== -->
+
+  <!-- 专业选择 -->
+  <van-popup show="{{showMajorPopup}}" position="bottom" bind:close="closeMajorPopup" round>
+    <view class="popup-header">
+      <text class="popup-title">选择专业</text>
+      <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeMajorPopup" />
+    </view>
+    <scroll-view class="popup-content" scroll-y>
+      <van-radio-group value="{{formData.major_code}}" bind:change="onMajorSelect">
+        <block wx:for="{{majorList}}" wx:for-item="group" wx:key="label">
+          <!-- 类型分组标题 -->
+          <view class="group-header">
+            <view class="group-header-line"></view>
+            <text class="group-header-text">{{group.label}}</text>
+            <view class="group-header-line"></view>
+          </view>
+          <!-- 该类型下的专业列表 -->
+          <van-cell-group>
+            <van-cell wx:for="{{group.majors}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onMajorCellClick">
+              <view slot="title" class="radio-cell-title">
+                <view class="major-row">
+                  <text class="major-name">{{item.label}}</text>
+                  <view class="major-category-tag {{group.label === '高起专' ? 'category-diqi' : 'category-zhuanqi'}}">{{group.label}}</view>
+                </view>
+                <view class="radio-cell-desc" wx:if="{{item.extra_data_obj.tuition}}">学制{{item.extra_data_obj.duration || '2.5年'}}，每年{{item.extra_data_obj.tuition}}元</view>
+                <view class="radio-cell-remark" wx:if="{{item.remark}}">{{item.remark}}</view>
+              </view>
+              <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+            </van-cell>
+          </van-cell-group>
+        </block>
+      </van-radio-group>
+    </scroll-view>
+  </van-popup>
+
+  <!-- 学习中心选择 -->
+  <van-popup show="{{showLearningCenterPopup}}" position="bottom" bind:close="closeLearningCenterPopup" round>
+    <view class="popup-header">
+      <text class="popup-title">选择学习中心</text>
+      <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeLearningCenterPopup" />
+    </view>
+    <scroll-view class="popup-content" scroll-y>
+      <van-radio-group value="{{formData.learning_center_code}}" bind:change="onLearningCenterSelect">
+        <van-cell-group>
+          <van-cell wx:for="{{learningCenterList}}" wx:key="code" clickable data-code="{{item.code}}" bindtap="onLearningCenterCellClick">
+            <view slot="title">
+              <view class="radio-cell-label">{{item.label}}</view>
+            </view>
+            <van-radio slot="right-icon" name="{{item.code}}" checked-color="#1a56db" />
+          </van-cell>
+        </van-cell-group>
+      </van-radio-group>
+    </scroll-view>
+  </van-popup>
+
+  <!-- 招生老师选择 -->
+  <van-popup show="{{showRecruiterPopup}}" position="bottom" round bind:close="closeRecruiterPopup" custom-style="height: 65vh;">
+    <view class="introducer-popup">
+      <view class="popup-header">
+        <text class="popup-title">选择招生老师</text>
+        <van-icon name="cross" size="24" color="#9ca3af" bindtap="closeRecruiterPopup" />
+      </view>
+      <view class="search-section">
+        <view class="search-box">
+          <van-icon name="search" size="28rpx" color="#9ca3af" />
+          <input class="search-input" placeholder="搜索姓名或首字母..." bindinput="onRecruiterSearch" value="{{recruiterSearchKeyword}}" />
+          <view class="search-clear {{recruiterSearchKeyword ? 'show' : ''}}" bindtap="clearRecruiterSearch">✕</view>
+        </view>
+      </view>
+      <view class="alphabet-nav">
+        <scroll-view class="alphabet-scroll" scroll-x show-scrollbar="false">
+          <view class="alphabet-list">
+            <view wx:for="{{alphabetList}}" wx:key="*this" class="alphabet-item {{selectedAlphabet === item ? 'active' : ''}}" bindtap="selectAlphabet" data-alphabet="{{item}}">{{item}}</view>
+          </view>
+        </scroll-view>
+      </view>
+      <scroll-view class="introducer-list" scroll-y>
+        <view wx:if="{{filteredRecruiters.length === 0}}" class="empty-state">
+          <van-icon name="friends-o" size="60rpx" color="#ccc" />
+          <view class="empty-text">未找到相关老师</view>
+        </view>
+        <view wx:for="{{filteredRecruiters}}" wx:key="name" class="introducer-item" bindtap="selectRecruiter" data-name="{{item.name}}">
+          <view class="introducer-avatar">{{item.avatar}}</view>
+          <view class="introducer-info">
+            <view class="introducer-name">{{item.name}}</view>
+            <view class="introducer-pinyin">{{item.pinyin}}</view>
+          </view>
+          <view class="introducer-check {{formData.recruiter === item.name ? 'checked' : ''}}">
+            <view class="check-icon">✓</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
+</view>
+
+<!-- ===== 报名成功弹窗 ===== -->
+<view class="success-modal-mask" wx:if="{{showSuccessModal}}" catchtouchmove="true">
+  <view class="success-modal-card">
+    <view class="success-modal-icon">✓</view>
+    <view class="success-modal-title">报名成功</view>
+    <view class="success-modal-desc">我们会尽快与您联系</view>
+    
+    <view class="success-modal-code-section" wx:if="{{successQueryCode}}">
+      <view class="success-modal-code-label">您的查询码</view>
+      <view class="success-modal-code-value">{{successQueryCode}}</view>
+      <view class="success-modal-code-hint">已通过短信发送至您手机，凭此码可查看和修改报名信息</view>
+    </view>
+    
+    <view class="success-modal-actions">
+      <button class="success-modal-copy-btn" bindtap="copySuccessQueryCode" wx:if="{{successQueryCode}}">复制查询码</button>
+      <button class="success-modal-close-btn" bindtap="closeSuccessModal">关闭</button>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 查询码输入弹窗 ===== -->
+<van-popup show="{{showQueryCodePopup}}" position="bottom" round bind:close="closeQueryCodePopup">
+  <view class="query-popup">
+    <view class="query-popup-header">
+      <view class="query-popup-title">查询报名信息</view>
+      <view class="query-popup-close" bindtap="closeQueryCodePopup">
+        <van-icon name="cross" size="36rpx" color="#999" />
+      </view>
+    </view>
+      <view class="query-popup-body">
+        <view class="query-popup-tip">请输入您收到的查询码</view>
+        <input
+          class="query-popup-input"
+          placeholder="输入查询码"
+          value="{{queryCodeInput}}"
+          bindinput="onQueryCodeInput"
+          maxlength="12"
+          focus="{{showQueryCodePopup}}"
+        />
+        <view class="query-popup-hint">查询码为8位字符，报名成功后会以短信形式发送</view>
+        <view class="query-popup-hint query-popup-hint-extra">查询后可修改信息并重新提交</view>
+      </view>
+    <view class="query-popup-footer">
+      <button class="query-popup-btn" bindtap="verifyQueryCode" loading="{{isQuerying}}" disabled="{{isQuerying || queryCodeInput.length < 8}}">
+        确认查询
+      </button>
+    </view>
+  </view>
+</van-popup>

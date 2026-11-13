@@ -1,0 +1,208 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <van-icon name="edit" size="40rpx" />
+    </view>
+    <view class="header-text">
+      <view class="header-title">{{isEdit ? '修改请假' : '请假申请'}}</view>
+      <view class="header-subtitle">Leave Application</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack">
+      <van-icon name="arrow-left" size="32rpx" />
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 提示栏 -->
+  <view class="notice-bar">
+    <view class="notice-content">
+      <van-icon name="info-o" size="32rpx" color="#1890FF" />
+      <text>请认真填写请假信息，提交后等待审批</text>
+    </view>
+  </view>
+
+  <form class="form">
+    <!-- 请假信息 -->
+    <view class="form-group">
+      <view class="form-title">请假信息</view>
+
+      <van-field
+        label="请假类别"
+        value="{{ formData.qjlb }}"
+        readonly
+        is-link
+        clickable
+        bindtap="showTypePicker"
+        placeholder="请选择请假类别"
+        required
+      />
+      
+      <van-field
+        label="请假事由"
+        type="textarea"
+        value="{{ formData.qjsy }}"
+        data-field="qjsy"
+        bind:input="onReasonInput"
+        bind:change="onInputChange"
+        placeholder="请详细描述请假原因（限100个汉字，200个字符）"
+        autosize
+        maxlength="100"
+        show-word-limit
+        required
+      />
+      
+      <van-field
+        label="请假日期"
+        value="{{ dateRangeDisplay }}"
+        readonly
+        is-link
+        clickable
+        bindtap="showDateRangePicker"
+        placeholder="请选择请假日期范围"
+        required
+      />
+      
+      <van-field
+        label="开始时间"
+        value="{{ formData.qjkssj_time }}"
+        readonly
+        is-link
+        clickable
+        bindtap="showStartTimePicker"
+        placeholder="请选择开始时间"
+        required
+      />
+      
+      <van-field
+        label="结束时间"
+        value="{{ formData.qjjssj_time }}"
+        readonly
+        is-link
+        clickable
+        bindtap="showEndTimePicker"
+        placeholder="请选择结束时间"
+        required
+      />
+
+      <!-- 请假时长展示 -->
+      <view class="duration-bar" wx:if="{{durationDisplay}}">
+        <van-icon name="clock-o" size="28rpx" color="#1890FF" />
+        <text class="duration-text">请假时长：{{durationDisplay}}</text>
+      </view>
+    </view>
+
+    <!-- 离校信息 -->
+    <view class="form-group">
+      <view class="form-title">离校信息</view>
+      
+      <van-field
+        label="离校线路"
+        value="{{ formData.xslxxl }}"
+        data-field="xslxxl"
+        bind:change="onInputChange"
+        placeholder="请填写离校线路（如：学校-火车站-家）"
+        maxlength="100"
+        required
+      />
+      
+      <van-field
+        label="交通工具"
+        value="{{ formData.xslxjtgj }}"
+        data-field="xslxjtgj"
+        bind:change="onInputChange"
+        placeholder="请填写离校交通工具（如：火车、汽车等）"
+        maxlength="50"
+        required
+      />
+    </view>
+
+    <!-- 本人承诺 -->
+    <view class="promise-section">
+      <view class="promise-checkbox" bindtap="togglePromise">
+        <view class="checkbox-icon {{promised ? 'checked' : ''}}">
+          <van-icon wx:if="{{promised}}" name="success" size="24rpx" color="#fff" />
+        </view>
+        <view class="promise-text">
+          <text class="promise-label">本人承诺：</text>
+          <text>本次请假属实，本人已将请假日程告知家长，请假期间在校外的人身安全、财产安全及一切行为责任均由本人及监护人自行承担，严格遵守校纪校规，按时返校。</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="btn-submit">
+      <van-button 
+        type="primary" 
+        block 
+        loading="{{ loading }}" 
+        disabled="{{ !promised }}"
+        bind:click="submitForm"
+      >{{isEdit ? '保存修改' : '提交申请'}}</van-button>
+    </view>
+  </form>
+
+  <!-- 请假类别选择器 -->
+  <van-popup 
+    show="{{ showTypePicker }}" 
+    position="bottom"
+    bind:close="onTypePickerClose"
+  >
+    <van-picker
+      show-toolbar
+      title="选择请假类别"
+      columns="{{ leaveTypes }}"
+      bind:confirm="onTypeConfirm"
+      bind:cancel="onTypePickerClose"
+    />
+  </van-popup>
+
+  <!-- 日期范围选择器 -->
+  <van-calendar
+    show="{{ showCalendar }}"
+    type="range"
+    color="#1890FF"
+    min-date="{{ minDate }}"
+    max-date="{{ maxDate }}"
+    default-date="{{ selectedDateRange }}"
+    allow-same-day
+    max-range="7"
+    range-prompt="最多选择7天"
+    bind:confirm="onCalendarConfirm"
+    bind:close="onCalendarClose"
+  />
+
+  <!-- 开始时间选择器（小时:分钟） -->
+  <van-popup 
+    show="{{ showStartTimePicker }}" 
+    position="bottom"
+    bind:close="onStartTimePickerClose"
+  >
+    <van-picker
+      show-toolbar
+      title="选择开始时间"
+      columns="{{ startTimeColumns }}"
+      bind:confirm="onStartTimeConfirm"
+      bind:cancel="onStartTimePickerClose"
+    />
+  </van-popup>
+
+  <!-- 结束时间选择器（小时:分钟） -->
+  <van-popup 
+    show="{{ showEndTimePicker }}" 
+    position="bottom"
+    bind:close="onEndTimePickerClose"
+  >
+    <van-picker
+      show-toolbar
+      title="选择结束时间"
+      columns="{{ endTimeColumns }}"
+      bind:confirm="onEndTimeConfirm"
+      bind:cancel="onEndTimePickerClose"
+    />
+  </van-popup>
+</view>

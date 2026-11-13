@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "形势与政策成绩",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F5F7FA",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-icon": "/components/vant-icon/index"
+  }
+}

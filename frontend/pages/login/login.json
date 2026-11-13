@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "开大登录",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "/components/vant-icon/index",
+    "van-checkbox": "@vant/weapp/checkbox/index"
+  }
+}

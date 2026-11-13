@@ -1,0 +1,143 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-content">
+      <view class="title-section">
+        <van-icon name="balance-pay" size="48rpx" color="#1890FF" />
+        <text class="title">缴费确认</text>
+      </view>
+      <view class="stats-info" wx:if="{{paymentInfo}}">
+        <text class="stats-text">{{paymentInfo.termDesc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 缴费信息卡片 -->
+  <view wx:if="{{paymentInfo}}" class="payment-card {{paymentInfo.needPay ? 'unpaid-card' : 'paid-card'}}">
+    <!-- 卡片状态指示器 -->
+    <view class="status-indicator {{paymentInfo.needPay ? 'unpaid-indicator' : 'paid-indicator'}}"></view>
+
+    <!-- 卡片头部 -->
+    <view class="record-header">
+      <view class="payment-info">
+        <view class="payment-title">
+          <van-icon name="gold-coin-o" size="28rpx" />
+          <text>{{paymentInfo.termDesc}}缴费详情</text>
+        </view>
+      </view>
+      <view class="status-badge {{paymentInfo.needPay ? 'unpaid' : 'paid'}}">
+        <van-icon name="{{paymentInfo.needPay ? 'clock-o' : 'passed'}}" size="24rpx" />
+        <text>{{paymentInfo.needPay ? '待缴费' : '已缴费'}}</text>
+      </view>
+    </view>
+
+    <!-- 费用详情 -->
+    <view class="record-content">
+      <view class="fee-grid">
+        <view class="fee-item">
+          <view class="fee-label">
+            <van-icon name="home-o" size="24rpx" />
+            <text>住宿费</text>
+          </view>
+          <text class="fee-value">¥{{paymentInfo.zsf}}</text>
+        </view>
+        <view class="fee-item">
+          <view class="fee-label">
+            <van-icon name="book-o" size="24rpx" />
+            <text>书费</text>
+          </view>
+          <text class="fee-value">¥{{paymentInfo.sf}}</text>
+        </view>
+      </view>
+
+      <view class="total-amount">
+        <view class="total-label">
+          <van-icon name="balance-pay" size="28rpx" />
+          <text>应付金额</text>
+        </view>
+        <text class="total-value">¥{{paymentInfo.totalFee}}</text>
+      </view>
+    </view>
+
+    <!-- 免缴费原因提示 -->
+    <view wx:if="{{!paymentInfo.needPay && paymentInfo.no_pay_reasons && paymentInfo.no_pay_reasons.length > 0}}" class="payment-notice success">
+      <van-icon name="passed" size="20rpx" />
+      <text>{{paymentInfo.no_pay_reasons[0]}}</text>
+    </view>
+    <!-- 缴费提示 -->
+    <view wx:elif="{{paymentInfo.needPay}}" class="payment-notice warning">
+      <van-icon name="info-o" size="20rpx" />
+      <text>请确认缴费信息无误后点击下方按钮进行缴费</text>
+    </view>
+    <!-- 已缴费提示 -->
+    <view wx:else class="payment-notice success">
+      <van-icon name="passed" size="20rpx" />
+      <text>该学期费用已缴纳完成</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view wx:if="{{paymentInfo}}" class="action-buttons">
+    <view wx:if="{{paymentInfo.needPay}}" class="button-group">
+      <!-- 返回按钮 -->
+      <van-button
+        type="default"
+        size="large"
+        round
+        bind:click="goBack"
+        custom-class="back-button"
+      >
+        返回
+      </van-button>
+
+      <!-- 确认缴费按钮 -->
+      <van-button
+        type="primary"
+        size="large"
+        round
+        color="#1890FF"
+        bind:click="confirmPayment"
+        disabled="{{paymentProcessing}}"
+        loading="{{paymentProcessing}}"
+        custom-class="pay-button"
+        icon="balance-pay"
+      >
+        <text wx:if="{{paymentProcessing}}">处理中...</text>
+        <text wx:else>确认缴费 ¥{{paymentInfo.totalFee}}</text>
+      </van-button>
+    </view>
+
+    <view wx:else class="single-button">
+      <van-button
+        type="default"
+        size="large"
+        round
+        bind:click="goBack"
+        custom-class="back-button-single"
+      >
+        返回
+      </van-button>
+    </view>
+  </view>
+
+
+
+  <!-- 错误信息 -->
+  <view wx:if="{{errorMsg}}" class="error-container">
+    <van-empty
+      image="error"
+      description="{{errorMsg}}"
+    >
+      <van-button
+        round
+        type="primary"
+        color="#1890FF"
+        bind:click="retry"
+      >
+        重试
+      </van-button>
+    </van-empty>
+  </view>
+</view>

@@ -1,0 +1,311 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="room-page">
+  <!-- 顶部考试信息条 + 倒计时徽章（顶部不显示标题，避免和导航栏重复） -->
+  <view class="info-bar {{remainingSeconds <= 60 ? 'info-bar-emergency' : ''}}">
+    <view class="info-left">
+      <view class="info-sub">
+        <text class="info-sub-text">防作弊侦测中</text>
+      </view>
+    </view>
+    <view class="timer-pill {{remainingSeconds <= 60 ? 'timer-pill-emergency' : ''}}">
+      <text class="timer-icon">{{remainingSeconds <= 60 ? '⏰' : '⏱'}}</text>
+      <text class="timer-text">{{remainingText || '--:--'}}</text>
+      <text wx:if="{{remainingSeconds <= 60}}" class="timer-badge">急</text>
+    </view>
+  </view>
+
+  <!-- 进度条 -->
+  <view wx:if="{{questions.length > 0}}" class="progress-bar">
+    <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+  </view>
+
+  <!-- 加载失败 -->
+  <view wx:if="{{loadError}}" class="error-area">
+    <view class="error-icon">⚠️</view>
+    <view class="error-text">{{loadError}}</view>
+    <view class="btn-retry" bindtap="startExam">重新加载</view>
+  </view>
+
+  <!-- 题目区 -->
+  <view wx:elif="{{questions.length > 0 && questions[currentIndex]}}" class="question-area">
+    <view class="q-card">
+      <!-- 题目元信息 -->
+      <view class="q-meta">
+        <view class="q-meta-left">
+          <view class="q-type-tag">{{questions[currentIndex].typeLabel || '题目'}}</view>
+          <text class="q-score">{{questions[currentIndex].score}} 分</text>
+        </view>
+        <view class="q-meta-right">
+          <view
+            class="auto-next {{autoNextEnabled ? 'auto-next-on' : ''}}"
+            bindtap="toggleAutoNext"
+          >
+            <text class="auto-next-icon">{{autoNextEnabled ? '⚡' : '○'}}</text>
+            <text>自动下一题</text>
+          </view>
+          <view
+            class="mark-btn {{marked[currentIndex] ? 'mark-btn-on' : ''}}"
+            bindtap="toggleMark"
+          >{{marked[currentIndex] ? '★' : '☆'}}</view>
+        </view>
+      </view>
+
+      <!-- 题干 -->
+      <view class="q-content">
+        <text class="q-order">{{currentIndex + 1}}.</text>
+        <text>{{questions[currentIndex].content}}</text>
+      </view>
+
+      <!-- 选项：单选 -->
+      <block wx:if="{{questions[currentIndex].type === 1}}">
+        <view class="options-area">
+          <view
+            wx:for="{{questions[currentIndex].options}}"
+            wx:key="id"
+            wx:for-item="opt"
+            class="opt-row {{opt.selected ? 'opt-row-on' : ''}}"
+            data-qindex="{{currentIndex}}"
+            data-oindex="{{index}}"
+            bindtap="selectOption"
+          >
+            <view class="opt-marker">
+              <text class="opt-marker-letter">{{opt.label}}</text>
+            </view>
+            <view class="opt-text">{{opt.content}}</view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 选项：多选 -->
+      <block wx:elif="{{questions[currentIndex].type === 2}}">
+        <view class="options-area">
+          <view
+            wx:for="{{questions[currentIndex].options}}"
+            wx:key="id"
+            wx:for-item="opt"
+            class="opt-row {{opt.selected ? 'opt-row-on' : ''}}"
+            data-qindex="{{currentIndex}}"
+            data-oindex="{{index}}"
+            bindtap="toggleMultiOption"
+          >
+            <view class="opt-marker opt-marker-multi">
+              <text wx:if="{{opt.selected}}" class="opt-mark-tick">✓</text>
+              <text wx:else class="opt-mark-none">·</text>
+            </view>
+            <view class="opt-text">{{opt.content}}</view>
+            <view wx:if="{{opt.selected}}" class="opt-checked-tag">已选</view>
+          </view>
+          <view class="multi-hint">* 多选题，请选好选项后点"下一题"</view>
+        </view>
+      </block>
+
+      <!-- 判断题 -->
+      <block wx:elif="{{questions[currentIndex].type === 3}}">
+        <view class="judge-area">
+          <view
+            class="opt-row {{questions[currentIndex].selectedJudge === 'A' ? 'opt-row-on' : ''}}"
+            data-qindex="{{currentIndex}}"
+            data-judge="A"
+            bindtap="selectJudge"
+          >
+            <view class="opt-marker opt-marker-multi">
+              <text wx:if="{{questions[currentIndex].selectedJudge === 'A'}}" class="opt-mark-tick">✓</text>
+              <text wx:else class="opt-marker-letter">A</text>
+            </view>
+            <view class="opt-text">正确</view>
+          </view>
+          <view
+            class="opt-row {{questions[currentIndex].selectedJudge === 'B' ? 'opt-row-on' : ''}}"
+            data-qindex="{{currentIndex}}"
+            data-judge="B"
+            bindtap="selectJudge"
+          >
+            <view class="opt-marker opt-marker-multi">
+              <text wx:if="{{questions[currentIndex].selectedJudge === 'B'}}" class="opt-mark-tick">✕</text>
+              <text wx:else class="opt-marker-letter">B</text>
+            </view>
+            <view class="opt-text">错误</view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 填空 -->
+      <block wx:elif="{{questions[currentIndex].type === 4}}">
+        <view class="text-area">
+          <view class="text-label">填空输入：</view>
+          <input
+            class="q-input"
+            placeholder="请输入答案"
+            value="{{questions[currentIndex].answerText || ''}}"
+            data-qindex="{{currentIndex}}"
+            bindinput="onTextInput"
+          />
+        </view>
+      </block>
+
+      <!-- 简答 -->
+      <block wx:elif="{{questions[currentIndex].type === 5}}">
+        <view class="text-area">
+          <view class="text-counter">
+            <text>论述作答区</text>
+            <text class="text-counter-len">{{textAnswerLength}} / 500</text>
+          </view>
+          <textarea
+            class="q-textarea q-textarea-large"
+            placeholder="请详细阐述您的论点及解答过程..."
+            value="{{questions[currentIndex].answerText || ''}}"
+            data-qindex="{{currentIndex}}"
+            bindinput="onTextInput"
+            maxlength="500"
+          />
+        </view>
+      </block>
+
+      <!-- 自动下一题 toast -->
+      <view wx:if="{{autoNextCountdown !== null}}" class="auto-next-tip">
+        <text class="auto-next-tip-icon">⚡</text>
+        <text>答案已记录，正在为您跳转下一题...</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮：常驻三键导航（答题卡始终可见） -->
+  <view wx:if="{{questions.length > 0}}" class="bottom-bar">
+    <view
+      class="btn btn-ghost {{currentIndex === 0 ? 'btn-disabled' : ''}}"
+      bindtap="onPrev"
+    >
+      <text class="btn-arrow">‹</text>
+      <text>上一题</text>
+    </view>
+
+    <!-- ⭐ 答题卡常驻入口（始终可见） -->
+    <view class="btn btn-card-persistent" bindtap="showCard" hover-class="btn-card-hover">
+      <text class="btn-icon">📋</text>
+      <text class="btn-card-label">答题卡</text>
+      <view class="btn-badge">{{answeredCount}}/{{questions.length}}</view>
+    </view>
+
+    <view
+      class="btn btn-primary {{currentIndex >= questions.length - 1 ? 'btn-disabled' : ''}}"
+      bindtap="onNext"
+    >
+      <text>下一题</text>
+      <text class="btn-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 答题卡抽屉 -->
+  <view wx:if="{{showCardPanel}}" class="card-mask" bindtap="hideCard">
+    <view class="card-panel" catchtap="noop">
+      <view class="card-handle"></view>
+
+      <view class="card-header">
+        <view class="header-left">
+          <view class="card-title">答题卡</view>
+          <view class="card-subtitle">按题型分组 · 共 {{questions.length}} 题</view>
+          <view class="card-legend">
+            <view class="legend-item">
+              <view class="legend-dot legend-answered"></view>
+              <text>已作答 ({{answeredCount}})</text>
+            </view>
+            <view class="legend-item">
+              <view class="legend-dot legend-unanswered"></view>
+              <text>未作答 ({{questions.length - answeredCount}})</text>
+            </view>
+            <view class="legend-item">
+              <view class="legend-dot legend-marked"></view>
+              <text>已标记 ({{markedCount}})</text>
+            </view>
+          </view>
+        </view>
+        <view class="card-close" bindtap="hideCard">✕</view>
+      </view>
+
+      <scroll-view scroll-y class="card-scroll">
+        <view wx:for="{{cardByType}}" wx:key="type" wx:for-item="group" class="card-group">
+          <view class="card-group-head">
+            <view class="card-group-title">
+              <text class="card-group-name">{{group.typeLabel}}</text>
+              <text class="card-group-count">{{group.answered}}/{{group.total}}</text>
+            </view>
+            <view class="card-group-bar">
+              <view class="card-group-bar-fill" style="width: {{group.total > 0 ? (group.answered / group.total * 100) : 0}}%"></view>
+            </view>
+          </view>
+
+          <view class="card-grid">
+            <view
+              wx:for="{{group.items}}"
+              wx:key="idx"
+              wx:for-item="cell"
+              class="card-cell {{cell.answered ? 'card-cell-answered' : ''}} {{cell.current ? 'card-cell-current' : ''}} {{cell.marked ? 'card-cell-marked' : ''}}"
+              data-idx="{{cell.idx}}"
+              bindtap="jumpToQuestion"
+            >
+              <text>{{cell.idx + 1}}</text>
+              <view wx:if="{{cell.marked}}" class="card-cell-mark"></view>
+            </view>
+          </view>
+        </view>
+
+        <view class="card-scroll-bottom-hint">— 已到底部 —</view>
+      </scroll-view>
+
+      <view class="card-foot">
+        <view class="btn-card-cancel" bindtap="hideCard">继续作答</view>
+        <view class="btn-card-submit" bindtap="showSubmitConfirm">检查完毕，立即交卷</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 交卷确认弹层（含未答题提示） -->
+  <view wx:if="{{showSubmitModal}}" class="submit-mask" bindtap="hideSubmitConfirm">
+    <view class="submit-panel" catchtap="noop">
+      <view class="submit-icon {{unansweredCount > 0 ? 'submit-icon-warn' : 'submit-icon-pass'}}">
+        {{unansweredCount > 0 ? '⚠️' : '✅'}}
+      </view>
+      <view class="submit-title">
+        {{unansweredCount > 0 ? '温馨交卷提醒' : '确认交卷'}}
+      </view>
+
+      <view class="submit-body">
+        <block wx:if="{{unansweredCount > 0}}">
+          <view class="submit-warn-text">
+            您尚有
+            <text class="submit-warn-num"> {{unansweredCount}} </text>
+            道题未填写答案：
+          </view>
+          <view class="submit-warn-list">未作答：第 {{unansweredListText}}</view>
+          <view class="submit-warn-tip">提前交卷未作答试题将计为 0 分，是否坚持提交？</view>
+        </block>
+        <block wx:else>
+          <view class="submit-pass-text">全部试题已完成作答！交卷后系统将立即进行客观题自动判分并展示深度知识点解析。</view>
+        </block>
+      </view>
+
+      <view class="submit-foot">
+        <view class="btn-cancel" bindtap="hideSubmitConfirm">返回继续检查</view>
+        <view class="btn-confirm {{submitting ? 'btn-disabled' : ''}}" bindtap="onSubmit">
+          {{submitting ? '交卷分析中...' : '确认现在交卷'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 防作弊警告 -->
+  <view wx:if="{{cheatModalVisible}}" class="cheat-mask" catchtap="hideCheatModal">
+    <view class="cheat-panel" catchtap="noop">
+      <view class="cheat-icon">⚠️</view>
+      <view class="cheat-title">考场防作弊警示</view>
+      <view class="cheat-body">
+        <view class="cheat-line cheat-line-strong">系统已记录到应用切换行为！</view>
+        <view>违规切屏/切后台已累计：<text class="cheat-num">{{cheatCount}}</text> 次</view>
+        <view class="cheat-tip">考务系统将记录切屏时间节点并上报监考教师，请诚信作答。</view>
+      </view>
+      <view class="btn-cheat" bindtap="hideCheatModal">我知道了，立即继续作答</view>
+    </view>
+  </view>
+</view>

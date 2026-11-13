@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "{{examTitle}}",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#FAFAFA",
+  "disableScroll": false,
+  "usingComponents": {}
+}

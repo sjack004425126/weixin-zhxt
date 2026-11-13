@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "考务中心",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#FAFAFA",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

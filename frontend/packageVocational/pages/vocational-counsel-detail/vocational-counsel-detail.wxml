@@ -1,0 +1,119 @@
+<include src="/utils/common-components.wxml" />
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:44rpx;color:#fff;"></text></view>
+    <view class="header-text">
+      <view class="header-title">{{board.title}}</view>
+      <view class="header-subtitle">{{board.doctor_name}} · {{board.counsel_date}}</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#047857;"></text></view>
+  </view>
+</view>
+
+<view class="container">
+  <block wx:if="{{loading}}">
+    <van-loading size="24px" vertical>加载中...</van-loading>
+  </block>
+
+  <block wx:else>
+    <!-- ============ 卡片1：我的预约 ============ -->
+    <view wx:if="{{mine}}" class="card">
+      <view class="card-head">
+        <text class="card-title-text">我的预约</text>
+        <text class="muted-tip">如需取消请联系咨询老师</text>
+      </view>
+
+      <view class="my-code-wrap">
+        <text class="my-code">{{mine.display_no}}</text>
+        <text class="status-tag {{mine.status}}">{{mine.status==='booked'?'待咨询':(mine.status==='attended'?'已咨询':'已取消')}}</text>
+      </view>
+
+      <view class="my-meta">
+        <text>{{mine.counsel_date}}</text>
+        <text>·</text>
+        <text>{{mine.slot_time}}</text>
+      </view>
+      <view class="my-meta">
+        <text>{{mine.category||'心理咨询'}}</text>
+        <text>·</text>
+        <text>{{mine.location||'地点待定'}}</text>
+      </view>
+
+      <block wx:if="{{mine.status==='booked'}}">
+        <view class="stat-grid">
+          <view class="stat-box">
+            <text class="stat-lbl">咨询顺序</text>
+            <text class="stat-val">{{mine.ahead===0 ? '第1位' : '第'+(mine.ahead+1)+'位'}}</text>
+          </view>
+          <view class="stat-box">
+            <text class="stat-lbl">预约号段</text>
+            <text class="stat-val">{{mine.slot_tag}}段</text>
+          </view>
+        </view>
+        <view class="tip-warn">请按预约时间到达 {{mine.location||'指定地点'}}，您的号码牌即咨询顺序</view>
+      </block>
+
+      <block wx:if="{{mine.status==='attended'}}">
+        <view class="tip-muted center">本次咨询已完成</view>
+      </block>
+    </view>
+
+    <view wx:else class="card">
+      <view class="no-ticket">
+        <text class="no-ticket-t">您当前暂无预约</text>
+        <text class="no-ticket-s">请在下方选择号段直接预约</text>
+      </view>
+    </view>
+
+    <!-- ============ 卡片2：预约咨询时段 ============ -->
+    <view class="card">
+      <view class="card-head">
+        <text class="card-title-text">预约咨询时段</text>
+        <text class="muted-tip">仅支持提前2天内预约·有未完成预约时不可再约</text>
+      </view>
+
+      <view wx:if="{{hasActive}}" class="tip-warn">您已有未完成预约 {{activeNo}}，完成后才能再次预约</view>
+
+      <view wx:if="{{board.slots.length===0}}" class="empty">暂无可预约号段</view>
+
+      <block wx:for="{{board.slots}}" wx:key="id">
+        <view class="slot-row">
+          <view class="q-mid">
+            <view class="slot-date">
+              <text>{{item.counsel_date}}</text>
+              <text class="slot-tag-chip">{{item.slot_tag}}段</text>
+            </view>
+            <text class="slot-time">{{item.time_range}}</text>
+            <view class="slot-sub">
+              <text>{{item.category||'心理咨询'}}</text>
+              <text>·</text>
+              <text>{{item.location||'地点待定'}}</text>
+            </view>
+            <view class="slot-sub">
+              <text class="{{item.left>0?'ok':'full'}}">{{item.left>0 ? '余 '+item.left+' 个号' : '已约满'}}</text>
+            </view>
+          </view>
+          <view wx:if="{{item.can_book}}" class="slot-btn" data-id="{{item.id}}" data-tag="{{item.slot_tag}}" bindtap="bookSlot">
+            <text>预约</text>
+          </view>
+          <view wx:else class="slot-btn slot-btn-off">
+            <text>{{item.limit_text ? item.limit_text : (item.left>0 ? '已预约' : '已满')}}</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 手机尾号核对（选填） -->
+      <view class="quick-row">
+        <block wx:if="{{showQuickRegister}}">
+          <view class="quick-form">
+            <input class="form-input mono" type="number" maxlength="4" placeholder="手机尾号后4位（选填）" value="{{phoneSuffix}}" bindinput="onPhoneInput" />
+            <view class="quick-close" bindtap="toggleQuickRegister">×</view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="quick-link" bindtap="toggleQuickRegister">填写手机尾号后4位（选填，用于现场核对）</view>
+        </block>
+      </view>
+    </view>
+  </block>
+</view>

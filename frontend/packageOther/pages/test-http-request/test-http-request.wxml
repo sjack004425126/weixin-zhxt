@@ -1,0 +1,60 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="title">HTTP 请求规范测试</view>
+  <view class="subtitle">验证 HTTP_REQUEST_GUIDE.md 14 个场景</view>
+</view>
+
+<view class="auth-banner {{hasToken ? 'auth-ok' : 'auth-no'}}">
+  <text>当前状态：{{hasToken ? '已登录（可测 tokenGet/Post）' : '未登录（只能测 silentGet）'}}</text>
+</view>
+
+<!-- 测试按钮网格 -->
+<view class="grid">
+  <button class="cell primary" bindtap="test1_silentGet">1 silentGet</button>
+  <button class="cell primary" bindtap="test2_tokenGet">2 tokenGet</button>
+  <button class="cell primary" bindtap="test3_tokenPost">3 tokenPost</button>
+
+  <button class="cell warning" bindtap="test4_businessFail">4 业务失败</button>
+  <button class="cell warning" bindtap="test5_networkFail">5 网络失败</button>
+  <button class="cell warning" bindtap="test6_http404">6 HTTP 404</button>
+
+  <button class="cell danger" bindtap="test7_authSilent">7 401 静默</button>
+  <button class="cell primary" bindtap="test8_parallelLoading" loading="{{parallelLoading}}">8 并发 3 请求</button>
+  <button class="cell primary" bindtap="test9_dedup" loading="{{dedupLoading}}">9 GET 去重(已发 {{dedupSent}})</button>
+
+  <button class="cell primary" bindtap="test10_interceptor">10 响应拦截器</button>
+  <button class="cell primary" bindtap="test11_upload">11 文件上传</button>
+  <button class="cell primary" bindtap="test12_errorStructure">12 错误体结构</button>
+
+  <button class="cell primary" bindtap="test13_pullRefresh">13 下拉刷新</button>
+  <button class="cell primary" bindtap="test14_quickPost">14 quickPost</button>
+  <button class="cell primary" bindtap="test15_businessFallback">15 业务码分支</button>
+
+  <button class="cell ghost" bindtap="clearLogs">清空日志</button>
+</view>
+
+<!-- 最近一次错误结构 -->
+<view class="card" wx:if="{{lastError}}">
+  <view class="card-title">最近一次错误结构</view>
+  <view class="err-row">errorType: <text class="mono">{{lastError.errorType}}</text></view>
+  <view class="err-row">isAuthError: <text class="mono">{{lastError.isAuthError}}</text></view>
+  <view class="err-row">code: <text class="mono">{{lastError.code}}</text></view>
+  <view class="err-row">message: <text class="mono">{{lastError.message}}</text></view>
+</view>
+
+<!-- 日志区 -->
+<view class="log-list">
+  <view class="log-title">执行日志（{{logs.length}}）</view>
+  <block wx:for="{{logs}}" wx:key="id">
+    <view class="log-item log-{{item.status}}">
+      <view class="log-head">
+        <text class="log-time">{{item.at}}</text>
+        <text class="log-status">{{item.status}}</text>
+      </view>
+      <view class="log-title-line">{{item.title}}</view>
+      <view class="log-payload" wx:if="{{item.payload}}">{{item.payload}}</view>
+    </view>
+  </block>
+  <view class="empty" wx:if="{{!logs.length}}">点击按钮开始测试</view>
+</view>

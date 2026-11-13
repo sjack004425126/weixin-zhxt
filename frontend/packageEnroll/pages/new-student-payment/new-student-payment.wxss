@@ -1,0 +1,1056 @@
+/* 蓝色主题色彩变量 */
+page {
+  --primary-color: #1890FF;
+  --primary-light: #E6F7FF;
+  --primary-gradient: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+  --secondary-color: #52C41A;
+  --success-color: #52C41A;
+  --warning-color: #FA8C16;
+  --error-color: #FF4D4F;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.08);
+  --card-shadow-hover: 0 8rpx 24rpx rgba(24, 144, 255, 0.15);
+  --border-radius: 16rpx;
+}
+
+/* 页面头部导航样式 */
+.page-header-nav {
+  padding: 32rpx 0 24rpx;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.1);
+}
+
+.header-nav-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 24rpx;
+  position: relative;
+}
+
+.header-nav-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.header-nav-text {
+  flex: 1;
+  margin-left: 8rpx;
+}
+
+.header-nav-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.header-nav-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+/* 头部操作按钮 */
+.header-nav-action {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.header-nav-action:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: scale(1.1);
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding: 24rpx;
+  padding-top: 160rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 卡片通用样式 */
+.form-card,
+.fee-card,
+.notice-card,
+.area-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 32rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.form-card:hover,
+.fee-card:hover,
+.notice-card:hover,
+.area-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2rpx);
+}
+
+.card-header {
+  margin-bottom: 24rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid var(--border-color);
+  position: relative;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  left: 0;
+  width: 60rpx;
+  height: 2rpx;
+  background: var(--primary-color);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.card-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-left: 44rpx;
+}
+
+/* 地区信息卡片样式 */
+.area-card {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border: 2rpx solid rgba(24, 144, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  padding-left: 40rpx;
+}
+
+.area-card::before {
+  content: '';
+  position: absolute;
+  top: 16rpx;
+  bottom: 16rpx;
+  left: 16rpx;
+  width: 8rpx;
+  border-radius: 4rpx;
+  background: var(--primary-gradient);
+}
+
+.area-simple {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 30rpx;
+}
+
+.area-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.area-value {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+
+
+
+
+
+
+.area-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.area-fee-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 16rpx;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8rpx;
+  border: 1rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.fee-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.fee-info-item van-icon {
+  color: var(--warning-color);
+}
+
+/* 表单样式 */
+.form-section {
+  margin-top: 8rpx;
+}
+
+.form-group {
+  border-radius: var(--border-radius) !important;
+  overflow: hidden !important;
+}
+
+.form-field {
+  border-bottom: 1rpx solid var(--border-color) !important;
+  transition: all 0.3s ease !important;
+}
+
+.form-field:last-child {
+  border-bottom: none !important;
+}
+
+.major-select-cell {
+  border-bottom: none !important;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%) !important;
+  border: 2rpx solid rgba(24, 144, 255, 0.2) !important;
+  border-radius: var(--border-radius) !important;
+  margin-top: 16rpx !important;
+}
+
+/* 专业显示 */
+.major-display {
+  margin-bottom: 24rpx;
+  padding: 20rpx;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border-radius: var(--border-radius);
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.major-name {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* 费用详情样式 */
+.fee-details {
+  background: #FAFBFC;
+  border-radius: var(--border-radius);
+  padding: 24rpx;
+  border: 1rpx solid var(--border-color);
+}
+
+.fee-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+}
+
+.fee-item:not(:last-child) {
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.fee-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.fee-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: "SF Mono", "Roboto Mono", monospace;
+}
+
+.fee-unit {
+  font-size: 24rpx;
+  color: var(--text-disabled);
+  margin-left: 8rpx;
+}
+
+.fee-divider {
+  height: 2rpx;
+  background: linear-gradient(90deg, var(--primary-color) 0%, transparent 100%);
+  margin: 16rpx 0;
+}
+
+.fee-item.total {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border-radius: var(--border-radius);
+  padding: 20rpx;
+  margin: 16rpx -24rpx -24rpx;
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.fee-item.total .fee-label {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.total-amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 28rpx;
+  margin: 24rpx -24rpx -24rpx;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(24, 144, 255, 0.25);
+}
+
+.total-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 32rpx;
+}
+
+.total-value {
+  color: var(--primary-color);
+  font-size: 40rpx;
+  font-weight: 700;
+  font-family: "SF Mono", "Roboto Mono", monospace;
+}
+
+/* 学费相关样式 */
+.tuition-fee-item {
+  position: relative;
+}
+
+.tuition-fee-value {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+/* 书费相关样式 */
+.book-fee-item {
+  position: relative;
+}
+
+.area-tag {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  margin-left: 12rpx;
+  padding: 4rpx 8rpx;
+  background: var(--warning-color);
+  color: white;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.book-fee-value {
+  color: var(--warning-color) !important;
+  position: relative;
+}
+
+.book-fee-note {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 12rpx;
+  padding: 12rpx 16rpx;
+  background: linear-gradient(135deg, #FFF7E6 0%, #FFF2E8 100%);
+  border-radius: 8rpx;
+  border: 1rpx solid rgba(250, 173, 20, 0.2);
+  font-size: 24rpx;
+  color: var(--warning-color);
+}
+
+.total-area-info {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  margin-left: 12rpx;
+  padding: 4rpx 8rpx;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+/* 温馨提示样式 */
+.notice-card {
+  background: linear-gradient(135deg, #FFF9F0 0%, #FFF7E6 100%);
+  border: 2rpx solid rgba(250, 141, 22, 0.25);
+  border-left: 8rpx solid #FA8C16;
+}
+
+.notice-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.notice-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #D46B08;
+}
+
+.notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.notice-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.notice-item van-icon {
+  color: #FA8C16;
+  flex-shrink: 0;
+}
+
+/* 提交区域样式 */
+.submit-section {
+  margin-top: 32rpx;
+}
+
+.button-wrap {
+  margin-bottom: 16rpx;
+}
+
+.submit-button {
+  height: 96rpx !important;
+  border-radius: 48rpx !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+  box-shadow: 0 6rpx 20rpx rgba(24, 144, 255, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.submit-button:active {
+  transform: translateY(2rpx) !important;
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.3) !important;
+}
+
+.submit-tips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-disabled);
+}
+
+/* 弹出层样式 */
+.major-picker-popup {
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+  overflow: hidden !important;
+  max-height: 80vh !important;
+}
+
+.picker-header {
+  padding: 32rpx 24rpx 24rpx;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border-bottom: 2rpx solid rgba(24, 144, 255, 0.1);
+}
+
+.picker-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 8rpx;
+}
+
+.picker-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-left: 44rpx;
+}
+
+/* 选择器工具栏样式 */
+.van-picker__toolbar {
+  height: 88rpx !important;
+  padding: 0 32rpx !important;
+  border-bottom: 2rpx solid var(--border-color) !important;
+  background: white !important;
+}
+
+.van-picker__title {
+  font-size: 30rpx !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+}
+
+.van-picker__cancel,
+.van-picker__confirm {
+  font-size: 28rpx !important;
+  padding: 0 32rpx !important;
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+  font-weight: 500 !important;
+}
+
+.van-picker__cancel {
+  color: var(--text-disabled) !important;
+}
+
+.van-picker__confirm {
+  color: var(--primary-color) !important;
+}
+
+/* 选择器主体样式 */
+.van-picker-column {
+  font-size: 28rpx !important;
+}
+
+.van-picker-column__item {
+  padding: 0 12rpx !important;
+  height: 84rpx !important;
+  line-height: 84rpx !important;
+  color: var(--text-secondary) !important;
+  transition: all 0.3s ease !important;
+}
+
+.van-picker-column__item--selected {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+  background: var(--primary-light) !important;
+}
+
+/* 调整不同列的宽度 */
+.van-picker-column:nth-child(1) {
+  flex: 0.6 !important;  /* 进一步减小层次列宽度 */
+}
+
+.van-picker-column:nth-child(2) {
+  flex: 0.7 !important;  /* 进一步减小类别列宽度 */
+}
+
+.van-picker-column:nth-child(3) {
+  flex: 1.7 !important;  /* 增加专业列宽度 */
+}
+
+/* 调整工具栏样式 */
+.van-picker__toolbar {
+  height: 88rpx !important;
+}
+
+.van-picker__title {
+  font-size: 30rpx !important;
+}
+
+.van-picker__cancel,
+.van-picker__confirm {
+  font-size: 28rpx !important;
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+}
+
+/* 优化专业名称显示 */
+.van-picker-column:last-child .van-picker-column__item {
+  text-align: left;
+  padding-left: 24rpx !important;
+  padding-right: 24rpx !important;
+  white-space: normal !important;  /* 允许换行 */
+  word-wrap: break-word !important;  /* 长单词换行 */
+  line-height: 1.3 !important;  /* 减小行高 */
+  height: auto !important;  /* 自适应高度 */
+  min-height: 84rpx !important;  /* 保持最小高度 */
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 优化选中项样式 */
+.van-picker-column__item--selected {
+  color: #E86433 !important;
+  font-weight: normal !important;
+}
+
+/* 调整选择器指示器样式 */
+.van-picker__frame {
+  height: 84rpx !important;
+  box-sizing: border-box !important;
+}
+
+/* 专业选择单元格样式 */
+.van-cell--required::before {
+  left: 8rpx !important;  /* 与表单字段保持一致 */
+}
+
+.van-cell {
+  padding: 28rpx 32rpx !important;
+  font-size: 28rpx !important;
+  line-height: 1.5 !important;
+}
+
+.van-cell__title {
+  padding-left: 16rpx !important;  /* 与表单字段保持一致 */
+  color: #333 !important;
+}
+
+.van-cell__value {
+  color: #666 !important;
+}
+
+.van-cell__right-icon {
+  color: #999 !important;
+  font-size: 28rpx !important;
+}
+
+/* 选择器弹出层动画 */
+.van-popup--bottom {
+  transition: transform 0.3s ease-out !important;
+}
+
+/* 类别标签样式 */
+.van-picker-column__item text {
+  display: inline-block;
+  padding: 0 16rpx;
+}
+
+/* 专业名称样式 */
+.van-picker-column:last-child .van-picker-column__item {
+  text-align: left;
+  padding-left: 32rpx !important;
+}
+
+/* 调整选择器整体高度 */
+.van-picker-column {
+  height: 420rpx !important;  /* 调整整体高度以适应多行文本 */
+}
+
+/* 调整表单字段样式 */
+.van-field--required::before {
+  left: 8rpx !important;  /* 减小左边距 */
+  font-size: 28rpx !important;
+  line-height: 1.5 !important;
+}
+
+/* 调整字段标签的样式 */
+.van-field__label {
+  padding-left: 16rpx !important;  /* 为必填标记留出空间 */
+  color: #333 !important;
+}
+
+/* 调整输入框样式 */
+.van-field__input {
+  color: #333 !important;
+}
+
+/* 调整占位符样式 */
+.van-field__placeholder {
+  color: #999 !important;
+}
+
+/* 修改专业信息样式为单行排版 */
+.major-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  gap: 12rpx;  /* 减小间距 */
+  overflow-x: auto;  /* 允许横向滚动 */
+  padding-bottom: 4rpx;  /* 为滚动条预留空间 */
+}
+
+/* 隐藏滚动条但保留滚动功能 */
+.major-info::-webkit-scrollbar {
+  display: none;
+}
+
+.major-item {
+  flex: none;  /* 不自动伸缩 */
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;  /* 稍微减小字号 */
+  line-height: 1.5;
+  background: #f8f8f8;
+  padding: 8rpx 16rpx;  /* 减小内边距 */
+  border-radius: 6rpx;
+  white-space: nowrap;  /* 防止换行 */
+}
+
+.major-item .label {
+  color: #999;
+  margin-right: 8rpx;
+}
+
+.major-item .value {
+  color: #333;
+}
+
+/* 调整分隔线样式 */
+.divider {
+  height: 1px;
+  background: #eee;
+  margin: 20rpx 0;
+  width: 100%;
+}
+
+/* 调整费用信息容器样式 */
+.fee-info {
+  margin: 30rpx 0;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 8rpx;
+  border: 1px solid #ebedf0;
+}
+
+/* 优化费用项样式 */
+.fee-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+  font-size: 28rpx;
+  padding: 8rpx 0;  /* 增加上下内边距 */
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+
+/* 应用动画 */
+.form-card {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.fee-card {
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.notice-card {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.submit-section {
+  animation: slideInLeft 0.6s ease-out 0.4s both;
+}
+
+
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .container {
+    padding: 0 16rpx 120rpx;
+  }
+
+  .form-card,
+  .fee-card,
+  .notice-card {
+    padding: 24rpx 20rpx;
+  }
+
+  .header-content {
+    padding: 0 16rpx;
+  }
+
+  .fee-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8rpx;
+  }
+
+  .fee-value {
+    align-self: flex-end;
+  }
+}
+
+/* Vant组件样式覆盖 */
+.van-field__label {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+.van-field__control {
+  color: var(--text-primary) !important;
+}
+
+.van-field__control::placeholder {
+  color: var(--text-disabled) !important;
+}
+
+.van-cell__title {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+.van-cell__value {
+  color: var(--text-secondary) !important;
+}
+
+.van-icon {
+  transition: all 0.3s ease !important;
+}
+
+/* ==================== 查询码入口 ==================== */
+.query-entry-card {
+  margin: 0 0 24rpx 0;
+  padding: 24rpx 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+}
+
+.query-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  height: 72rpx;
+  padding: 0 48rpx;
+  background: linear-gradient(135deg, #1890FF, #40A9FF);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 36rpx;
+  border: none;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.25);
+}
+
+.query-btn::after {
+  border: none;
+}
+
+/* ==================== 查询码弹窗 ==================== */
+.query-popup {
+  padding: 32rpx 32rpx 48rpx;
+}
+
+.query-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40rpx;
+  position: relative;
+}
+
+.query-popup-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.query-popup-close {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.query-popup-body {
+  margin-bottom: 32rpx;
+}
+
+.query-popup-tip {
+  font-size: 26rpx;
+  color: #666;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.query-popup-input {
+  height: 88rpx;
+  background: #f5f7fa;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 16rpx;
+  padding: 0 32rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+  text-transform: uppercase;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.query-popup-input:focus {
+  border-color: #1890FF;
+  background: #fff;
+}
+
+.query-popup-hint {
+  font-size: 22rpx;
+  color: #999;
+  text-align: center;
+  margin-top: 20rpx;
+}
+
+.query-popup-hint-extra {
+  color: #1890FF;
+  font-weight: 500;
+  margin-top: 12rpx;
+}
+
+.query-popup-footer {
+  padding: 0 16rpx;
+}
+
+.query-popup-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #1890FF, #40A9FF);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  border-radius: 44rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
+}
+
+.query-popup-btn[disabled] {
+  background: #d1d5db;
+  box-shadow: none;
+}
+
+.query-popup-btn::after {
+  border: none;
+}
+
+/* ==================== 缴费状态卡片 ==================== */
+.payment-status-card {
+  margin: 0 0 24rpx 0;
+  padding: 24rpx 28rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+}
+
+.payment-status-card.paid {
+  background: #f6ffed;
+  border: 1rpx solid #b7eb8f;
+}
+
+.payment-status-card.unpaid {
+  background: #fff2e8;
+  border: 1rpx solid #ffbb96;
+}
+
+.payment-status-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.payment-status-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.payment-status-card.paid .payment-status-icon {
+  background: #52c41a;
+  color: #fff;
+}
+
+.payment-status-card.unpaid .payment-status-icon {
+  background: #fa8c16;
+  color: #fff;
+}
+
+.payment-status-text {
+  flex: 1;
+}
+
+.payment-status-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.payment-status-detail {
+  font-size: 22rpx;
+  color: #666;
+  margin-top: 4rpx;
+}

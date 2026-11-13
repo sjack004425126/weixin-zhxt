@@ -1,0 +1,12 @@
+name: deploy-prod
+on:
+  push: { branches: [main] }
+  workflow_dispatch: {}
+jobs:
+  deploy:
+    # 微信小程序项目：只部署后端到 102，frontend 只进仓不发布
+    runs-on: [self-hosted, weixin-zhxt-prod]
+    steps:
+      - uses: actions/checkout@v4
+      - name: 后端部署
+        run: bash scripts/deploy-backend.sh

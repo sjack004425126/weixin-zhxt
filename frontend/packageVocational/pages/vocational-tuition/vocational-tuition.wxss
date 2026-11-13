@@ -1,0 +1,511 @@
+/* 主题色彩变量 */
+page {
+  --primary-color: #1890FF;
+  --primary-light: #E6F7FF;
+  --success-color: #52C41A;
+  --warning-color: #FAAD14;
+  --error-color: #FF4D4F;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  --card-shadow-hover: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding: 0 24rpx 120rpx;
+}
+
+/* 页面头部样式 */
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  margin: 0 -24rpx 32rpx;
+  padding: 32rpx 24rpx 24rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1rpx;
+}
+
+.stats-info {
+  padding: 8rpx 16rpx;
+  background: var(--primary-light);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.stats-text {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* 学生信息卡片样式 */
+.student-info-card {
+  position: relative;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.student-info-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2rpx);
+}
+
+/* 状态指示器 */
+.status-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6rpx;
+  height: 100%;
+  border-radius: 0 4rpx 4rpx 0;
+}
+
+.info-indicator {
+  background: linear-gradient(180deg, var(--primary-color) 0%, #40A9FF 100%);
+}
+
+.paid-indicator {
+  background: linear-gradient(180deg, var(--success-color) 0%, #73D13D 100%);
+}
+
+.unpaid-indicator {
+  background: linear-gradient(180deg, var(--warning-color) 0%, #FFC53D 100%);
+}
+
+.disabled-indicator {
+  background: linear-gradient(180deg, var(--text-disabled) 0%, #D9D9D9 100%);
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 信息网格 */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.info-label {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.info-value {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* 记录列表样式 */
+.records-list {
+  padding: 0;
+}
+
+.semester-card {
+  position: relative;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.semester-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2rpx);
+}
+
+.paid-card {
+  border-left: 4rpx solid var(--success-color);
+}
+
+.unpaid-card {
+  border-left: 4rpx solid var(--warning-color);
+}
+
+.disabled-card {
+  border-left: 4rpx solid var(--text-disabled);
+  opacity: 0.7;
+}
+
+/* 记录头部 */
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.semester-info {
+  flex: 1;
+}
+
+.semester-title {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge.paid {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--success-color);
+  border: 1rpx solid rgba(82, 196, 26, 0.2);
+}
+
+.status-badge.unpaid {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--warning-color);
+  border: 1rpx solid rgba(250, 173, 20, 0.2);
+}
+
+.status-badge.disabled {
+  background: rgba(191, 191, 191, 0.1);
+  color: var(--text-disabled);
+  border: 1rpx solid rgba(191, 191, 191, 0.2);
+}
+
+/* 费用详情 */
+.record-content {
+  margin-bottom: 20rpx;
+}
+
+.fee-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.fee-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 16rpx;
+  background: #FAFAFA;
+  border-radius: 12rpx;
+  border: 1rpx solid var(--border-color);
+}
+
+.fee-label {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.fee-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 总金额 */
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #F0F8FF 100%);
+  border-radius: 12rpx;
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.total-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* 时间信息 */
+.record-footer {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx dashed var(--border-color);
+}
+
+.time-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.time-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-disabled);
+}
+
+/* 操作按钮 */
+.record-actions {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pay-notice {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 16rpx;
+  background: rgba(250, 173, 20, 0.1);
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  border-left: 4rpx solid var(--warning-color);
+  width: 100%;
+}
+
+.pay-notice text {
+  font-size: 24rpx;
+  color: var(--warning-color);
+}
+
+/* 无需缴费原因：横向展示 */
+.no-pay-reasons {
+  margin-top: 20rpx;
+  padding: 16rpx 20rpx;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 12rpx;
+  border: 1rpx solid var(--border-color);
+}
+
+.reason-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.reason-item .van-icon {
+  color: var(--text-disabled);
+  flex-shrink: 0;
+}
+
+/* 确保按钮居中且宽度合适 */
+.record-actions .van-button {
+  width: auto !important;
+  min-width: 240rpx !important;
+  padding: 0 32rpx !important;
+}
+
+/* 空状态 */
+.empty-container {
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+/* 加载状态 */
+.loading-container {
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+/* 错误状态 */
+.error-container {
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+/* Vant组件样式覆盖 */
+.van-button--primary {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.3) !important;
+  transition: all 0.3s ease !important;
+  border-radius: 12rpx !important;
+}
+
+.van-button--primary:active {
+  transform: translateY(1rpx) !important;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.3) !important;
+}
+
+/* 特别针对缴费按钮的样式 */
+.record-actions .van-button--primary {
+  border-radius: 12rpx !important;
+  height: 88rpx !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+}
+
+.van-empty__description {
+  color: var(--text-disabled) !important;
+  font-size: 28rpx !important;
+}
+
+.van-loading__text {
+  color: var(--text-secondary) !important;
+  font-size: 28rpx !important;
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 应用动画 */
+.student-info-card {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.semester-card {
+  animation: slideInLeft 0.6s ease-out both;
+}
+
+.semester-card:nth-child(1) { animation-delay: 0.2s; }
+.semester-card:nth-child(2) { animation-delay: 0.3s; }
+.semester-card:nth-child(3) { animation-delay: 0.4s; }
+.semester-card:nth-child(4) { animation-delay: 0.5s; }
+.semester-card:nth-child(5) { animation-delay: 0.6s; }
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .container {
+    padding: 0 16rpx 120rpx;
+  }
+
+  .page-header {
+    margin: 0 -16rpx 24rpx;
+    padding: 24rpx 16rpx 16rpx;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 16rpx;
+  }
+
+  .fee-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .total-amount {
+    flex-direction: column;
+    gap: 12rpx;
+    text-align: center;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16rpx;
+    align-items: flex-start;
+  }
+
+  .stats-info {
+    align-self: flex-end;
+  }
+}
+

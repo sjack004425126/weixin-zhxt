@@ -1,0 +1,197 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-content">
+      <view class="title-section">
+        <van-icon name="bill-o" size="48rpx" color="#1890FF" />
+        <text class="title">缴费记录</text>
+      </view>
+      <view class="stats-info">
+        <text class="stats-text">共{{records.length}}条记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 待支付区域（后端计算出欠费金额） ========== -->
+  <view class="section-title" wx:if="{{hasPending}}">
+    <van-icon name="warning-o" size="32rpx" color="#FAAD14" />
+    <text>待支付</text>
+  </view>
+
+  <view class="records-list" wx:if="{{hasPending}}">
+    <view class="record-card unpaid-card">
+      <view class="status-indicator unpaid-indicator"></view>
+
+      <view class="record-header">
+        <view class="order-info">
+          <view class="order-no offline">
+            <van-icon name="clock-o" size="28rpx" />
+            <text>待支付订单</text>
+          </view>
+        </view>
+        <view class="status-badge unpaid">
+          <van-icon name="clock-o" size="24rpx" />
+          <text>待支付</text>
+        </view>
+      </view>
+
+      <view class="record-description">
+        <van-icon name="description" size="28rpx" />
+        <text>{{pendingInfoDisplay.body}}</text>
+      </view>
+
+      <view class="record-content">
+        <view class="fee-grid">
+          <view class="fee-item">
+            <view class="fee-label">
+              <van-icon name="gold-coin-o" size="24rpx" />
+              <text>学费</text>
+            </view>
+            <text class="fee-value">¥{{pendingInfoDisplay.xf_display}}</text>
+          </view>
+          <view class="fee-item">
+            <view class="fee-label">
+              <van-icon name="book-o" size="24rpx" />
+              <text>书费</text>
+            </view>
+            <text class="fee-value">¥{{pendingInfoDisplay.sf_display}}</text>
+          </view>
+          <view class="fee-item" wx:if="{{pendingInfo.jm > 0}}">
+            <view class="fee-label">
+              <van-icon name="coupon-o" size="24rpx" />
+              <text>减免</text>
+            </view>
+            <text class="fee-value reduction">-¥{{pendingInfoDisplay.jm_display}}</text>
+          </view>
+        </view>
+
+        <view class="total-amount">
+          <view class="total-label">
+            <van-icon name="balance-pay" size="28rpx" />
+            <text>应付金额</text>
+          </view>
+          <text class="total-value">¥{{pendingInfoDisplay.money_display}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 立即支付按钮（有待支付时显示） -->
+  <view class="bottom-pay-btn" wx:if="{{hasPending && needPay}}">
+    <van-button
+      type="primary"
+      block
+      round
+      bind:click="handlePay"
+      icon="balance-pay"
+    >
+      立即支付
+    </van-button>
+  </view>
+
+  <!-- ========== 已支付记录区域 ========== -->
+  <view class="paid-section" wx:if="{{hasPaid}}">
+    <view class="section-title paid" bindtap="togglePaidRecords">
+      <van-icon name="passed" size="32rpx" color="#52C41A" />
+      <text>已支付（{{paidRecords.length}}）</text>
+      <van-icon
+        name="{{showPaidRecords ? 'arrow-up' : 'arrow-down'}}"
+        size="28rpx"
+        color="#52C41A"
+        class="toggle-icon"
+      />
+    </view>
+
+    <view class="records-list" wx:if="{{showPaidRecords}}">
+      <block wx:for="{{paidRecords}}" wx:key="o_order_no">
+        <view class="record-card paid-card">
+          <!-- 卡片状态指示器 -->
+          <view class="status-indicator paid-indicator"></view>
+
+          <!-- 卡片头部 -->
+          <view class="record-header">
+            <view class="order-info">
+              <view class="order-no" wx:if="{{item.o_order_no}}">
+                <van-icon name="orders-o" size="28rpx" />
+                <text>{{item.o_order_no}}</text>
+              </view>
+              <view class="order-no offline" wx:else>
+                <van-icon name="shop-o" size="28rpx" />
+                <text>线下缴费</text>
+              </view>
+            </view>
+            <view class="status-badge paid">
+              <van-icon name="passed" size="24rpx" />
+              <text>{{item.o_status_desc}}</text>
+            </view>
+          </view>
+
+          <!-- 缴费描述 -->
+          <view class="record-description">
+            <van-icon name="description" size="28rpx" />
+            <text>{{item.o_body}}</text>
+          </view>
+
+          <!-- 费用详情 -->
+          <view class="record-content">
+            <view class="fee-grid">
+              <view class="fee-item">
+                <view class="fee-label">
+                  <van-icon name="gold-coin-o" size="24rpx" />
+                  <text>学费</text>
+                </view>
+                <text class="fee-value">¥{{item.o_xf_display}}</text>
+              </view>
+              <view class="fee-item">
+                <view class="fee-label">
+                  <van-icon name="book-o" size="24rpx" />
+                  <text>书费</text>
+                </view>
+                <text class="fee-value">¥{{item.o_sf_display}}</text>
+              </view>
+              <view class="fee-item" wx:if="{{item.o_jm > 0}}">
+                <view class="fee-label">
+                  <van-icon name="coupon-o" size="24rpx" />
+                  <text>减免</text>
+                </view>
+                <text class="fee-value reduction">-¥{{item.o_jm_display}}</text>
+              </view>
+            </view>
+
+            <view class="total-amount paid">
+              <view class="total-label">
+                <van-icon name="balance-pay" size="28rpx" />
+              </view>
+              <text class="total-value">¥{{item.o_money_display}}</text>
+            </view>
+          </view>
+
+          <!-- 时间信息 -->
+          <view class="record-footer">
+            <view class="time-info">
+              <view class="time-item">
+                <van-icon name="clock-o" size="20rpx" />
+                <text>创建：{{item.o_addtime_display}}</text>
+              </view>
+              <view class="time-item" wx:if="{{item.o_paytime}}">
+                <van-icon name="passed" size="20rpx" />
+                <text>支付：{{item.o_paytime_display}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-container" wx:if="{{records.length === 0}}">
+    <van-empty
+      image="https://img.yzcdn.cn/vant/custom-empty-image.png"
+      description="暂无缴费记录"
+    >
+    </van-empty>
+  </view>
+</view>

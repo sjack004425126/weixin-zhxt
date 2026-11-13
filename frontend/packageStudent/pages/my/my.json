@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "个人中心",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-dialog": "@vant/weapp/dialog/index",
+    "van-icon": "/components/vant-icon/index",
+    "top-message": "/components/top-message/top-message",
+    "fee-toast": "/components/fee-toast/fee-toast"
+  }
+}

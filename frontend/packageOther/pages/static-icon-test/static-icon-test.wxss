@@ -1,0 +1,289 @@
+/* static-icon-test.wxss
+ * iconfont 字体引用：base64 嵌入（项目现有做法）
+ * 小程序子包 wxss 不能跨包加载本地字体文件，必须用 base64 内联
+ * 源文件：/static/fonts/my-iconfont.woff2
+ */
+@font-face {
+  font-family: "my-iconfont";
+  src: url('data:font/woff2;charset=utf-8;base64,d09GMgABAAAAAAS4AAsAAAAACegAAARrAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHFQGYACDKAqHNIYYATYCJAMYCw4ABCAFhDoHOxt6CMgekkSNgHK4BZwFADhQGulKjRdsrw/QH8BnqgJEHRH4EjaEoU9FXbgEgo7gdJo/xkYHyI+ONdAv7jpnZzty7l8KqkrQ5CW44oWgBMDl7idIYwkFni9di97DPn1NLPCxKfumv1f1v9y984CtBSBzTwrlYrGxvQuzsHuLlasVtlrELXP4SNmr8zUggFKpDa3X5Xkeq2QjyY8NcNIggZtL2UTJYrm7GidyiYHIrKeGF2gbBGg1rRdimGv+Pp1Q5B5oRATpAf12N0bs9wN9EKw7YugZuU02YL8GEAAGKO2Ylia0eYikHS7FqDhzSjHbzhF8EP//84F0drf/5QFEw3ACKIUkDgH2igj4QKoIpkSDCJAwiAAJhwiQCKBgB2SFexJAfcRoDElayj+WYXQcdUIp08yLxqLJaCInHjXN/PFvDVJMJ/M8lT6FFa59Itfo09CQyc5ZKaSh2zHACtoT0J7G/08YX1xXXspcOHy+ZuUZ59S+05mzXVYGFKSU468MrExAZFBmPFDuWckrXOW48Mp0jncKP1phZeRkNM3tctf+OOF6VvqSlb5q7CjlUGwhSTXyKfBDRheoQmjV3UvdyTR4Kj9IN9OQQQnXw2uByBfYxdiMQ6vc8cURXxT0J7Q75abqE00U2INypVdYQ1MKT+TfULTSd9wVXiYYP0HpJUE6fTzt3ZVK/VgNIpTiAp7tBH5K1/MhC8sBZ8+zR1vv/8ZtjQGjvg8dZ6/fqw657trCwZMUyXb19xupu9AwilfmFbRsyXVD9i/Ybp/B5pmNLre2a2u0jkvaf0U39cdFN2YRMX2GxVsa2TzcMQxeMZIcNu/9rbx6hcC0fS6abbSUMmZLIWW/XGghSZoiLriVncgxdY1HpMxXmEkUcgIxHr+WjAklSfBD2QoNQhaRolBgc4HQS2ItRFwyK2FUxzQD2WbPfnWNWWNyS25mmyy7ZiXTSXZIyaTNUD8RmaXcbMazeXTxrV//VvEGcfyJiYaCi/6v5jojwUTzIYUvqS/tHnOOYWK8kpFxl8fiknYczjZn89OfMZO6B0ZLo0FlgudwnIrQ0i6lZb9otEU2xxLSF1BJbwCgH30BgL70DgB60AsA6BPHPUg78uPbzvBoq6+GddGt4I2785bJrKbsC8CgETSQhaP3o/JK5B4zFtFSVYMQWQsdDm4tFAX4T7LGXK7KSqzMaECTWi6RsSQAh02BgIVAwhqiUqLN2ZakiZIoNkFsSziiJmIHkbEdAhyeAwLeBBK+ICpD/K+35Ad9pkZDiytfKCfSFOXKZTrU6GCWqENrGDbKK2Oecoc+akZowEsE4VpuEgkQWnlwS9wNXVdBoJWNnEYmUXA4rhj3vdGIKy/miQxNxCk+of8VMoWkFRej6Q5ikpeQFvIsHAyoUq4yG7gT+1mpGYIM4ajPJjDbmrRpjmwUQK3WFA/oUsyIXBZWwIz4XTbEkZEJBYKBQxWs27is4lHzUm9bTgEYpGfIQCNGnARJ0kFdqqYaqqU6AAA=') format('woff2');
+  font-display: swap;
+}
+
+/* 基础图标类
+ * - 命中所有 icon- 开头的 class
+ * - font-family 必须和 @font-face 中一致
+ * - 用 rpx 单位，小程序友好
+ * 默认 64rpx（在卡片中使用时由 .icon-wrap .my-iconfont 覆盖为更大尺寸）
+ */
+.my-iconfont {
+  font-family: "my-iconfont" !important;
+  font-size: 64rpx;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* 5 个图标的伪元素 content（对应 unicode 编码） */
+.icon-1::before { content: "\ea01"; }
+.icon-2::before { content: "\ea02"; }
+.icon-3::before { content: "\ea03"; }
+.icon-4::before { content: "\ea04"; }
+.icon-5::before { content: "\ea05"; }
+
+/* ============ 页面样式 ============ */
+page {
+  --primary: #1890ff;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --bg-card: #ffffff;
+  --bg-page: #f5f7fa;
+}
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding: 24rpx 24rpx 80rpx;
+  box-sizing: border-box;
+}
+
+.banner {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  padding: 36rpx 32rpx;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.2);
+}
+
+.banner-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8rpx;
+}
+
+.banner-sub {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.section {
+  background: var(--bg-card);
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+}
+
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44rpx;
+  height: 44rpx;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 26rpx;
+  margin-right: 16rpx;
+  font-weight: 700;
+}
+
+.section-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 24rpx;
+  padding: 12rpx 16rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-family: Menlo, Consolas, monospace;
+  word-break: break-all;
+}
+
+.section-warn {
+  margin-top: 20rpx;
+  padding: 16rpx 20rpx;
+  background: #fff7e6;
+  border-left: 6rpx solid #fa8c16;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #874d00;
+  line-height: 1.6;
+}
+
+/* ============ 网格 ============ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fafafa;
+  border-radius: 12rpx;
+  padding: 24rpx 12rpx 16rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.grid-item:active {
+  background: #f0f0f0;
+  transform: scale(0.97);
+}
+
+.icon-wrap {
+  width: 144rpx;
+  height: 144rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.icon-wrap .my-iconfont {
+  font-size: 300rpx;
+  color: var(--primary);
+}
+
+.icon-svg {
+  width: 96rpx;
+  height: 96rpx;
+  fill: #d9d9d9;
+}
+
+.icon-name {
+  font-size: 22rpx;
+  color: var(--text-primary);
+  font-family: Menlo, Consolas, monospace;
+  margin-bottom: 4rpx;
+}
+
+.icon-guess {
+  font-size: 20rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.icon-action {
+  font-size: 20rpx;
+  color: var(--primary);
+  padding: 4rpx 12rpx;
+  background: #e6f7ff;
+  border-radius: 4rpx;
+}
+
+/* ============ 动态演示区 ============ */
+.dynamic-demo {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 48rpx 24rpx;
+  background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+
+.dynamic-demo .my-iconfont {
+  transition: all 0.3s ease;
+}
+
+.control-row {
+  margin-bottom: 20rpx;
+}
+
+.control-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.color-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.color-dot {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  border: 4rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.color-dot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 4rpx var(--primary), 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  transform: scale(1.1);
+}
+
+/* ============ 自检 ============ */
+.check-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.check-item:last-of-type {
+  border-bottom: none;
+}
+
+.check-label {
+  font-size: 28rpx;
+  color: var(--text-primary);
+}
+
+.check-status {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 4rpx;
+}
+
+.check-status.ok {
+  color: #52c41a;
+  background: #f6ffed;
+}
+
+.check-status.fail {
+  color: #f5222d;
+  background: #fff1f0;
+}
+
+.check-tips {
+  margin-top: 20rpx;
+  padding: 20rpx 24rpx;
+  background: #f0f5ff;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.footer-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #bbb;
+  margin-top: 40rpx;
+  padding-bottom: 40rpx;
+}

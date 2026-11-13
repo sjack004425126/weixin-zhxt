@@ -1,0 +1,15 @@
+<!-- pages/icon-isolate/icon-isolate.wxml -->
+<!-- 极致隔离测试：完全裸 van-icon，无任何 class、无任何包裹、无任何样式干扰 -->
+<view style="padding:24rpx;">
+  <view style="font-size:28rpx;color:#999;margin-bottom:24rpx;">裸 van-icon（零样式，无 import）</view>
+  <van-icon name="phone-o" size="48rpx" color="#E86433" />
+  <van-icon name="arrow" size="48rpx" color="#1890ff" />
+  <van-icon name="lock" size="48rpx" color="#333" />
+  <van-icon name="chat-o" size="48rpx" color="#E86433" />
+  <van-icon name="shield-o" size="48rpx" color="#E86433" />
+  <van-icon name="user-o" size="48rpx" color="#E86433" />
+  <van-icon name="closed-eye" size="48rpx" color="#E86433" />
+  <van-icon name="exchange" size="48rpx" color="#E86433" />
+  <van-icon name="medal-o" size="48rpx" color="#333" />
+  <van-icon name="star-o" size="48rpx" color="#333" />
+</view>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "login 图标测试",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

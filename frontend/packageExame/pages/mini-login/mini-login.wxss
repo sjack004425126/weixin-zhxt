@@ -1,0 +1,263 @@
+/* =========================================================
+ * mini-login 简洁版（参考 vocational-login）
+ * ========================================================= */
+
+@import "../../../components/vant-icon/index.wxss";
+
+page {
+  --primary: #1890FF;
+  --primary-light: #40A9FF;
+  --primary-bg: #E6F7FF;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-tertiary: #999;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+}
+
+.container {
+  min-height: 100vh;
+  background: #F0F8FF;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* 切换身份按钮 */
+.switch-role-btn {
+  position: absolute;
+  top: 60rpx;
+  left: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 14rpx 28rpx 14rpx 14rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 52rpx;
+  box-shadow: 0 2rpx 10rpx rgba(24, 144, 255, 0.1);
+  z-index: 10;
+  transition: all 0.2s ease;
+  border: 1rpx solid rgba(24, 144, 255, 0.1);
+}
+.switch-role-btn:active {
+  transform: scale(0.96);
+}
+.switch-role-icon {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #E6F7FF;
+  border-radius: 50%;
+}
+.switch-role-btn text {
+  font-size: 26rpx;
+  color: #1890FF;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+/* 登录卡 */
+.login-box {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24rpx;
+  padding: 80rpx 40rpx 50rpx;
+  box-shadow: 0 8rpx 32rpx rgba(24, 144, 255, 0.15);
+  border: 2rpx solid rgba(24, 144, 255, 0.1);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.login-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: #1890FF;
+  border-radius: 24rpx 24rpx 0 0;
+}
+
+/* 标题 */
+.title {
+  font-size: 42rpx;
+  font-weight: 700;
+  color: #1890FF;
+  text-align: center;
+  margin-bottom: 12rpx;
+  letter-spacing: 1rpx;
+  line-height: 1.3;
+}
+.title-sub {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-bottom: 60rpx;
+  letter-spacing: 1rpx;
+}
+
+/* 学校标识徽章 */
+.school-badge {
+  position: absolute;
+  top: -20rpx;
+  right: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 40rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+.school-badge.exame {
+  background: #1890FF;
+  color: white;
+}
+.badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.badge-text {
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  color: #fff;
+}
+
+/* 登录表单 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* 自定义输入格 */
+.custom-input-cell {
+  display: flex;
+  align-items: center;
+  background: #F0F8FF;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+  padding: 24rpx 32rpx;
+  border: 2rpx solid rgba(24, 144, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  box-sizing: border-box;
+}
+.custom-input-cell:focus-within {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
+  background: #fff;
+}
+.custom-input-icon {
+  margin-right: 16rpx;
+  color: #1890FF;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.custom-input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  height: 44rpx;
+  line-height: 44rpx;
+  min-height: 44rpx;
+}
+
+.field-clear {
+  padding: 0 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.field-eye {
+  padding: 8rpx 12rpx;
+  margin-left: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8rpx;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 10;
+}
+.field-eye:active {
+  background: rgba(24, 144, 255, 0.1);
+}
+.field-eye-active {
+  background: rgba(24, 144, 255, 0.15);
+}
+.eye-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  display: inline-block;
+  user-select: none;
+}
+
+/* 记住密码 */
+.remember-password {
+  margin: 20rpx 0 30rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+.remember-password checkbox {
+  transform: scale(0.8);
+  margin-right: 8rpx;
+}
+
+/* van-button 覆盖 */
+.van-button {
+  height: 96rpx !important;
+  line-height: 96rpx !important;
+  border-radius: 12rpx !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+  box-shadow: 0 6rpx 20rpx rgba(24, 144, 255, 0.3) !important;
+}
+.van-button:active {
+  transform: translateY(2rpx) scale(0.98) !important;
+}
+
+/* 协议 */
+.agreement {
+  margin-top: 30rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.agreement checkbox {
+  transform: scale(0.8);
+}
+.agreement-links {
+  margin-top: 8rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.agreement-links text {
+  margin: 0 4rpx;
+}
+.link {
+  color: #1890ff;
+  display: inline;
+}

@@ -1,0 +1,246 @@
+page {
+  --primary-color: #1890FF;
+  --primary-light: #F0F8FF;
+  --primary-gradient: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.08);
+  --border-radius: 16rpx;
+  --success-color: #52C41A;
+  --danger-color: #FF4D4F;
+  --warning-color: #FAAD14;
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding-top: 140rpx;
+}
+
+.page-header {
+  padding: 32rpx 0 24rpx;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10rpx);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 24rpx;
+}
+
+.header-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
+}
+
+.header-text {
+  flex: 1;
+  margin-left: 8rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+.header-nav-action {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  border: 2rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.detail-content {
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.info-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid var(--primary-color);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+  padding: 12rpx 0;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  min-width: 160rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: right;
+  word-break: break-all;
+}
+
+/* 审批步骤样式 */
+.approval-step {
+  display: flex;
+  padding: 16rpx 0;
+}
+
+.approval-step:last-child .step-line {
+  display: none;
+}
+
+.step-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20rpx;
+}
+
+.step-number {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.step-pending {
+  background: #D9D9D9;
+}
+
+.step-done {
+  background: var(--success-color);
+}
+
+.step-rejected {
+  background: var(--danger-color);
+}
+
+.step-line {
+  width: 4rpx;
+  flex: 1;
+  min-height: 40rpx;
+  background: #E8E8E8;
+  margin: 8rpx 0;
+}
+
+.line-done {
+  background: var(--success-color);
+}
+
+.step-content {
+  flex: 1;
+  padding-bottom: 24rpx;
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.step-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.step-desc {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.step-waiting {
+  color: var(--text-disabled);
+}
+
+/* 审批操作按钮 */
+.action-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 24rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+}
+
+.action-hint {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: var(--warning-color);
+  margin-bottom: 20rpx;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+}
+
+.action-buttons .van-button {
+  min-width: 140rpx !important;
+  max-width: 200rpx !important;
+}

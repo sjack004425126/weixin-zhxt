@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "走读证",
+  "navigationBarBackgroundColor": "#FFFFFF",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#F6F8F7",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

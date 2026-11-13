@@ -1,0 +1,81 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 顶部统计 -->
+<view class="stats-row">
+  <view class="stat-card">
+    <view class="stat-num">{{stats.total}}</view>
+    <view class="stat-label">总提交</view>
+  </view>
+  <view class="stat-card stat-cert">
+    <view class="stat-num">{{stats.with_certificate}}</view>
+    <view class="stat-label">已传凭证</view>
+  </view>
+  <view class="stat-card stat-no-cert">
+    <view class="stat-num">{{stats.without_certificate}}</view>
+    <view class="stat-label">未传凭证</view>
+  </view>
+</view>
+
+<!-- 搜索 + 过滤 -->
+<view class="filter-bar">
+  <view class="search-wrap">
+    <van-icon name="search" size="28rpx" color="#999" />
+    <input class="search-input" placeholder="学号 / 姓名 / 手机 / 单位" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" />
+    <van-icon wx:if="{{keyword}}" name="clear" size="28rpx" color="#999" bindtap="onClearSearch" />
+  </view>
+</view>
+
+<scroll-view scroll-x class="filter-tabs" enhanced show-scrollbar="{{false}}">
+  <view class="tab {{activeDestination === '' ? 'tab-active' : ''}}" data-value="" bindtap="onFilterDestination">全部去向</view>
+  <view class="tab {{activeDestination === item.value ? 'tab-active' : ''}}" wx:for="{{destinations}}" wx:key="value" data-value="{{item.value}}" bindtap="onFilterDestination">
+    {{item.label}}
+  </view>
+</scroll-view>
+
+<scroll-view scroll-x class="filter-tabs" enhanced show-scrollbar="{{false}}">
+  <view class="tab {{hasCertificate === '' ? 'tab-active' : ''}}" data-value="" bindtap="onFilterCert">凭证全部</view>
+  <view class="tab {{hasCertificate === '1' ? 'tab-active' : ''}}" data-value="1" bindtap="onFilterCert">已上传</view>
+  <view class="tab {{hasCertificate === '0' ? 'tab-active' : ''}}" data-value="0" bindtap="onFilterCert">未上传</view>
+</scroll-view>
+
+<scroll-view wx:if="{{batches.length > 0}}" scroll-x class="filter-tabs" enhanced show-scrollbar="{{false}}">
+  <view class="tab {{activeBatch === '' ? 'tab-active' : ''}}" data-value="" bindtap="onFilterBatch">全部批次</view>
+  <view class="tab {{activeBatch === item.value ? 'tab-active' : ''}}" wx:for="{{batches}}" wx:key="value" data-value="{{item.value}}" bindtap="onFilterBatch">
+    批次 {{item.value}}
+  </view>
+</scroll-view>
+
+<!-- 列表 -->
+<view class="list-wrap">
+  <view wx:if="{{loading && list.length === 0}}" class="loading-tip">加载中...</view>
+  <view wx:elif="{{list.length === 0}}" class="empty-tip">暂无提交记录</view>
+
+  <view class="record-card" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="onTapItem">
+    <view class="record-top">
+      <view class="record-name">
+        <text wx:if="{{item.student_name}}">{{item.student_name}}</text>
+        <text wx:else class="muted">匿名</text>
+        <text class="record-no" wx:if="{{item.student_no}}">· {{item.student_no}}</text>
+      </view>
+      <view class="record-batch" wx:if="{{item.batch}}">{{item.batch}}</view>
+    </view>
+
+    <view class="record-mid">
+      <van-tag type="primary" plain>{{item.destination_label || item.destination}}</van-tag>
+      <view class="record-extra" wx:if="{{item.company_name}}">单位：{{item.company_name}}</view>
+      <view class="record-extra" wx:elif="{{item.college_name}}">升学：{{item.college_name}}{{item.major_name ? ' · ' + item.major_name : ''}}</view>
+      <view class="record-extra" wx:elif="{{item.military_office}}">入伍：{{item.military_office}}</view>
+    </view>
+
+    <view class="record-bottom">
+      <text class="record-time">{{item.submit_time || ''}}</text>
+      <view class="record-cert {{item.has_certificate ? 'has-cert' : 'no-cert'}}">
+        <van-icon name="{{item.has_certificate ? 'photo-o' : 'warning-o'}}" size="22rpx" />
+        <text>{{item.has_certificate ? '已传凭证' : '无凭证'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading && list.length > 0}}" class="loading-more">加载中...</view>
+  <view wx:elif="{{noMore && list.length > 0}}" class="loading-more">— 已加载全部 —</view>
+</view>

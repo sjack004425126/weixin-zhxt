@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "请假审批",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-icon": "/components/vant-icon/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index"
+  }
+}

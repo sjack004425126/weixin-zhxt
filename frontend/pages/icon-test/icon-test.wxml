@@ -1,0 +1,63 @@
+<!-- pages/icon-test/icon-test.wxml -->
+<!-- vant-icon 极简测试页：仅测试组件方式，不掺其他元素 -->
+<view class="container">
+  <view class="title">vant-icon 测试（无任何干扰元素）</view>
+
+  <!-- 区域A：home 页面用到的图标 -->
+  <view class="block">
+    <view class="block-title">A. home 页用到的图标</view>
+    <view class="row">
+      <view class="item"><van-icon name="medal-o" size="48rpx" color="#333" /><text>medal-o</text></view>
+      <view class="item"><van-icon name="certificate" size="48rpx" color="#333" /><text>certificate</text></view>
+      <view class="item"><van-icon name="friends-o" size="48rpx" color="#333" /><text>friends-o</text></view>
+      <view class="item"><van-icon name="star-o" size="48rpx" color="#333" /><text>star-o</text></view>
+      <view class="item"><van-icon name="volume-o" size="48rpx" color="#333" /><text>volume-o</text></view>
+      <view class="item"><van-icon name="cross" size="48rpx" color="#94A3B8" /><text>cross</text></view>
+      <view class="item"><van-icon name="clock-o" size="48rpx" color="#94A3B8" /><text>clock-o</text></view>
+      <view class="item"><van-icon name="arrow" size="48rpx" color="#1890FF" /><text>arrow</text></view>
+      <view class="item"><van-icon name="apps-o" size="48rpx" color="#333" /><text>apps-o</text></view>
+      <view class="item"><van-icon name="add-o" size="48rpx" color="#1890FF" /><text>add-o</text></view>
+      <view class="item"><van-icon name="balance-pay" size="48rpx" color="#52C41A" /><text>balance-pay</text></view>
+      <view class="item"><van-icon name="orders-o" size="48rpx" color="#FA8C16" /><text>orders-o</text></view>
+    </view>
+  </view>
+
+  <!-- 区域B：login 页面用到的图标 -->
+  <view class="block">
+    <view class="block-title">B. login 页用到的图标</view>
+    <view class="row">
+      <view class="item"><van-icon name="exchange" size="48rpx" color="#E86433" /><text>exchange</text></view>
+      <view class="item"><van-icon name="lock" size="48rpx" color="#333" /><text>lock</text></view>
+      <view class="item"><van-icon name="phone-o" size="48rpx" color="#E86433" /><text>phone-o</text></view>
+      <view class="item"><van-icon name="chat-o" size="48rpx" color="#333" /><text>chat-o</text></view>
+      <view class="item"><van-icon name="shield-o" size="48rpx" color="#E86433" /><text>shield-o</text></view>
+      <view class="item"><van-icon name="user-o" size="48rpx" color="#E86433" /><text>user-o</text></view>
+      <view class="item"><van-icon name="closed-eye" size="48rpx" color="#E86433" /><text>closed-eye</text></view>
+    </view>
+  </view>
+
+  <!-- 区域C：基础测试（无 color、无 size） -->
+  <view class="block">
+    <view class="block-title">C. 极简基础测试（不传 color/size）</view>
+    <view class="row">
+      <view class="item"><van-icon name="phone-o" /><text>phone-o 默认</text></view>
+      <view class="item"><van-icon name="arrow" /><text>arrow 默认</text></view>
+      <view class="item"><van-icon name="star-o" /><text>star-o 默认</text></view>
+      <view class="item"><van-icon name="home-o" /><text>home-o 默认</text></view>
+    </view>
+  </view>
+
+  <!-- 区域D：直接 unicode 字符 + 手动 font-family -->
+  <view class="block">
+    <view class="block-title">D. 直接用 unicode（绕过 vant-icon 组件）</view>
+    <view class="row">
+      <text class="unicode-icon" decode space="nbsp"></text>
+      <text class="unicode-icon" decode space="nbsp"></text>
+      <text class="unicode-icon" decode space="nbsp"></text>
+      <text class="unicode-icon" decode space="nbsp"></text>
+      <text class="unicode-icon" decode space="nbsp"></text>
+    </view>
+    <view class="hint">期望：5 个图标字符（如果字体加载成功）</view>
+  </view>
+
+</view>

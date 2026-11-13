@@ -1,0 +1,248 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:inherit;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">请假详情</view>
+      <view class="header-subtitle">Leave Detail</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+  <block wx:elif="{{leaveDetail}}">
+    <!-- 状态卡片 -->
+    <view class="status-card {{leaveDetail.xj_zt === 1 ? 'status-completed' : (leaveDetail.bzr_zt === 2 || leaveDetail.xsk_zt === 2) ? 'status-rejected' : (leaveDetail.bzr_zt === 1 && leaveDetail.xsk_zt === 1) ? 'status-approved' : 'status-pending'}}">
+      <view class="status-icon">
+        <text wx:if="{{leaveDetail.xj_zt === 1}}" class="vi" style="font-family:vant-icon,sans-serif;font-size:60rpx;"></text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 2 || leaveDetail.xsk_zt === 2}}" class="vi" style="font-family:vant-icon,sans-serif;font-size:60rpx;"></text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 1 && leaveDetail.xsk_zt === 1}}" class="vi" style="font-family:vant-icon,sans-serif;font-size:60rpx;"></text>
+        <text wx:else class="vi" style="font-family:vant-icon,sans-serif;font-size:60rpx;"></text>
+      </view>
+      <view class="status-text">
+        <text wx:if="{{leaveDetail.xj_zt === 1}}">已销假</text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 2 || leaveDetail.xsk_zt === 2}}">审批不通过</text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 1 && leaveDetail.xsk_zt === 1}}">审批通过</text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 0 && leaveDetail.xsk_zt === 0}}">待审批</text>
+        <text wx:else>审批中</text>
+      </view>
+      <view class="status-desc">
+        <text wx:if="{{leaveDetail.xj_zt === 1}}">销假时间：{{leaveDetail.xjsj}}</text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 1 && leaveDetail.xsk_zt === 1}}">请假已通过，请按时返校并销假</text>
+        <text wx:elif="{{leaveDetail.bzr_zt === 0 && leaveDetail.xsk_zt === 0}}">请耐心等待班主任和学生科审批</text>
+        <text wx:else>部分审批已完成，请继续等待</text>
+      </view>
+    </view>
+
+    <!-- 请假信息 -->
+    <view class="info-card">
+      <view class="card-title">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+        <text>请假信息</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">请假类别</text>
+          <van-tag type="{{leaveDetail.qjlb === '病假' ? 'danger' : leaveDetail.qjlb === '事假' ? 'warning' : 'primary'}}">{{leaveDetail.qjlb}}</van-tag>
+        </view>
+        <view class="info-item">
+          <text class="info-label">请假事由</text>
+          <text class="info-value">{{leaveDetail.qjsy}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">申请时间</text>
+          <text class="info-value">{{leaveDetail.qjsqsj}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">开始时间</text>
+          <text class="info-value">{{leaveDetail.qjkssj}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">结束时间</text>
+          <text class="info-value">{{leaveDetail.qjjssj}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 离校信息 -->
+    <view class="info-card">
+      <view class="card-title">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+        <text>离校信息</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">离校线路</text>
+          <text class="info-value">{{leaveDetail.xslxxl}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">交通工具</text>
+          <text class="info-value">{{leaveDetail.xslxjtgj}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 审批信息 -->
+    <view class="info-card">
+      <view class="card-title">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+        <text>审批信息</text>
+      </view>
+      <view class="approval-list">
+        <view class="approval-item">
+          <view class="approval-role">班主任审批</view>
+          <view class="approval-status {{leaveDetail.bzr_zt === 0 ? 'status-pending' : leaveDetail.bzr_zt === 1 ? 'status-approved' : 'status-rejected'}}">
+            <text wx:if="{{leaveDetail.bzr_zt === 0}}">待审批</text>
+            <text wx:elif="{{leaveDetail.bzr_zt === 1}}">审批通过</text>
+            <text wx:else>审批不通过</text>
+          </view>
+          <view class="approval-name" wx:if="{{leaveDetail.sp_bzr_xm}}">审批人：{{leaveDetail.sp_bzr_xm}}</view>
+        </view>
+        <view class="approval-item">
+          <view class="approval-role">学生科审批</view>
+          <view class="approval-status {{leaveDetail.xsk_zt === 0 ? 'status-pending' : leaveDetail.xsk_zt === 1 ? 'status-approved' : 'status-rejected'}}">
+            <text wx:if="{{leaveDetail.xsk_zt === 0}}">待审批</text>
+            <text wx:elif="{{leaveDetail.xsk_zt === 1}}">审批通过</text>
+            <text wx:else>审批不通过</text>
+          </view>
+          <view class="approval-name" wx:if="{{leaveDetail.sp_xsk_xm}}">审批人：{{leaveDetail.sp_xsk_xm}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 返校信息（已销假时显示） -->
+    <view class="info-card" wx:if="{{leaveDetail.xj_zt === 1}}">
+      <view class="card-title">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+        <text>返校信息</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">返校线路</text>
+          <text class="info-value">{{leaveDetail.xsfxxl}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">交通工具</text>
+          <text class="info-value">{{leaveDetail.xsfxjtgj}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">销假时间</text>
+          <text class="info-value">{{leaveDetail.xjsj}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <!-- 未审批时可修改 -->
+      <van-button 
+        wx:if="{{leaveDetail.bzr_zt === 0 && leaveDetail.xsk_zt === 0}}"
+        type="default" 
+        block 
+        bind:click="goToEdit"
+      >修改申请</van-button>
+      
+      <!-- 审批通过且未销假时可销假 -->
+      <van-button 
+        wx:if="{{leaveDetail.bzr_zt === 1 && leaveDetail.xsk_zt === 1 && leaveDetail.xj_zt === 0}}"
+        type="primary" 
+        block 
+        bind:click="showCancelModal"
+      >销假</van-button>
+    </view>
+  </block>
+
+  <!-- 销假弹窗 -->
+  <van-popup 
+    show="{{ showCancelModal }}" 
+    position="bottom"
+    round
+    closeable
+    bind:close="hideCancelModal"
+  >
+    <view class="cancel-modal">
+      <view class="modal-title">销假</view>
+      
+      <!-- 门禁记录验证区域 -->
+      <view class="access-check-section">
+        <view class="access-check-title">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#1989fa;"></text>
+          <text>门禁记录验证</text>
+        </view>
+        
+        <!-- 加载中 -->
+        <view class="access-check-loading" wx:if="{{accessCheckLoading}}">
+          <van-loading size="24px" vertical>正在查询门禁记录...</van-loading>
+        </view>
+        
+        <!-- 验证结果 -->
+        <view class="access-check-result" wx:elif="{{accessCheckResult}}">
+          <!-- 有回校记录 -->
+          <view class="access-result-success" wx:if="{{accessCheckResult.has_return}}">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;color:#07c160;"></text>
+            <view class="access-result-info">
+              <view class="access-result-title">已检测到回校记录</view>
+              <view class="access-result-detail">
+                <text class="detail-label">进入时间：</text>
+                <text class="detail-value">{{accessCheckResult.return_time}}</text>
+              </view>
+              <view class="access-result-detail">
+                <text class="detail-label">门禁点：</text>
+                <text class="detail-value">{{accessCheckResult.door_name}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 无回校记录 -->
+          <view class="access-result-fail" wx:else>
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;color:#ee0a24;"></text>
+            <view class="access-result-info">
+              <view class="access-result-title">未检测到回校记录</view>
+              <view class="access-result-msg">{{accessCheckResult.message}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 返校信息表单 -->
+      <view class="modal-content" wx:if="{{accessCheckResult.has_return}}">
+        <van-field
+          label="返校线路"
+          value="{{ cancelForm.xsfxxl }}"
+          data-field="xsfxxl"
+          bind:change="onCancelFormChange"
+          placeholder="请填写返校线路"
+          required
+        />
+        <van-field
+          label="交通工具"
+          value="{{ cancelForm.xsfxjtgj }}"
+          data-field="xsfxjtgj"
+          bind:change="onCancelFormChange"
+          placeholder="请填写返校交通工具"
+          required
+        />
+      </view>
+      
+      <view class="modal-footer">
+        <van-button 
+          type="primary" 
+          block 
+          loading="{{ cancelLoading }}"
+          disabled="{{ !accessCheckResult.has_return || accessCheckLoading }}"
+          bind:click="submitCancel"
+        >确认销假</van-button>
+      </view>
+    </view>
+  </van-popup>
+</view>

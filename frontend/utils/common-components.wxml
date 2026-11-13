@@ -1,0 +1,33 @@
+<!--
+  通用组件片段 - 由 createPage 创建的页面统一引入
+
+  使用方式（在页面 wxml 顶部）：
+    <include src="/utils/common-components.wxml" />
+
+  约定：
+    - 组件 id 必须保持稳定：top-message、__common-components-marker
+    - page-mixin.js 中的 showSuccess / showError 等方法会通过 selectComponent('#top-message') 调用
+    - 页面可在 data 中声明 _topMessageIds 数组以支持自定义 id 实例
+      示例：data: { _topMessageIds: ['#my-toast', '#top-message'] }
+    - 增加新通用组件时，请同步更新 page-mixin.js 的注释
+
+  注意（关于 include + 自定义组件）：
+    include 是模板包含机制，引入的代码继承调用方页面的组件配置。
+    因此调用方页面的 json.usingComponents 必须注册本片段中用到的所有组件
+    （当前主要是 top-message）。如发现某个页面 include 后 top-message 不显示，
+    请检查该页面 json 是否已注册 "top-message": "/components/top-message/top-message"。
+-->
+<!-- 顶部消息提示（核心组件，所有页面都应包含） -->
+<top-message id="top-message"></top-message>
+
+<!-- 不可见标记，用于 page-mixin 检测当前页面是否包含本片段 -->
+<view id="__common-components-marker" style="display:none;"></view>
+
+<!-- 费用提示组件（按需使用） -->
+<!--
+  使用方法：
+    const feeToast = this.selectComponent('#fee-toast');
+    feeToast && feeToast.show({ message, type });
+  如本页面需要用到，请在 wxml 中解开下一行注释：
+-->
+<!-- <fee-toast id="fee-toast"></fee-toast> -->

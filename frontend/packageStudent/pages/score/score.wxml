@@ -1,0 +1,111 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+
+  <!-- ============ 列表模式 ============ -->
+  <block wx:if="{{mode === 'list'}}">
+    <view class="page-header">
+      <view class="header-content">
+        <view class="header-icon">
+          <van-icon name="chart-trending-o" size="40rpx" />
+        </view>
+        <view class="header-text">
+          <view class="header-title">成绩列表</view>
+          <view class="header-subtitle">Exam Records</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-tip">
+      <van-icon name="loading" size="36rpx" color="#1890FF" />
+      <text>加载中...</text>
+    </view>
+
+    <view wx:else class="score-list">
+      <view
+        wx:for="{{records}}"
+        wx:key="id"
+        class="score-item"
+        data-record="{{item.id}}"
+        bindtap="goToDetail"
+      >
+        <view class="score-row-top">
+          <text class="score-title">{{item.exam_title}}</text>
+          <text class="score-status {{item.is_passed ? 'pass' : 'fail'}}">
+            {{item.grading_status === 'pending' ? '待评阅' : (item.is_passed ? '通过' : '未通过')}}
+          </text>
+        </view>
+        <view class="score-row-mid">
+          <text class="score-value" style="color: {{item.is_passed ? '#52c41a' : '#ff4d4f'}}">
+            {{item.score != null ? item.score : '-'}}
+          </text>
+          <text class="score-total">/{{item.total_score || '-'}}</text>
+        </view>
+        <view class="score-row-bottom">
+          <text class="score-time">{{item.submitted_at || item.started_at}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{!loading && records.length === 0}}" class="empty-tip">
+        <van-icon name="info-o" size="48rpx" color="#909399" />
+        <view style="margin-top: 16rpx;">暂无成绩记录</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ============ 详情模式 ============ -->
+  <block wx:elif="{{mode === 'detail'}}">
+    <view class="page-header">
+      <view class="header-content">
+        <view class="back-button" bindtap="goToExameList">
+          <van-icon name="arrow-left" size="32rpx" />
+        </view>
+        <view class="header-icon">
+          <van-icon name="award-o" size="40rpx" />
+        </view>
+        <view class="header-text">
+          <view class="header-title">成绩详情</view>
+          <view class="header-subtitle">Score Detail</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-tip">
+      <van-icon name="loading" size="36rpx" color="#1890FF" />
+      <text>加载中...</text>
+    </view>
+
+    <block wx:elif="{{detail}}">
+      <view class="score-summary">
+        <view class="summary-title">{{detail.exam_title}}</view>
+        <view class="summary-score-row">
+          <text class="summary-score" style="color: {{detail.is_passed ? '#52c41a' : '#ff4d4f'}}">
+            {{detail.score != null ? detail.score : '-'}}
+          </text>
+          <text class="summary-total">/{{detail.total_score || '-'}}</text>
+        </view>
+        <view class="summary-meta">
+          <text>及格分：{{detail.pass_score || '-'}}</text>
+          <text>状态：{{detail.grading_status === 'pending' ? '待评阅' : (detail.is_passed ? '通过' : '未通过')}}</text>
+        </view>
+        <view class="summary-time" wx:if="{{detail.submitted_at}}">
+          提交时间：{{detail.submitted_at}}
+        </view>
+      </view>
+
+      <view wx:if="{{detail.questions && detail.questions.length > 0}}" class="questions-list">
+        <view wx:for="{{detail.questions}}" wx:key="id" class="question-row">
+          <view class="q-header">
+            <text class="q-type">{{item.type}}</text>
+            <text class="q-order">第 {{index + 1}} 题</text>
+            <text class="q-score" style="color: {{item.is_correct === true ? '#52c41a' : (item.is_correct === false ? '#ff4d4f' : '#909399')}}">
+              {{item.student_score != null ? item.student_score : 0}}/{{item.score || 0}}
+            </text>
+          </view>
+          <view class="q-content">{{item.content}}</view>
+        </view>
+      </view>
+    </block>
+  </block>
+
+</view>

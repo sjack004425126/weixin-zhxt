@@ -1,0 +1,171 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部导航 -->
+<view class="page-header-nav">
+  <view class="header-nav-content">
+    <view class="header-nav-icon">
+      <van-icon name="balance-pay" size="40rpx" />
+    </view>
+    <view class="header-nav-text">
+      <view class="header-nav-title">我的学费</view>
+      <view class="header-nav-subtitle">My Tuition</view>
+    </view>
+    <view class="header-nav-action">
+      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+    </view>
+  </view>
+</view>
+
+<wxs module="utils">
+  function abs(num) {
+    return num < 0 ? -num : num;
+  }
+  module.exports = {
+    abs: abs
+  }
+</wxs>
+
+<view class="container">
+  <block wx:if="{{tuitionData}}">
+    <!-- 学生信息卡片 - 优化版 -->
+    <view class="card student-card">
+      <view class="student-info">
+        <view class="student-content">
+          <text class="student-name">{{tuitionData.student.name}}</text>
+          <text class="student-details">{{tuitionData.student.student_no}} · {{tuitionData.student.class_name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 费用详情与缴费状态整合卡片 -->
+    <view class="card fee-card">
+      <view class="card-title">
+        <van-icon name="balance-list-o" size="32rpx" />
+        <text>费用详情</text>
+      </view>
+
+      <!-- 费用明细 -->
+      <view class="fee-summary">
+        <view class="fee-row">
+          <text class="fee-label">第一学年</text>
+          <view class="fee-amounts">
+            <text class="fee-amount">学费 ¥{{tuitionData.tuition_info.first_year.tuition/100}}</text>
+            <text class="fee-amount">书费 ¥{{tuitionData.tuition_info.first_year.books/100}}</text>
+          </view>
+        </view>
+        <view class="fee-row">
+          <text class="fee-label">第二学年</text>
+          <view class="fee-amounts">
+            <text class="fee-amount">学费 ¥{{tuitionData.tuition_info.second_year.tuition/100}}</text>
+            <text class="fee-amount">书费 ¥{{tuitionData.tuition_info.second_year.books/100}}</text>
+          </view>
+        </view>
+
+        <!-- 总计与实缴对比 -->
+        <view class="fee-comparison">
+          <view class="comparison-row total">
+            <text class="comparison-label">应交总额</text>
+            <text class="comparison-amount">¥{{(tuitionData.tuition_info.total.tuition + tuitionData.tuition_info.total.books)/100}}</text>
+          </view>
+          <view class="comparison-row paid">
+            <text class="comparison-label">已缴费用</text>
+            <text class="comparison-amount">¥{{(tuitionData.tuition_info.actual_payment.tuition + tuitionData.tuition_info.actual_payment.books)/100}}</text>
+          </view>
+        </view>
+
+        <!-- 缴费状态 -->
+        <view class="payment-status {{tuitionData.tuition_info.remaining_payment < 0 ? 'overpaid' : tuitionData.tuition_info.remaining_payment === 0 ? 'completed' : 'pending'}}">
+          <view class="status-icon">
+            <van-icon name="{{tuitionData.tuition_info.remaining_payment < 0 ? 'gold-coin-o' : tuitionData.tuition_info.remaining_payment === 0 ? 'passed' : 'warning-o'}}" size="40rpx" />
+          </view>
+          <view class="status-content">
+            <text class="status-title">{{tuitionData.tuition_info.remaining_payment < 0 ? '多缴费用' : tuitionData.tuition_info.remaining_payment === 0 ? '缴费完成' : '待缴费用'}}</text>
+            <text class="status-amount" wx:if="{{tuitionData.tuition_info.remaining_payment !== 0}}">¥{{tuitionData.tuition_info.remaining_payment < 0 ? utils.abs(tuitionData.tuition_info.remaining_payment/100) : tuitionData.tuition_info.remaining_payment/100}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 书费退费详情 - 简化版 -->
+    <view class="card refund-card" wx:if="{{tuitionData.refund_info && tuitionData.student.semester >=5 }}">
+      <view class="card-title">
+        <van-icon name="gold-coin-o" size="32rpx" />
+        <text>书费退费</text>
+      </view>
+      <view class="refund-info">
+        <view class="refund-summary">
+          <view class="refund-amount">
+            <text class="amount-label">退费金额</text>
+            <text class="amount-value">¥{{tuitionData.refund_info.refund_amount/100}}</text>
+          </view>
+          <view class="refund-status status-{{tuitionData.refund_info.refund_status}}">
+            <text class="status-text">
+              {{tuitionData.refund_info.refund_status === 0 ? '可申请退费' :
+                tuitionData.refund_info.refund_status === 1 ? '申请失败' :
+                tuitionData.refund_info.refund_status === 2 ? '待确认收款' : '退费成功'}}
+            </text>
+          </view>
+        </view>
+
+        <!-- 退费时间信息 -->
+        <view class="refund-times" wx:if="{{tuitionData.refund_info.refund_time || tuitionData.refund_info.o_payment_time}}">
+          <view class="time-item" wx:if="{{tuitionData.refund_info.refund_time}}">
+            <text class="time-label">申请时间</text>
+            <text class="time-value">{{tuitionData.refund_info.refund_time}}</text>
+          </view>
+          <view class="time-item" wx:if="{{tuitionData.refund_info.o_payment_time}}">
+            <text class="time-label">收款时间</text>
+            <text class="time-value">{{tuitionData.refund_info.o_payment_time}}</text>
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="refund-actions" wx:if="{{tuitionData.refund_info.refund_status <= 2}}">
+          <van-button
+            wx:if="{{tuitionData.refund_info.refund_id && (tuitionData.refund_info.refund_status === 0 || tuitionData.refund_info.refund_status === 1)}}"
+            type="primary"
+            block
+            color="linear-gradient(135deg, #1890FF, #40A9FF)"
+            custom-class="refund-button"
+            bind:click="applyRefund"
+          >{{tuitionData.refund_info.refund_status === 1 ? '重新申请退费' : '申请退费'}}</van-button>
+
+          <van-button
+            wx:if="{{tuitionData.refund_info.refund_status === 2}}"
+            type="primary"
+            block
+            color="linear-gradient(135deg, #1890FF, #40A9FF)"
+            custom-class="refund-button"
+            bind:click="confirmRefund"
+          >确认收款</van-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提示信息和缴费按钮 -->
+    <block wx:if="{{tuitionData.tuition_info.remaining_payment > 0}}">
+      <view class="notice-wrap warning">
+        <van-icon name="warning-o" />
+        <text>您还有未缴费用，请及时缴纳</text>
+      </view>
+      <view class="pay-button-wrap">
+        <van-button
+          type="primary"
+          block
+          color="linear-gradient(135deg, #1890FF, #40A9FF)"
+          custom-class="pay-button"
+          bind:click="goPay"
+        >去缴费</van-button>
+      </view>
+    </block>
+    <view class="notice-wrap success" wx:elif="{{tuitionData.tuition_info.remaining_payment < 0}}">
+      <van-icon name="info-o" />
+      <text>您已多缴费用，您可以在第五个学期后申请退还多余费用</text>
+    </view>
+    <view class="notice-wrap complete" wx:else>
+      <van-icon name="checked" />
+      <text>学费已交清</text>
+    </view>
+  </block>
+</view>

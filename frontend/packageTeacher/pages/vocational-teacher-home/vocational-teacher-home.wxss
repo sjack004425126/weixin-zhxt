@@ -1,0 +1,167 @@
+@import "../../../components/vant-icon/index.wxss";
+
+/* vi 类：直接用 text 渲染 vant-icon 字体（绕过 van-icon 组件 view+::before，见 INCIDENTS/001） */
+.vi{display:inline-block;vertical-align:middle;line-height:1;font-family:vant-icon,sans-serif;}
+
+/* van-cell 左侧图标槽位：slot="icon" 的 text 替代 van-icon，补上与原生左图标一致的边距和颜色 */
+.cell-vi{margin-right:8rpx;color:#EB2F96;}
+
+page {
+  --primary-color: #EB2F96;
+  --primary-light: #FFF0F6;
+  --primary-gradient: linear-gradient(135deg, #EB2F96 0%, #F759AB 100%);
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding-bottom: 40rpx;
+}
+
+/* 用户信息卡片 */
+.user-card {
+  margin: 24rpx;
+  background: white;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(235, 47, 150, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: var(--primary-gradient);
+}
+
+.user-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+}
+
+.avatar-container {
+  position: relative;
+}
+
+.avatar-wrapper {
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.avatar-badge {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: #ff976a;
+  color: #fff;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  text-align: center;
+  border: 3rpx solid #fff;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid var(--primary-light);
+}
+
+.info-wrap {
+  flex: 1;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.status-tags {
+  display: flex;
+  gap: 8rpx;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 16rpx;
+  font-weight: 500;
+}
+
+.status-tag.teacher {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.status-tag.role {
+  background: #F6FFED;
+  color: #52C41A;
+}
+
+.user-detail {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 8rpx;
+}
+
+/* 功能列表 */
+.function-list {
+  padding: 0 24rpx;
+}
+
+.section {
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.title-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-left: 16rpx;
+  border-left: 6rpx solid var(--primary-color);
+}
+
+.section .van-cell-group {
+  border-radius: 16rpx !important;
+  overflow: hidden;
+}
+
+.logout-text {
+  color: #FF4D4F !important;
+}

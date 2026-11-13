@@ -1,0 +1,172 @@
+<!-- pages/book-pickup/book-pickup.wxml -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部（对齐 graduate-form 蓝白风格） -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:#fff;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">新书领取登记</view>
+      <view class="header-subtitle">Book Pickup</view>
+    </view>
+    <view class="header-nav-action">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;" bindtap="goHome"></text>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 状态提示栏 -->
+  <block wx:if="{{show_pending}}">
+    <view class="notice-bar">
+      <view class="notice-content">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#1890FF;"></text>
+        <text>每个学期统计一次，提交后仍可回来修改</text>
+      </view>
+    </view>
+  </block>
+  <block wx:if="{{show_filled}}">
+    <view class="notice-bar notice-filled">
+      <view class="notice-content">
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#52C41A;"></text>
+        <text>{{status_summary}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="form">
+    <view class="form-group" wx:if="{{has_pc}}">
+      <view class="form-title">当前批次</view>
+      <view class="pc-text">第 {{pc}} 批</view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-title">领取方式</view>
+      <view class="type-row">
+        <view class="type-item {{is_self_pickup ? 'is-on' : ''}}" data-type="self_pickup" bindtap="onTypeChange">
+          <text class="type-icon">自</text>
+          <text class="type-item-text">到校领取</text>
+          <text class="type-item-desc">本人到校自提</text>
+        </view>
+        <view class="type-item {{is_mail ? 'is-on' : ''}}" data-type="mail" bindtap="onTypeChange">
+          <text class="type-icon">邮</text>
+          <text class="type-item-text">邮寄</text>
+          <text class="type-item-desc">按地址寄送</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 自取 / 邮寄两块用 hidden 切换显隐，不做 wx:if 销毁重建：
+         反复重建 region-picker / datetime-picker 子树会在部分基础库触发 null[0] / 解构报错 -->
+    <view hidden="{{is_mail}}">
+      <view class="form-group">
+        <view class="form-title">自取地点</view>
+        <view class="site-card" wx:if="{{has_site_addr}}">
+          <view class="site-title">请到以下地点领取</view>
+          <view class="site-addr">{{site_address}}</view>
+          <view class="site-contact" wx:if="{{has_site_contact}}">{{site_contact_text}}</view>
+        </view>
+        <view class="site-card site-empty" wx:if="{{show_site_contact_only}}">
+          <view class="site-title">自取地点请联系班主任</view>
+          <view class="site-contact">{{site_contact_text}}</view>
+        </view>
+        <view class="site-card site-empty" wx:if="{{show_site_empty}}">
+          <view class="site-title">暂未设置领取地点，请联系班主任</view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <view class="form-title">到校时间</view>
+        <view bindtap="showDatePicker">
+          <van-field
+            label="大概日期"
+            value="{{pickup_date}}"
+            readonly="{{true}}"
+            placeholder="请选择大概到校日期"
+            is-link
+            required
+            clickable
+          />
+        </view>
+      </view>
+    </view>
+
+    <view hidden="{{is_self_pickup}}">
+      <view class="form-group" wx:if="{{has_last_mail}}">
+        <view class="form-title-row">
+          <text class="form-title">上次地址</text>
+          <text class="form-subtitle">可一键沿用</text>
+        </view>
+        <view class="last-mail-card">
+          <view class="last-mail-text">{{last_mail_text}}</view>
+          <van-button type="default" size="small" bind:click="onUseLastMail" class="add-btn">一键沿用上次地址</van-button>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <view class="form-title">收货地址</view>
+        <van-field
+          label="收件人"
+          value="{{receiver_name}}"
+          data-field="receiver_name"
+          bind:change="onInputChange"
+          placeholder="请输入收件人姓名"
+          maxlength="20"
+          required
+        />
+        <van-field
+          label="收件电话"
+          value="{{receiver_phone}}"
+          data-field="receiver_phone"
+          bind:change="onInputChange"
+          placeholder="请输入11位手机号"
+          type="number"
+          maxlength="11"
+          required
+        />
+        <picker mode="region" value="{{region}}" bindchange="onRegionChange" wx:if="{{has_region}}">
+          <view class="picker-content selected">
+            <text class="picker-text">{{region_text}}</text>
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#969799;"></text>
+          </view>
+        </picker>
+        <picker mode="region" bindchange="onRegionChange" wx:else>
+          <view class="picker-content">
+            <text class="picker-text placeholder">请选择省/市/区</text>
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#969799;"></text>
+          </view>
+        </picker>
+        <van-field
+          label="详细地址"
+          value="{{detail_addr}}"
+          data-field="detail_addr"
+          bind:change="onInputChange"
+          placeholder="请输入街道/门牌号"
+          maxlength="200"
+          required
+        />
+      </view>
+    </view>
+
+    <view class="btn-submit">
+      <van-button type="primary" block loading="{{submitting}}" bind:click="onSubmit">{{submit_btn_text}}</van-button>
+    </view>
+  </view>
+</view>
+
+<van-popup
+  show="{{showDatePicker}}"
+  position="bottom"
+  bind:close="onDatePickerClose"
+>
+  <van-datetime-picker
+    type="date"
+    value="{{currentDate}}"
+    min-date="{{minDate}}"
+    max-date="{{maxDate}}"
+    bind:confirm="onDatePickerConfirm"
+    bind:cancel="onDatePickerClose"
+  />
+</van-popup>

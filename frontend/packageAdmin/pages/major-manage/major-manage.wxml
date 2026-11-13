@@ -1,0 +1,58 @@
+<view class="page-container">
+  <view class="main-container">
+    <!-- 顶部标题栏 -->
+    <view class="header">
+      <text class="header-title">专业费用管理</text>
+      <view class="back-btn" bindtap="goBack">返回</view>
+    </view>
+
+    <!-- 上部：三级联动选择器 -->
+    <view class="picker-panel">
+      <view class="panel-title">选择专业</view>
+      <view class="picker-wrapper">
+        <picker-view class="picker-view" value="{{pickerValue}}" bindchange="onPickerViewChange">
+          <picker-view-column>
+            <view wx:for="{{typeList}}" wx:key="index" class="picker-item">{{item}}</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{levelList}}" wx:key="index" class="picker-item">{{item}}</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{majorList}}" wx:key="index" class="picker-item">{{item}}</view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+    </view>
+
+    <!-- 下部：专业信息和费用编辑 -->
+    <view class="info-panel" wx:if="{{selectedMajor}}">
+      <view class="major-header">
+        <text class="major-name">{{selectedMajor.name}}</text>
+        <view class="major-tags">
+          <text class="tag type-tag">{{selectedTypeName}}</text>
+          <text class="tag level-tag">{{selectedLevelName}}</text>
+        </view>
+      </view>
+      
+      <view class="fee-form">
+        <view class="form-row">
+          <view class="form-item">
+            <text class="form-label">学费（元/年）</text>
+            <input class="form-input" type="number" value="{{editTuition}}" bindinput="onTuitionInput" placeholder="请输入学费"/>
+          </view>
+          <view class="form-item">
+            <text class="form-label">书费（元/年）</text>
+            <input class="form-input" type="number" value="{{editBooks}}" bindinput="onBooksInput" placeholder="请输入书费"/>
+          </view>
+        </view>
+        <button class="save-btn" bindtap="saveFees" disabled="{{saving}}">
+          {{saving ? '保存中...' : '保存修改'}}
+        </button>
+      </view>
+    </view>
+
+    <view class="empty-panel" wx:else>
+      <text class="empty-text">请在上方选择专业</text>
+    </view>
+  </view>
+</view>

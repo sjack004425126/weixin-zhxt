@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "智慧教务平台",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-notice-bar": "@vant/weapp/notice-bar/index"
+  }
+}

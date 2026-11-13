@@ -1,0 +1,17 @@
+/* pages/login-icons-test/login-icons-test.wxss */
+/* 完全复制 login.wxss 中的所有样式，看是否影响图标 */
+/* 如果这页图标全部显示，再对比 icon-isolate 看 login 样式是否会破坏图标 */
+
+/* 关键：import vant-icon 组件样式（与 login 页保持一致） */
+@import "../../components/vant-icon/index.wxss";
+
+/* 关键：从 login.wxss 复制所有自定义样式，看是否冲突 */
+.van-icon {
+  transition: all 0.3s ease !important;
+}
+
+.custom-input-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

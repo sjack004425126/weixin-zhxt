@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的成绩",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#FAFAFA",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

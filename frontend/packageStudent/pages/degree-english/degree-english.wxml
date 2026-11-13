@@ -1,0 +1,125 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部导航 -->
+<view class="page-header-nav">
+  <view class="header-nav-content">
+    <view class="header-nav-icon">
+      <van-icon name="certificate" size="40rpx" />
+    </view>
+    <view class="header-nav-text">
+      <view class="header-nav-title">学位英语</view>
+      <view class="header-nav-subtitle">Degree English</view>
+    </view>
+    <view class="header-nav-action">
+      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+    </view>
+  </view>
+</view>
+
+<!-- 页面容器 -->
+<view class="page-container">
+  <!-- 报名信息卡片 -->
+  <view class="info-card">
+    <view class="card-title">学位英语报名信息</view>
+    <view class="timeline-container">
+      <view class="timeline-item">
+        <view class="timeline-point"></view>
+        <view class="timeline-content">
+          <view class="timeline-label">报名开始</view>
+          <view class="timeline-time">{{examInfo.start_time || '暂未公布'}}</view>
+        </view>
+      </view>
+      <view class="timeline-line"></view>
+      <view class="timeline-item">
+        <view class="timeline-point"></view>
+        <view class="timeline-content">
+          <view class="timeline-label">报名截止</view>
+          <view class="timeline-time">{{examInfo.end_time || '暂未公布'}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 费用卡片 -->
+  <view class="fee-card">
+    <view class="fee-title">考试费用</view>
+    <view class="fee-amount">
+      <text class="fee-symbol">¥</text>{{signOrder.money/100 || '45'}}
+    </view>
+    <view class="fee-notice">您必须先到一网一平台申请，然后再在此处报名及缴费，否则报名无效。</view>
+  </view>
+
+  <!-- 公章容器 -->
+  <view class="stamp-container" wx:if="{{hasOrder && hasPaid}}">
+    <view class="stamp"><text>已报名</text></view>
+    <view class="stamp"><text>已缴费</text></view>
+  </view>
+
+  <!-- 考生信息 -->
+  <view class="info-card">
+    <view class="card-title">考生信息</view>
+    <view class="info-item">
+      <text class="label">姓名</text>
+      <text class="value">{{userInfo.xs_xm || ''}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">学号</text>
+      <text class="value">{{userInfo.xs_xh || ''}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">班级</text>
+      <text class="value">{{userInfo.class_name || ''}}</text>
+    </view>
+  </view>
+
+  <!-- 报名状态步骤条 -->
+  <view class="status-card">
+    <view class="status-title">报名状态</view>
+    <view class="step-flow">
+      <!-- 步骤1：国开报名 -->
+      <view class="step-node {{inList ? 'done' : 'pending'}}">
+        <view class="step-circle">{{inList ? '✓' : '1'}}</view>
+        <view class="step-label">{{inList ? '已国开报名' : '未国开报名'}}</view>
+      </view>
+      <view class="step-arrow {{hasPaid ? 'done' : ''}}">›</view>
+      <!-- 步骤2：缴纳费用 -->
+      <view class="step-node {{hasPaid ? 'done' : (inList ? 'active' : 'pending')}}">
+        <view class="step-circle">{{hasPaid ? '✓' : '2'}}</view>
+        <view class="step-label">缴纳费用</view>
+      </view>
+      <view class="step-arrow {{hasPaid ? 'done' : ''}}">›</view>
+      <!-- 步骤3：审批状态（单节点，直接展示 bkspzt） -->
+      <view class="step-node {{bkspztNodeClass}}">
+        <view class="step-circle">{{bkspztNodeIcon}}</view>
+        <view class="step-label">{{bkspztNodeLabel}}</view>
+      </view>
+    </view>
+    <!-- 审批说明 -->
+    <view class="step-hint" wx:if="{{hasPaid}}">
+      <van-icon name="info-o" size="24rpx" color="#FAAD14" />
+      <text wx:if="{{bkspzt && bkspzt.includes('一级审批通过')}}">一级审批已通过，请等待二级审批，二级审批通过后才算报名成功</text>
+      <text wx:elif="{{bkspzt && bkspzt.includes('二级审批通过')}}">二级审批已通过，报名成功，请按时参加考试</text>
+      <text wx:elif="{{bkspzt && bkspzt.includes('不通过')}}">审批未通过，请联系学校相关部门了解详情</text>
+      <text wx:else>已缴费，二级审批通过才算报名成功</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="button-group">
+    <block wx:if="{{!inList}}">
+      <button class="disabled-btn" disabled>未在国开报名，无法缴费</button>
+    </block>
+    <block wx:elif="{{!hasPaid}}">
+      <button class="primary-btn" bindtap="prePay" disabled="{{paying}}">
+        {{paying ? '支付中...' : '立即缴费'}}
+      </button>
+    </block>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="notice-card" wx:if="{{notice}}">
+    <view class="notice-title">注意事项</view>
+    <view class="notice-content">{{notice}}</view>
+  </view>
+</view> 

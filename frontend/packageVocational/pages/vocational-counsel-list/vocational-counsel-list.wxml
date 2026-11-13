@@ -1,0 +1,77 @@
+<include src="/utils/common-components.wxml" />
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:44rpx;color:#fff;"></text></view>
+    <view class="header-text">
+      <view class="header-title">心理咨询预约</view>
+      <view class="header-subtitle">按号段预约 · 号码即咨询顺序</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#047857;"></text></view>
+  </view>
+</view>
+
+<view class="container">
+  <block wx:if="{{loading}}">
+    <van-loading size="24px" vertical>加载中...</van-loading>
+  </block>
+
+  <block wx:else>
+    <!-- ============ 可预约场次 ============ -->
+    <view wx:if="{{list.length===0}}" class="empty-card">暂无可预约场次</view>
+
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="card-top">
+          <text class="card-title">{{item.title}}</text>
+          <text class="status-chip">{{item.status==='published'?'可预约':'已结束'}}</text>
+        </view>
+        <view class="card-sub">{{item.doctor_name}} · {{item.counsel_date}}</view>
+
+        <view class="slot-list">
+          <block wx:for="{{item.slots}}" wx:for-item="s" wx:key="id">
+            <view class="slot-chip-row">
+              <view class="slot-chip-date">{{s.counsel_date}}</view>
+              <text class="slot-chip-time">{{s.time_range}}</text>
+              <text class="slot-chip-meta">{{s.category}}{{s.location?' · '+s.location:''}}</text>
+              <text class="slot-chip-left {{s.left>0?'ok':'full'}}">{{s.left>0 ? '余'+s.left : '已满'}}</text>
+            </view>
+          </block>
+        </view>
+
+        <view wx:if="{{item.mine}}" class="mine">我的号：{{item.mine.display_no}}（{{item.mine.status}}）→ 点击查看</view>
+      </view>
+    </block>
+
+    <!-- ============ 历史预约记录（近期5条，可展开） ============ -->
+    <view class="card history-card">
+      <view class="card-head" bindtap="toggleHistory">
+        <text class="card-title-text">我的预约记录</text>
+        <view class="toggle-btn" wx:if="{{historyCanToggle}}">
+          <text class="muted-tip">{{historyToggleText}}</text>
+          <text class="toggle-arrow {{historyExpanded ? 'up' : ''}}">›</text>
+        </view>
+        <text class="muted-tip-static" wx:else>{{historyToggleText}}</text>
+      </view>
+
+      <view wx:if="{{historyAll.length===0}}" class="empty">暂无预约记录</view>
+
+      <!-- 单列表渲染：折叠/收起只替换 history 数组（全量 copy / 前5 copy），避免双 block 显隐不同步 -->
+      <block wx:for="{{history}}" wx:key="booking_id">
+        <view class="history-row">
+          <view class="history-left">
+            <text class="history-code">{{item.display_no}}</text>
+            <view class="history-meta">
+              <text>{{item.counsel_date}} {{item.slot_time}}</text>
+            </view>
+            <view class="history-meta">
+              <text>{{item.category||'心理咨询'}}{{item.location?' · '+item.location:''}}</text>
+            </view>
+          </view>
+          <text class="history-status {{item.status}}">{{item.status_text}}</text>
+        </view>
+      </block>
+
+      <view wx:if="{{historyTipShow}}" class="history-tip">{{historyTipText}}</view>
+    </view>
+  </block>
+</view>

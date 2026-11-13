@@ -1,0 +1,6 @@
+<view class="fee-toast {{ show ? 'show' : '' }}">
+  <view class="major-name">{{ majorName }}</view>
+  <view class="fee-item">学费：{{ tuition }}元/年</view>
+  <view class="fee-item">教材费：{{ books }}元/年</view>
+  <view class="fee-item total">总计：{{ total }}元/年</view>
+</view> 

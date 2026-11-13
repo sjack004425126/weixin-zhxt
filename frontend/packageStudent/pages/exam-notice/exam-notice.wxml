@@ -1,0 +1,151 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部导航 -->
+<view class="page-header-nav">
+  <view class="header-nav-content">
+    <view class="header-nav-icon">
+      <van-icon name="calendar-o" size="40rpx" />
+    </view>
+    <view class="header-nav-text">
+      <view class="header-nav-title">考试通知单</view>
+      <view class="header-nav-subtitle">Exam Notice</view>
+    </view>
+    <view class="header-nav-action">
+      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <block wx:if="{{studentInfo > 0}}">
+    <!-- 学生信息 -->
+    <view class="student-info">
+      <view class="card-header">
+        <view class="header-icon">
+          <van-icon name="contact" size="32rpx" />
+        </view>
+        <text class="card-title">考生信息</text>
+      </view>
+      <view class="info-grid">
+        <view class="info-item">
+          <view class="item-icon">
+            <van-icon name="user-o" size="24rpx" />
+          </view>
+          <text class="label">姓名</text>
+          <text class="value">{{studentInfo.name}}</text>
+        </view>
+        <view class="info-item">
+          <view class="item-icon">
+            <van-icon name="idcard" size="24rpx" />
+          </view>
+          <text class="label">学号</text>
+          <text class="value">{{studentInfo.student_no}}</text>
+        </view>
+        <view class="info-item">
+          <view class="item-icon">
+            <van-icon name="medal" size="24rpx" />
+          </view>
+          <text class="label">学籍状态</text>
+          <text class="value status-{{studentInfo.status === '在读' ? 'active' : 'inactive'}}">{{studentInfo.status}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 考试列表 -->
+    <view class="exam-list">
+      <view class="exam-item" wx:for="{{exams}}" wx:key="paper_no">
+        <view class="exam-header">
+          <view class="subject-info">
+            <view class="subject-icon">
+              <van-icon name="edit" size="28rpx" />
+            </view>
+            <text class="subject">{{item.subject}}</text>
+          </view>
+          <view class="type-badge type-{{item.exam_type === '正考' ? 'normal' : 'makeup'}}">
+            <van-icon name="{{item.exam_type === '正考' ? 'passed' : 'replay'}}" size="20rpx" />
+            <text>{{item.exam_type}}</text>
+          </view>
+        </view>
+
+        <view class="exam-info">
+          <view class="info-section">
+            <view class="section-title">
+              <van-icon name="clock-o" size="24rpx" />
+              <text>考试安排</text>
+            </view>
+            <view class="info-grid-exam">
+              <view class="info-row" wx:if="{{item.exam_date}}">
+                <view class="row-icon">
+                  <van-icon name="calendar-o" size="20rpx" />
+                </view>
+                <text class="label">考试日期</text>
+                <text class="value highlight">{{item.exam_date}}</text>
+              </view>
+              <view class="info-row" wx:if="{{item.exam_time}}">
+                <view class="row-icon">
+                  <van-icon name="clock" size="20rpx" />
+                </view>
+                <text class="label">考试时间</text>
+                <text class="value highlight">{{item.exam_time}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="info-section">
+            <view class="section-title">
+              <van-icon name="location-o" size="24rpx" />
+              <text>考场信息</text>
+            </view>
+            <view class="info-grid-exam">
+              <view class="info-row" wx:if="{{item.room_no}}">
+                <view class="row-icon">
+                  <van-icon name="shop-o" size="20rpx" />
+                </view>
+                <text class="label">考场</text>
+                <text class="value">{{item.room_no}}</text>
+              </view>
+              <view class="info-row" wx:if="{{item.seat_no}}">
+                <view class="row-icon">
+                  <van-icon name="friends-o" size="20rpx" />
+                </view>
+                <text class="label">座位号</text>
+                <text class="value">{{item.seat_no}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="info-section">
+            <view class="section-title">
+              <van-icon name="description" size="24rpx" />
+              <text>其他信息</text>
+            </view>
+            <view class="info-grid-exam">
+              <view class="info-row">
+                <view class="row-icon">
+                  <van-icon name="newspaper-o" size="20rpx" />
+                </view>
+                <text class="label">试卷号</text>
+                <text class="value">{{item.paper_no}}</text>
+              </view>
+              <view class="info-row">
+                <view class="row-icon">
+                  <van-icon name="{{item.is_makeup === '是' ? 'replay' : 'passed'}}" size="20rpx" />
+                </view>
+                <text class="label">是否补考</text>
+                <text class="value makeup-{{item.is_makeup === '是' ? 'yes' : 'no'}}">{{item.is_makeup}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <van-empty
+    wx:else
+    class="empty-state"
+    description="当前未到考试时间，还没有考试通知单"
+    image="search"
+  />
+</view> 

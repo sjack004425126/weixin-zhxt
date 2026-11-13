@@ -1,0 +1,17 @@
+{
+  "navigationBarTitleText": "校园反馈管理",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-search": "@vant/weapp/search/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-switch": "@vant/weapp/switch/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-dialog": "@vant/weapp/dialog/index"
+  }
+}

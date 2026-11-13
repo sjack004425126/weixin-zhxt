@@ -1,0 +1,207 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-content">
+      <view class="title-section">
+        <van-icon name="gold-coin-o" size="48rpx" color="#1890FF" />
+        <text class="title">老生缴费</text>
+      </view>
+      <view class="stats-info">
+        <text class="stats-text">第{{currentTerm}}学期</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学生信息卡片 -->
+  <view wx:if="{{studentInfo}}" class="student-info-card">
+    <!-- 卡片状态指示器 -->
+    <view class="status-indicator info-indicator"></view>
+
+    <!-- 卡片头部 -->
+    <view class="card-header">
+      <view class="header-left">
+        <van-icon name="contact" size="28rpx" />
+        <text class="card-title">学生信息</text>
+      </view>
+    </view>
+
+    <!-- 学生信息网格 -->
+    <view class="card-content">
+      <view class="info-grid">
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="user-o" size="20rpx" />
+            <text>姓名</text>
+          </view>
+          <text class="info-value">{{studentInfo.xm}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="idcard" size="20rpx" />
+            <text>学号</text>
+          </view>
+          <text class="info-value">{{studentInfo.xh}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="home-o" size="20rpx" />
+            <text>班级</text>
+          </view>
+          <text class="info-value">{{studentInfo.bj_mc}}</text>
+        </view>
+        <view class="info-item">
+          <view class="info-label">
+            <van-icon name="bookmark-o" size="20rpx" />
+            <text>专业</text>
+          </view>
+          <text class="info-value">{{studentInfo.zy_mc}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 缴费记录列表 -->
+  <view class="records-list">
+    <block wx:if="{{semesterPayments && semesterPayments.length > 0}}">
+      <view class="semester-card {{item.status === 'paid' ? 'paid-card' : (item.can_pay ? 'unpaid-card' : 'disabled-card')}}" wx:for="{{semesterPayments}}" wx:key="term_number">
+        <!-- 卡片状态指示器 -->
+        <view class="status-indicator {{item.status === 'paid' ? 'paid-indicator' : (item.can_pay ? 'unpaid-indicator' : 'disabled-indicator')}}"></view>
+
+        <!-- 卡片头部 -->
+        <view class="record-header">
+          <view class="semester-info">
+            <view class="semester-title">
+              <van-icon name="calendar-o" size="28rpx" />
+              <text>{{item.term_desc}}</text>
+            </view>
+          </view>
+          <view class="status-badge {{item.status === 'paid' ? 'paid' : (item.can_pay ? 'unpaid' : 'disabled')}}">
+            <van-icon name="{{item.status === 'paid' ? 'passed' : (item.can_pay ? 'clock-o' : 'warning-o')}}" size="24rpx" />
+            <text>{{item.status === 'paid' ? '已缴费' : (item.can_pay ? '待缴费' : '无需缴费')}}</text>
+          </view>
+        </view>
+
+        <!-- 费用详情 -->
+        <view class="record-content">
+          <view class="fee-grid">
+            <view class="fee-item">
+              <view class="fee-label">
+                <van-icon name="home-o" size="24rpx" />
+                <text>住宿费</text>
+              </view>
+              <text class="fee-value">¥{{item.zsf}}</text>
+            </view>
+            <view class="fee-item">
+              <view class="fee-label">
+                <van-icon name="book-o" size="24rpx" />
+                <text>书费</text>
+              </view>
+              <text class="fee-value">¥{{item.sf}}</text>
+            </view>
+          </view>
+
+          <view class="total-amount">
+            <view class="total-label">
+              <van-icon name="balance-pay" size="28rpx" />
+              <text>应付金额</text>
+            </view>
+            <text class="total-value">¥{{item.total_fee}}</text>
+          </view>
+        </view>
+
+        <!-- 时间信息 -->
+        <view class="record-footer" wx:if="{{item.pay_time}}">
+          <view class="time-info">
+            <view class="time-item">
+              <van-icon name="passed" size="20rpx" />
+              <text>缴费时间：{{item.pay_time}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- needPay 为 false 时展示不缴费原因 -->
+        <view class="no-pay-reasons" wx:if="{{!item.can_pay && item.no_pay_reasons && item.no_pay_reasons.length > 0}}">
+          <view class="reason-item" wx:for="{{item.no_pay_reasons}}" wx:for-item="reason" wx:key="*this">
+            <van-icon name="info-o" size="22rpx" />
+            <text>{{reason}}</text>
+          </view>
+        </view>
+
+        <!-- 操作按钮：needPay 为 true 且（无订单或未支付）时展示 -->
+        <view class="record-actions" wx:if="{{item.can_pay}}">
+          <view class="pay-notice">
+            <van-icon name="info-o" size="20rpx" />
+            <text>当前学期费用待缴纳</text>
+          </view>
+          <van-button
+            wx:if="{{item.order_no}}"
+            type="primary"
+            size="large"
+            round
+            color="#1890FF"
+            bind:click="payCurrentSemester"
+            data-term="{{item.term_number}}"
+            data-order="{{item.order_no}}"
+            icon="balance-pay"
+          >
+            立即缴费 ¥{{item.total_fee}}
+          </van-button>
+          <van-button
+            wx:else
+            type="primary"
+            size="large"
+            round
+            color="#1890FF"
+            bind:click="createCurrentSemesterOrder"
+            data-term="{{item.term_number}}"
+            icon="balance-pay"
+          >
+            立即缴费 ¥{{item.total_fee}}
+          </van-button>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-container" wx:if="{{!semesterPayments || semesterPayments.length === 0}}">
+      <van-empty
+        image="https://img.yzcdn.cn/vant/custom-empty-image.png"
+        description="暂无缴费记录"
+      >
+        <van-button
+          round
+          type="primary"
+          color="#1890FF"
+          bind:click="retry"
+        >
+          刷新数据
+        </van-button>
+      </van-empty>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <van-loading size="24px" color="#1890FF">加载中...</van-loading>
+  </view>
+
+  <!-- 错误信息 -->
+  <view wx:if="{{errorMsg}}" class="error-container">
+    <van-empty
+      image="error"
+      description="{{errorMsg}}"
+    >
+      <van-button
+        round
+        type="primary"
+        color="#1890FF"
+        bind:click="retry"
+      >
+        重试
+      </van-button>
+    </van-empty>
+  </view>
+</view>
+

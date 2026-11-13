@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "隔离测试",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

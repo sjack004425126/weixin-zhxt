@@ -1,0 +1,258 @@
+page {
+  background: #F5F7FA;
+  --primary: #1890FF;
+  --primary-light: #E6F7FF;
+}
+.page { padding: 0 0 200rpx; }
+
+/* ===== 顶部横幅 ===== */
+.user-hero {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+  padding: 28rpx 28rpx;
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.18);
+  margin-bottom: 24rpx;
+}
+.user-avatar {
+  width: 84rpx; height: 84rpx; border-radius: 42rpx;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+.user-meta { flex: 1; min-width: 0; }
+.user-name-row {
+  display: flex; align-items: center; gap: 12rpx;
+  font-size: 32rpx; line-height: 1.3;
+}
+.user-name {
+  font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 260rpx;
+}
+.user-tag { font-size: 24rpx; opacity: 0.88; margin-top: 6rpx; }
+
+.admin-badge {
+  display: inline-flex; align-items: center;
+  padding: 2rpx 14rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 500;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+.hero-icons {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  flex-shrink: 0;
+}
+.icon-btn {
+  width: 64rpx; height: 64rpx; border-radius: 32rpx;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .15s, background .15s;
+}
+.icon-btn van-icon { color: #fff !important; }
+.icon-btn-hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0.95);
+}
+.icon-btn.admin {
+  background: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 36, 88, 0.2);
+}
+.icon-btn.admin van-icon { color: #1890FF !important; }
+
+/* ===== 卡片基础 ===== */
+.card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 28rpx;
+  margin: 0 24rpx 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+.field-label {
+  font-size: 28rpx; color: #262626; font-weight: 600; margin-bottom: 16rpx;
+}
+.field-label.mt { margin-top: 24rpx; }
+.dot { color: #FF4D4F; margin-right: 4rpx; }
+
+/* ===== 分类切换 ===== */
+.seg-card { padding: 16rpx; }
+.seg {
+  display: flex; gap: 12rpx;
+  background: #F5F7FA; border-radius: 16rpx; padding: 8rpx;
+}
+.seg-item {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8rpx;
+  padding: 22rpx 0;
+  border-radius: 12rpx; font-size: 28rpx; color: #595959;
+  transition: all 0.2s;
+}
+.seg-item van-icon { color: inherit !important; }
+.seg-item.seg-active.repair {
+  background: #fff; color: #FA541C; font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(250,84,28,0.18);
+}
+.seg-item.seg-active.suggest {
+  background: #fff; color: #13C2C2; font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(19,194,194,0.18);
+}
+.seg-tip { padding: 16rpx 16rpx 4rpx; color: #8C8C8C; font-size: 24rpx; }
+
+/* ===== 维修类型 / 维修地点 chips 通用 ===== */
+.chips {
+  display: flex; flex-wrap: wrap; gap: 16rpx;
+}
+.chip {
+  padding: 14rpx 28rpx;
+  background: #F5F7FA; color: #595959;
+  border-radius: 32rpx; font-size: 26rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+.chip-active {
+  background: var(--primary-light); color: var(--primary);
+  border-color: var(--primary); font-weight: 600;
+}
+.custom-input { margin-top: 16rpx; }
+
+.text-input {
+  background: #F5F7FA; border-radius: 12rpx;
+  padding: 22rpx 24rpx; font-size: 28rpx; color: #262626;
+}
+.textarea {
+  background: #F5F7FA; border-radius: 12rpx;
+  padding: 22rpx 24rpx; font-size: 28rpx;
+  width: 100%; min-height: 180rpx; box-sizing: border-box;
+}
+.char-count { text-align: right; font-size: 22rpx; color: #BFBFBF; margin-top: 8rpx; }
+
+/* ===== 行式开关卡 ===== */
+.row-card { display: flex; align-items: center; justify-content: space-between; }
+.row-label { display: flex; align-items: center; gap: 12rpx; font-size: 28rpx; color: #262626; }
+
+/* ===== 媒体 ===== */
+.img-grid { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.img-item, .img-add {
+  width: 200rpx; height: 200rpx; border-radius: 12rpx; overflow: hidden;
+  position: relative;
+}
+.img-item image { width: 100%; height: 100%; }
+.video-thumb {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #1f2937, #374151);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.video-poster {
+  position: absolute; left: 0; top: 0;
+  width: 100%; height: 100%;
+}
+.video-play {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 72rpx; height: 72rpx;
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 2rpx 6rpx rgba(0,0,0,0.4));
+}
+.video-tag {
+  position: absolute; left: 8rpx; bottom: 8rpx;
+  padding: 2rpx 12rpx; border-radius: 8rpx;
+  background: rgba(0,0,0,0.55); color: #fff; font-size: 20rpx;
+}
+.img-del {
+  position: absolute; top: 8rpx; right: 8rpx;
+  width: 40rpx; height: 40rpx; border-radius: 20rpx;
+  background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+}
+.img-add {
+  background: #F5F7FA; border: 2rpx dashed #D9D9D9;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #BFBFBF; font-size: 24rpx; gap: 8rpx;
+}
+
+.agree-tip {
+  display: flex; align-items: center; gap: 8rpx;
+  color: #8C8C8C; font-size: 24rpx; padding: 8rpx 16rpx 24rpx;
+}
+
+.submit-bar {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0,0,0,0.04);
+  z-index: 99;
+}
+
+/* ===== 字典加载态 ===== */
+.dict-loading { color: #999; font-size: 24rpx; padding: 8rpx 0; }
+.dict-empty { color: #999; font-size: 24rpx; padding: 16rpx 0; }
+
+/* ===== 维修地点 sections（2026-09-28：chips 直接展示） ===== */
+.loc-section {
+  margin-top: 8rpx;
+}
+.loc-section:first-child {
+  margin-top: 0;
+}
+.loc-section-title {
+  font-size: 26rpx;
+  color: #8C8C8C;
+  margin-bottom: 12rpx;
+  padding-left: 4rpx;
+  font-weight: 500;
+}
+
+/* 2026-09-28：chip 按下时的视觉反馈（确认事件能命中） */
+.chip-hover {
+  transform: scale(0.96);
+  background: #B7E1FF !important;
+  color: #fff !important;
+  border-color: #1890FF !important;
+}
+
+/* 2026-09-28：地点备注（嵌在维修地点卡片里） */
+.loc-remark-card {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx dashed #E8E8E8;
+}
+
+/* 2026-09-28：chips 拼出来的只读预览（用户不能改） */
+.loc-readonly {
+  background: #F5F7FA;
+  border: 1rpx dashed #BFBFBF;
+  border-radius: 12rpx;
+  padding: 18rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+.loc-readonly-empty {
+  background: #FAFAFA;
+  border-style: dashed;
+}
+.loc-readonly-text {
+  font-size: 28rpx;
+  color: #262626;
+  word-break: break-all;
+}
+.loc-readonly-empty .loc-readonly-text {
+  color: #BFBFBF;
+}
+.loc-remark-textarea {
+  min-height: 88rpx;
+}
+
+.loc-tip-info {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
+  padding-left: 4rpx;
+}

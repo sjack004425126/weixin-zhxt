@@ -1,0 +1,213 @@
+/* 全局主题色彩配置 */
+/* 这个文件定义了整个应用的主题色彩系统 */
+
+/* 主题色彩变量 */
+page {
+  /* 主色调 - 蓝色系 */
+  --primary-color: #1890FF;
+  --primary-light: #E6F7FF;
+  --primary-dark: #0050B3;
+  --primary-gradient: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+  
+  /* 辅助色彩 */
+  --success-color: #52C41A;
+  --warning-color: #FAAD14;
+  --error-color: #FF4D4F;
+  --info-color: #1890FF;
+  
+  /* 文字颜色 */
+  --text-main: #333333;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --text-disabled: #BFBFBF;
+  
+  /* 背景颜色 */
+  --bg-white: #FFFFFF;
+  --bg-gray: #F7F8FA;
+  --bg-light: #FAFBFC;
+  
+  /* 边框颜色 */
+  --border-color: #EEEEEE;
+  --border-light: #F0F0F0;
+  
+  /* 阴影效果 */
+  --card-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.08);
+  --card-shadow-hover: 0 8rpx 24rpx rgba(24, 144, 255, 0.12);
+  --card-shadow-active: 0 2rpx 8rpx rgba(24, 144, 255, 0.15);
+  
+  /* 圆角大小 */
+  --border-radius-sm: 8rpx;
+  --border-radius-md: 12rpx;
+  --border-radius-lg: 16rpx;
+  --border-radius-xl: 20rpx;
+  
+  /* 间距大小 */
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+  
+  /* 字体大小 */
+  --font-size-xs: 20rpx;
+  --font-size-sm: 24rpx;
+  --font-size-md: 28rpx;
+  --font-size-lg: 32rpx;
+  --font-size-xl: 36rpx;
+  --font-size-xxl: 40rpx;
+  
+  /* 动画时长 */
+  --animation-duration-fast: 0.2s;
+  --animation-duration-base: 0.3s;
+  --animation-duration-slow: 0.5s;
+  
+  /* 层级 */
+  --z-index-base: 1;
+  --z-index-popup: 100;
+  --z-index-modal: 1000;
+  --z-index-toast: 2000;
+}
+
+/* 全局通用样式 */
+.theme-primary {
+  color: var(--primary-color) !important;
+}
+
+.theme-primary-bg {
+  background-color: var(--primary-color) !important;
+}
+
+.theme-primary-border {
+  border-color: var(--primary-color) !important;
+}
+
+.theme-gradient-bg {
+  background: var(--primary-gradient) !important;
+}
+
+.theme-card-shadow {
+  box-shadow: var(--card-shadow) !important;
+}
+
+.theme-card-shadow-hover {
+  box-shadow: var(--card-shadow-hover) !important;
+}
+
+/* 状态标签通用样式 */
+.status-tag {
+  font-size: var(--font-size-xs);
+  padding: 4rpx 16rpx;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--animation-duration-base) ease;
+}
+
+.status-tag.primary {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--primary-color);
+  border: 1rpx solid rgba(24, 144, 255, 0.2);
+}
+
+.status-tag.success {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--success-color);
+  border: 1rpx solid rgba(82, 196, 26, 0.2);
+}
+
+.status-tag.warning {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--warning-color);
+  border: 1rpx solid rgba(250, 173, 20, 0.2);
+}
+
+.status-tag.error {
+  background: rgba(255, 77, 79, 0.1);
+  color: var(--error-color);
+  border: 1rpx solid rgba(255, 77, 79, 0.2);
+}
+
+/* 按钮通用样式 */
+.theme-button-primary {
+  background: var(--primary-gradient) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: all var(--animation-duration-base) ease !important;
+}
+
+.theme-button-primary:hover {
+  box-shadow: var(--card-shadow-hover) !important;
+  transform: translateY(-2rpx) !important;
+}
+
+.theme-button-primary:active {
+  box-shadow: var(--card-shadow-active) !important;
+  transform: translateY(0) !important;
+}
+
+/* 卡片通用样式 */
+.theme-card {
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  transition: all var(--animation-duration-base) ease;
+}
+
+.theme-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2rpx);
+}
+
+.theme-card-header {
+  position: relative;
+}
+
+.theme-card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: var(--primary-gradient);
+}
+
+/* 标题装饰样式 */
+.theme-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-main);
+  position: relative;
+  padding-left: var(--spacing-md);
+  display: flex;
+  align-items: center;
+}
+
+.theme-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 32rpx;
+  background: var(--primary-gradient);
+  border-radius: 3rpx;
+  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.3);
+}
+
+/* 渐变背景样式 */
+.theme-gradient-background {
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-gray) 100%);
+}
+
+/* 响应式工具类 */
+@media (max-width: 750rpx) {
+  .theme-responsive-padding {
+    padding: var(--spacing-sm) !important;
+  }
+  
+  .theme-responsive-margin {
+    margin: var(--spacing-sm) !important;
+  }
+}

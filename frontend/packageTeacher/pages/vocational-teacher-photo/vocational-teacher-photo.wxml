@@ -1,0 +1,131 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:inherit;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">照片管理</view>
+      <view class="header-subtitle">Photo Management</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 班级选择和筛选 -->
+  <view class="filter-bar">
+    <van-dropdown-menu>
+      <van-dropdown-item value="{{ selectedClassId }}" bind:change="onClassChange" options="{{ classOptions }}" />
+      <van-dropdown-item value="{{ filterType }}" bind:change="onFilterChange" options="{{ [{ text: '全部', value: 'all' }, { text: '有照片', value: 'has' }, { text: '无照片', value: 'none' }] }}" />
+      <van-dropdown-item value="{{ xjztFilter }}" bind:change="onXjztFilterChange" options="{{ xjztOptions }}" />
+    </van-dropdown-menu>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-bar" wx:if="{{!loading && studentList.length > 0}}">
+    <view class="stats-item">
+      <text class="stats-label">共</text>
+      <text class="stats-value">{{totalCount}}</text>
+      <text class="stats-label">人</text>
+    </view>
+    <view class="stats-item has">
+      <text class="stats-label">有照片</text>
+      <text class="stats-value">{{hasPhotoCount}}</text>
+      <text class="stats-label">人</text>
+    </view>
+    <view class="stats-item no">
+      <text class="stats-label">无照片</text>
+      <text class="stats-value">{{noPhotoCount}}</text>
+      <text class="stats-label">人</text>
+    </view>
+  </view>
+
+  <!-- 照片墙内容 -->
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+    <view wx:elif="{{studentList.length === 0}}" class="empty-state">
+      <van-empty description="暂无学生数据" />
+    </view>
+
+    <view wx:else class="photo-wall">
+      <view 
+        class="photo-item {{item.headphoto === 1 ? 'has-photo' : 'no-photo'}}" 
+        wx:for="{{filteredStudentList || studentList}}" 
+        wx:key="id"
+      >
+        <!-- 序号 -->
+        <view class="photo-index">{{item.displayIndex || (index + 1)}}</view>
+        
+        <!-- 上传按钮 -->
+        <view
+          class="upload-btn {{uploadingStudentId === item.id ? 'uploading' : ''}}"
+          catchtap="chooseUploadMethod"
+          data-student-id="{{item.id}}"
+          data-student-name="{{item.xs_xm}}"
+        >
+          <block wx:if="{{uploadingStudentId === item.id}}">
+            <view class="upload-spinner"></view>
+          </block>
+          <block wx:else>
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#fff;"></text>
+          </block>
+        </view>
+
+        <view class="photo-avatar" bindtap="previewPhoto" data-url="{{item.photo_url}}" data-name="{{item.xs_xm}}">
+          <image
+            wx:if="{{item.photo_url}}"
+            src="{{item.photo_url}}"
+            mode="aspectFill"
+          ></image>
+          <view wx:else class="avatar-placeholder">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:60rpx;color:{{item.headphoto === 1 ? '#52c41a' : '#999'}};"></text>
+          </view>
+          <view class="photo-status-badge {{item.headphoto === 1 ? 'status-yes' : 'status-no'}}">
+            <block wx:if="{{item.headphoto === 1}}">
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;"></text>
+            </block>
+            <block wx:else>
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;"></text>
+            </block>
+          </view>
+        </view>
+        
+        <view class="photo-info">
+          <view class="photo-name-row">
+            <view class="photo-name">{{item.xs_xm}}</view>
+            <view class="photo-xjzt xjzt-{{item.xjzt}}" wx:if="{{item.xjzt}}">
+              {{xjztMap[item.xjzt]}}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 处理中遮罩层（稳定遮罩，不闪屏） -->
+<view class="processing-overlay" wx:if="{{processingOverlay.show}}">
+  <view class="processing-mask"></view>
+  <view class="processing-content">
+    <view class="processing-icon-wrap">
+      <view class="processing-ring"></view>
+      <text class="vi processing-icon" style="font-family:vant-icon,sans-serif;font-size:56rpx;color:#fff;"></text>
+    </view>
+    <view class="processing-title">{{processingOverlay.title}}</view>
+    <view class="processing-step" wx:if="{{processingOverlay.step}}">{{processingOverlay.step}}</view>
+    <view class="processing-bar-wrap" wx:if="{{processingOverlay.progress >= 0}}">
+      <view class="processing-bar">
+        <view class="processing-bar-fill" style="width: {{processingOverlay.progress}}%"></view>
+      </view>
+      <view class="processing-percent">{{processingOverlay.progress}}%</view>
+    </view>
+    <view class="processing-tip">{{processingOverlay.tip}}</view>
+  </view>
+</view>

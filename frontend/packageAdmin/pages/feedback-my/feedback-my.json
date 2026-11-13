@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "我的反馈",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-tag": "@vant/weapp/tag/index"
+  }
+}

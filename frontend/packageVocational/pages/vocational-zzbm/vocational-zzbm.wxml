@@ -1,0 +1,606 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="container">
+
+  <!-- ===== 粘性头部 + 步骤条 ===== -->
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-icon">
+        <van-icon name="edit" size="40rpx" />
+      </view>
+      <view class="header-text">
+        <view class="header-title">{{isEditMode ? '修改报名' : '志愿填报'}}</view>
+        <view class="header-subtitle">
+          {{isEditMode ? '通过查询码修改已提交信息' : '中高职贯通报名'}}
+        </view>
+        <view wx:if="{{isEditMode}}" class="header-mode-tag header-mode-tag-edit">编辑模式</view>
+        <view wx:elif="{{isNewRegistration}}" class="header-mode-tag header-mode-tag-new">新报名（名额已抢占）</view>
+        <view wx:else class="header-mode-tag header-mode-tag-new">新报名模式</view>
+      </view>
+      <view class="step-badge">{{ currentStep + 1 }} / {{stepList.length}}</view>
+    </view>
+
+    <!-- 步骤指示器 -->
+    <view class="step-bar">
+      <block wx:for="{{stepList}}" wx:key="index">
+        <view class="step-node {{index === currentStep ? 'active' : ''}} {{index < currentStep ? 'done' : ''}}">
+          <view class="step-dot">
+            <text wx:if="{{index < currentStep}}">✓</text>
+            <text wx:else>{{index + 1}}</text>
+          </view>
+          <text class="step-label">{{item}}</text>
+        </view>
+        <view wx:if="{{index < stepList.length - 1}}" class="step-connector {{index < currentStep ? 'done' : ''}}"></view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 推广横幅 -->
+  <view wx:if="{{ isPromotionEntry }}" class="promotion-banner">
+    <view class="promotion-icon">🎯</view>
+    <view class="promotion-text">
+      <view class="promotion-title">推广专属通道</view>
+      <view class="promotion-subtitle">{{ promotionIntroducer }} 老师为您推荐</view>
+    </view>
+    <view class="promotion-badge">专属</view>
+  </view>
+
+  <view class="form-container">
+
+    <!-- ===== 缴费状态卡片（编辑模式显示） ===== -->
+    <view wx:if="{{isEditMode && paymentInfo && currentStep === 0}}" class="payment-status-card {{paymentInfo.has_paid ? 'paid' : 'unpaid'}}">
+      <view class="payment-status-header">
+        <view class="payment-status-icon">{{paymentInfo.has_paid ? '✓' : '!'}}</view>
+        <view class="payment-status-text">
+          <view class="payment-status-title">缴费状态：{{paymentInfo.status_text}}</view>
+          <view wx:if="{{paymentInfo.has_paid && paymentInfo.amount}}" class="payment-status-detail">
+            金额：¥{{paymentInfo.amount / 100}}元　{{paymentInfo.pay_time ? '时间：' + paymentInfo.pay_time : ''}}
+          </view>
+        </view>
+      </view>
+      <button wx:if="{{!paymentInfo.has_paid}}" class="payment-go-btn" bindtap="goToPayment">去缴费</button>
+    </view>
+
+    <!-- ========== Step 0: 身份证和电话 ========== -->
+    <view wx:if="{{currentStep === 0}}" class="step-content">
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="idcard" size="32rpx" color="#1890FF" />
+          <text>身份验证</text>
+        </view>
+
+        <view class="step-intro">
+          <van-icon name="info-o" size="28rpx" />
+          <text>请填写身份证号和学生电话，系统将自动查询您的报名状态</text>
+        </view>
+
+        <van-field
+          value="{{ bmxs.sfzh }}" data-name="sfzh"
+          label="身份证号" placeholder="请输入身份证号"
+          required bind:change="onFieldChange" />
+
+        <van-field
+          value="{{ bmxs.xsdh }}" data-name="xsdh"
+          label="学生电话" placeholder="请输入学生电话"
+          required bind:change="onFieldChange" />
+      </view>
+    </view>
+
+    <!-- ========== Step 1: 专业选择 ========== -->
+    <view wx:if="{{currentStep === 1}}" class="step-content">
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="school-o" size="32rpx" color="#1890FF" />
+          <text>专业选择</text>
+        </view>
+
+        <!-- 编辑模式下也可选择专业 -->
+        <view wx:if="{{isEditMode}}" class="edit-mode-notice">
+          <van-icon name="info-o" size="28rpx" color="#1890FF" />
+          <text>修改专业将在提交时检查名额，请确认后再提交</text>
+        </view>
+
+        <view class="picker-card" bindtap="openMajorPicker">
+          <view class="picker-card-icon">📚</view>
+          <view class="picker-card-body">
+            <view class="picker-card-label">报读专业 / 贯通院校<text class="req-star">*</text></view>
+            <view class="picker-card-value {{bmxs.bdzy ? 'has-value' : 'placeholder'}}">
+              {{ bmxs.bdzy ? bdzyArray[0][bdzyIndex[0]].name : '点击选择报读专业 →' }}
+            </view>
+          </view>
+          <van-icon name="arrow" size="32rpx" color="#BFBFBF" />
+        </view>
+      </view>
+
+      <!-- 选择结果展示卡 -->
+      <view wx:if="{{bmxs.bdzy && bdzyArray[1] && bdzyIndex[1] !== undefined}}" class="selection-result-card">
+        <view class="src-header">
+          <view class="src-title">已选择专业</view>
+          <view class="src-tag">{{ bdzyArray[1][bdzyIndex[1]].remark }}</view>
+        </view>
+        <view class="src-grid">
+          <view class="src-item">
+            <view class="src-item-label">报读专业</view>
+            <view class="src-item-value primary">{{ bdzyArray[0][bdzyIndex[0]].name }}</view>
+          </view>
+          <view class="src-item">
+            <view class="src-item-label">贯通专业</view>
+            <view class="src-item-value">{{ bdzyArray[1][bdzyIndex[1]].cooperation_major }}</view>
+          </view>
+          <view class="src-item full">
+            <view class="src-item-label">贯通院校</view>
+            <view class="src-item-value primary">{{ bdzyArray[1][bdzyIndex[1]].cooperation_school }}</view>
+          </view>
+          <view class="src-item {{bdzyArray[1][bdzyIndex[1]].remaining <= 10 ? 'warn' : ''}}">
+            <view class="src-item-label">剩余名额</view>
+            <view class="src-item-value {{bdzyArray[1][bdzyIndex[1]].remaining <= 10 ? 'warn-text' : 'ok-text'}}">
+              {{ bdzyArray[1][bdzyIndex[1]].remaining }} 个
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+
+    <!-- ========== Step 3: 基本信息 ========== -->
+    <view wx:if="{{currentStep === 2}}" class="step-content">
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="contact" size="32rpx" color="#1890FF" />
+          <text>基本信息</text>
+        </view>
+
+        <van-field
+          value="{{ bmxs.xm }}" data-name="xm"
+          label="姓名" placeholder="请输入姓名"
+          required bind:change="onFieldChange" />
+
+        <picker bindchange="xbPickerChange" value="{{xbIndex}}" range="{{xbArray || []}}">
+          <van-field value="{{ bmxs.xb }}" label="性别" placeholder="请选择性别" readonly is-link required />
+        </picker>
+
+        <van-field
+          value="{{ bmxs.sfzh }}" data-name="sfzh"
+          label="身份证号" placeholder="请输入身份证号"
+          required bind:change="onFieldChange" />
+
+        <picker bindchange="mzPickerChange" value="{{mzIndex}}" range="{{mzArray || []}}">
+          <van-field value="{{ mzArray[mzIndex] || '' }}" label="民族" placeholder="请选择民族" readonly is-link required />
+        </picker>
+
+        <picker bindchange="zzmmPickerChange" value="{{zzmmIndex}}" range="{{zzmmArray || []}}">
+          <van-field value="{{ zzmmArray[zzmmIndex] || '' }}" label="政治面貌" placeholder="请选择政治面貌" readonly is-link required />
+        </picker>
+
+        <picker bindchange="hkxzPickerChange" value="{{hkxzIndex}}" range="{{hkxzArray || []}}">
+          <van-field value="{{ hkxzArray[hkxzIndex] || '' }}" label="户口类型" placeholder="请选择户口类型" readonly is-link required />
+        </picker>
+
+        <picker bindchange="sfjdlkPickerChange" value="{{sfjdlkIndex}}" range="{{sfjdlkArray || []}}">
+          <van-field value="{{ sfjdlkArray[sfjdlkIndex] || '' }}" label="是否建档立卡" placeholder="请选择" readonly is-link required />
+        </picker>
+
+        <picker bindchange="sflsetPickerChange" value="{{sflsetIndex}}" range="{{sflsetArray || []}}">
+          <van-field value="{{ sflsetArray[sflsetIndex] || '' }}" label="是否留守儿童" placeholder="请选择" readonly is-link required />
+        </picker>
+      </view>
+    </view>
+
+
+    <!-- ========== Step 4: 联系与家庭 ========== -->
+    <view wx:if="{{currentStep === 3}}" class="step-content">
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="phone-o" size="32rpx" color="#1890FF" />
+          <text>联系方式</text>
+        </view>
+        <van-field
+          value="{{ bmxs.xsdh }}" data-name="xsdh"
+          label="学生电话" placeholder="请输入学生电话"
+          required bind:change="onFieldChange" />
+        <van-field
+          value="{{ bmxs.jtxxdz }}" data-name="jtxxdz"
+          label="家庭详细地址" placeholder="请输入家庭详细地址"
+          required bind:change="onFieldChange" />
+      </view>
+
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="certificate" size="32rpx" color="#1890FF" />
+          <text>毕业信息</text>
+        </view>
+        <van-field
+          value="{{ bmxs.byxxmc }}" data-name="byxxmc"
+          label="毕业学校名称" placeholder="请输入毕业学校名称"
+          required bind:change="onFieldChange" />
+        <picker mode="region" bindchange="regonPickerChange" value="{{address}}">
+          <van-field
+            value="{{ bmxs.byxxssx1 }} {{ bmxs.byxxssx2 }} {{ bmxs.byxxssx3 }}"
+            label="毕业学校所在地" placeholder="请选择省市区"
+            readonly is-link required />
+        </picker>
+      </view>
+
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="friends-o" size="32rpx" color="#1890FF" />
+          <text>家长信息</text>
+        </view>
+        <van-field
+          value="{{ bmxs.jzxm }}" data-name="jzxm"
+          label="家长姓名" placeholder="请输入家长姓名"
+          required bind:change="onFieldChange" />
+        <picker bindchange="jzgxPickerChange" value="{{jzgxIndex}}" range="{{jzgxArray || []}}">
+          <van-field value="{{ jzgxArray[jzgxIndex] || '' }}" label="与家长关系" placeholder="请选择" readonly is-link required />
+        </picker>
+        <picker bindchange="jzdlxPickerChange" value="{{jzdlxIndex}}" range="{{jzdlxArray || []}}">
+          <van-field value="{{ jzdlxArray[jzdlxIndex] || '' }}" label="居住地类型" placeholder="请选择" readonly is-link required />
+        </picker>
+        <van-field
+          value="{{ bmxs.jzdh }}" data-name="jzdh"
+          label="家长电话" placeholder="请输入家长电话"
+          required bind:change="onFieldChange" />
+      </view>
+
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="edit" size="32rpx" color="#1890FF" />
+          <text>其他信息</text>
+        </view>
+        <van-field
+          value="{{ bmxs.remark }}" data-name="remark"
+          label="备注" type="textarea"
+          placeholder="可填写其他补充信息（选填）"
+          autosize="{{ {minHeight: 80} }}"
+          bind:change="onFieldChange" />
+      </view>
+    </view>
+
+
+    <!-- ========== Step 6: 招生信息 ========== -->
+    <view wx:if="{{currentStep === 5}}" class="step-content">
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="manager-o" size="32rpx" color="#1890FF" />
+          <text>招生信息</text>
+        </view>
+        <picker bindchange="zslyPickerChange" value="{{zslyIndex}}" range="{{zslyArray || []}}">
+          <van-field value="{{ zslyArray[zslyIndex] || '' }}" label="招生来源" placeholder="请选择" readonly is-link required />
+        </picker>
+        <picker bindchange="zsdxPickerChange" value="{{zsdxIndex}}" range="{{zsdxArray || []}}">
+          <van-field value="{{ zsdxArray[zsdxIndex] || '' }}" label="招生对象" placeholder="请选择" readonly is-link required />
+        </picker>
+        <picker bindchange="qdPickerChange" value="{{qdIndex}}" range="{{qdArray || []}}">
+          <van-field value="{{ qdArray[qdIndex] || '' }}" label="渠道" placeholder="请选择" readonly is-link required />
+        </picker>
+      </view>
+
+      <!-- 渠道介绍人 -->
+      <view wx:if="{{ bmxs.qd === 7 }}" class="form-section introducer-selector">
+        <view class="section-title">
+          <van-icon name="contact" size="32rpx" color="#1890FF" />
+          <text>介绍人</text>
+        </view>
+        <view class="field-wrapper" bindtap="showIntroducerPicker">
+          <van-field value="{{ bmxs.qdjs }}" label="渠道介绍人" placeholder="请选择渠道介绍人" readonly is-link required />
+        </view>
+
+        <van-popup show="{{ showIntroducerPopup }}" position="bottom" round
+          bind:close="hideIntroducerPicker" custom-style="height: 65vh;">
+          <view class="introducer-popup">
+            <view class="popup-header">
+              <view class="popup-title">选择渠道介绍人</view>
+              <view class="popup-close" bind:tap="hideIntroducerPicker">✕</view>
+            </view>
+            <view class="search-section">
+              <view class="search-box">
+                <view class="search-icon">🔍</view>
+                <input class="search-input" placeholder="搜索姓名或首字母..."
+                  bindinput="onIntroducerSearch" value="{{ introducerSearchKeyword }}" />
+                <view class="search-clear {{ introducerSearchKeyword ? 'show' : '' }}"
+                  bind:tap="clearIntroducerSearch">✕</view>
+              </view>
+            </view>
+            <view class="alphabet-nav">
+              <scroll-view class="alphabet-scroll" scroll-x="true" show-scrollbar="false">
+                <view class="alphabet-list">
+                  <view wx:for="{{ alphabetList }}" wx:key="*this"
+                    class="alphabet-item {{ selectedAlphabet === item ? 'active' : '' }}"
+                    bind:tap="selectAlphabet" data-alphabet="{{ item }}">{{ item }}</view>
+                </view>
+              </scroll-view>
+            </view>
+            <scroll-view class="introducer-list" scroll-y="true">
+              <view wx:if="{{ filteredIntroducers.length === 0 }}" class="empty-state">
+                <view class="empty-icon">👤</view>
+                <view class="empty-text">未找到相关介绍人</view>
+              </view>
+              <view wx:for="{{ filteredIntroducers }}" wx:key="name"
+                class="introducer-item" bind:tap="selectIntroducer" data-name="{{ item.name }}">
+                <view class="introducer-avatar">{{ item.avatar }}</view>
+                <view class="introducer-info">
+                  <view class="introducer-name">{{ item.name }}</view>
+                  <view class="introducer-pinyin">{{ item.pinyin }}</view>
+                </view>
+                <view class="introducer-check {{ bmxs.qdjs === item.name ? 'checked' : '' }}">
+                  <view class="check-icon">✓</view>
+                </view>
+              </view>
+            </scroll-view>
+          </view>
+        </van-popup>
+      </view>
+
+      <!-- 报名信息汇总确认卡（仅新报名模式，编辑模式不显示，因为bdzyArray可能未填充） -->
+      <view wx:if="{{!isEditMode}}" class="summary-card">
+        <view class="summary-header">
+          <van-icon name="description" size="32rpx" color="#1890FF" />
+          <text>报名信息确认</text>
+        </view>
+        <view class="summary-divider"></view>
+        <view class="summary-row">
+          <text class="summary-label">姓名</text>
+          <text class="summary-value">{{ bmxs.xm }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">性别 / 民族</text>
+          <text class="summary-value">{{ bmxs.xb }} · {{ bmxs.mz }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">身份证号</text>
+          <text class="summary-value mono">{{ bmxs.sfzh }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">报读专业</text>
+          <text class="summary-value primary">{{ bdzyArray[0][bdzyIndex[0]].name }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">贯通院校</text>
+          <text class="summary-value primary">{{ bdzyArray[1][bdzyIndex[1]].cooperation_school }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">贯通专业</text>
+          <text class="summary-value">{{ bdzyArray[1][bdzyIndex[1]].cooperation_major }}</text>
+        </view>
+      </view>
+
+      <!-- 编辑模式汇总 -->
+      <view wx:if="{{isEditMode}}" class="summary-card">
+        <view class="summary-header">
+          <van-icon name="description" size="32rpx" color="#1890FF" />
+          <text>修改信息确认</text>
+        </view>
+        <view class="summary-divider"></view>
+        <view class="summary-row">
+          <text class="summary-label">姓名</text>
+          <text class="summary-value">{{ bmxs.xm }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">性别 / 民族</text>
+          <text class="summary-value">{{ bmxs.xb }} · {{ bmxs.mz }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">身份证号</text>
+          <text class="summary-value mono">{{ bmxs.sfzh }}</text>
+        </view>
+        <view class="summary-row" wx:if="{{bdzyArray[1] && bdzyIndex[1] !== undefined && bdzyArray[1][bdzyIndex[1]]}}">
+          <text class="summary-label">报读专业</text>
+          <text class="summary-value primary">{{ bdzyArray[0][bdzyIndex[0]].name }}</text>
+        </view>
+        <view class="summary-row" wx:if="{{bdzyArray[1] && bdzyIndex[1] !== undefined && bdzyArray[1][bdzyIndex[1]]}}">
+          <text class="summary-label">贯通院校</text>
+          <text class="summary-value primary">{{ bdzyArray[1][bdzyIndex[1]].cooperation_school }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">学生电话</text>
+          <text class="summary-value">{{ bmxs.xsdh }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">家庭地址</text>
+          <text class="summary-value">{{ bmxs.jtxxdz }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">毕业学校</text>
+          <text class="summary-value">{{ bmxs.byxxmc }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">家长姓名</text>
+          <text class="summary-value">{{ bmxs.jzxm }}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">家长电话</text>
+          <text class="summary-value">{{ bmxs.jzdh }}</text>
+        </view>
+      </view>
+
+      <!-- 报名完成状态开关（仅编辑模式显示） -->
+      <view wx:if="{{isEditMode}}" class="form-section">
+        <view class="section-title">
+          <van-icon name="flag-o" size="32rpx" color="#1890FF" />
+          <text>报名状态</text>
+        </view>
+        <view class="complete-switch-row">
+          <view class="complete-switch-label">
+            <text>标记为已完成</text>
+            <text class="complete-switch-hint">开启后表示该报名信息已完整确认</text>
+          </view>
+          <van-switch
+            checked="{{ bmxs.is_complete == 1 }}"
+            size="22px"
+            active-color="#07c160"
+            inactive-color="#ebedf0"
+            bind:change="onIsCompleteChange" />
+        </view>
+      </view>
+    </view>
+
+
+    <!-- ========== Step 5: 校服确认 ========== -->
+    <view wx:if="{{currentStep === 4}}" class="step-content">
+      <view class="form-section">
+        <view class="section-title">
+          <van-icon name="shop-o" size="32rpx" color="#1890FF" />
+          <text>校服确认</text>
+        </view>
+
+        <view class="uniform-tip">
+          <van-icon name="info-o" size="28rpx" color="#FA8C16" />
+          <text>请如实选择以下内容，所选结果将作为校服订购的依据。</text>
+        </view>
+
+        <view class="uniform-question">学生本人和监护人是否同意购买校服？<text class="req-star">*</text></view>
+        <picker bindchange="sfqdxfPickerChange" value="{{sfqdxfIndex}}" range="{{sfArray || []}}">
+          <van-field value="{{ sfArray[sfqdxfIndex] || '' }}" label="是否同意购买校服" placeholder="请选择" readonly is-link required />
+        </picker>
+      </view>
+    </view>
+
+
+    <!-- ===== 底部步骤导航 ===== -->
+    <view class="step-nav">
+      <view class="step-nav-inner">
+        <van-button
+          wx:if="{{currentStep > 0}}"
+          plain type="primary"
+          bind:click="prevStep"
+          custom-class="nav-back-btn">← 上一步</van-button>
+        <van-button
+          wx:if="{{currentStep < 5}}"
+          type="primary"
+          bind:click="nextStep"
+          color="linear-gradient(135deg, #1890FF, #40A9FF)"
+          custom-class="nav-next-btn">下一步 →</van-button>
+        <van-button
+          wx:if="{{currentStep === 5}}"
+          type="primary"
+          bind:click="onSubmit"
+          disabled="{{submitDisabled}}"
+          color="linear-gradient(135deg, #1890FF, #40A9FF)"
+          custom-class="nav-next-btn">{{isEditMode ? '保存修改' : '提交报名'}}</van-button>
+      </view>
+      <view class="clear-link" bindtap="clearFormData">清空表单</view>
+    </view>
+
+  </view>
+</view>
+
+<!-- ===== 专业选择自定义弹出层 ===== -->
+<van-popup show="{{showMajorPickerPopup}}" position="bottom" round safe-area-inset-bottom
+           bind:close="closeMajorPicker"
+           custom-style="height:75vh;display:flex;flex-direction:column;overflow:hidden;">
+  <!-- 头部 -->
+  <view class="mp-header">
+    <view class="mp-drag-bar"></view>
+    <view class="mp-header-row">
+      <text class="mp-header-title">选择报读专业 / 贯通院校</text>
+      <van-icon name="cross" size="40rpx" color="#8C8C8C" bindtap="closeMajorPicker" />
+    </view>
+  </view>
+  <!-- 左右双栏展示区 -->
+  <view class="mp-body">
+    <!-- 左栏：专业大类 -->
+    <scroll-view scroll-y class="mp-left">
+      <view wx:for="{{bdzyArray[0]}}" wx:key="id"
+            class="mp-cat-item {{tempCatIndex===index ? 'mp-cat-active' : ''}}"
+            bindtap="onMajorCatTap" data-index="{{index}}">
+        <view wx:if="{{tempCatIndex===index}}" class="mp-cat-bar"></view>
+        <text class="mp-cat-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+    <!-- 右栏：学校/专业卡片 -->
+    <scroll-view scroll-y class="mp-right">
+      <view wx:for="{{tempSchoolList}}" wx:key="id"
+            class="mp-item {{bmxs.bdzy===item.id ? 'mp-item-selected' : ''}} {{item.remaining<=0 || (isEditMode && originalBdzy===item.id) ? 'mp-item-disabled' : ''}}"
+            bindtap="{{item.remaining<=0 || (isEditMode && originalBdzy===item.id) ? '' : 'onMajorItemTap'}}" data-index="{{index}}">
+        <view class="mp-item-top">
+          <text class="mp-item-school">{{item.cooperation_school}}</text>
+          <van-icon wx:if="{{bmxs.bdzy===item.id}}" name="success" size="32rpx" color="#1890FF" />
+        </view>
+        <text class="mp-item-major">{{item.cooperation_major}}</text>
+        <view class="mp-item-foot">
+          <view class="mp-remaining {{item.remaining<=0 ? 'mp-full' : item.remaining<=10 ? 'mp-warn' : 'mp-ok'}}">
+            <text wx:if="{{isEditMode && originalBdzy===item.id}}">已报名</text>
+            <text wx:else>{{item.remaining<=0 ? '已满额' : '余'+item.remaining+'个'}}</text>
+          </view>
+          <view class="mp-remark">{{item.remark}}</view>
+        </view>
+      </view>
+      <view wx:if="{{tempSchoolList.length===0}}" class="mp-empty">暂无院校数据</view>
+    </scroll-view>
+  </view>
+</van-popup>
+
+
+<!-- ===== 报名成功弹窗 ===== -->
+<view class="success-modal-mask" wx:if="{{showSuccessModal}}" catchtouchmove="true">
+  <view class="success-modal-card">
+    <view class="success-modal-icon">✓</view>
+    <view class="success-modal-title">{{ isNewRegistration ? '名额抢占成功' : '报名成功' }}</view>
+    <view class="success-modal-desc" wx:if="{{successMajorName}}">专业：{{successMajorName}}</view>
+
+    <view class="success-modal-code-section" wx:if="{{successQueryCode}}">
+      <view class="success-modal-code-label">您的查询码</view>
+      <view class="success-modal-code-value">{{successQueryCode}}</view>
+      <view class="success-modal-code-hint">已短信发送至您的手机，请妥善保存！名额已锁定，还需继续完善信息才能完成报名。</view>
+    </view>
+
+    <view class="success-modal-actions">
+      <button class="success-modal-copy-btn" bindtap="copyQueryCode" wx:if="{{successQueryCode}}">复制查询码</button>
+      <button class="success-modal-continue-btn" bindtap="closeSuccessModal">继续完善信息</button>
+    </view>
+  </view>
+</view>
+
+
+<!-- ===== 报名手机号快捷认证弹窗（已报名用户身份二次验证） ===== -->
+<view class="success-modal-mask" wx:if="{{showVerifyCodeModal}}" catchtouchmove="true">
+  <view class="success-modal-card verify-modal-card">
+    <view class="verify-modal-icon">
+      <van-icon name="shield-o" size="56rpx" color="#1890FF" />
+    </view>
+    <view class="success-modal-title">身份验证</view>
+    <view class="verify-modal-desc">
+      检测到您的身份证号已有报名记录，为保护信息安全，需要验证报名时预留的手机号。
+    </view>
+
+    <view wx:if="{{!verifyRolePassed}}" class="verify-role-list">
+      <button
+        class="verify-role-btn"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="_onEnrollVerifyByPhone"
+        data-role="self"
+        hover-class="none"
+      >
+        <van-icon name="phone-o" size="28rpx" color="#059669" />
+        <text>本人手机号快捷验证</text>
+      </button>
+      <button
+        class="verify-role-btn verify-role-btn-parent"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="_onEnrollVerifyByPhone"
+        data-role="parent"
+        hover-class="none"
+      >
+        <van-icon name="contact" size="28rpx" color="#1890FF" />
+        <text>家长手机号快捷验证</text>
+      </button>
+    </view>
+
+    <view wx:else class="verify-modal-phone verified-phone">
+      <van-icon name="passed" size="28rpx" color="#059669" />
+      <text wx:if="{{verifyRoleMaskedPhone}}">已验证：{{verifyRoleMaskedPhone}} · {{verifyRoleTypeText}}</text>
+      <text wx:else>已验证身份（{{verifyRoleTypeText}}）</text>
+    </view>
+
+    <view class="verify-modal-actions">
+      <button class="verify-modal-cancel-btn" bindtap="_closeVerifyCodeModal" hover-class="none">取消</button>
+      <button
+        class="verify-modal-confirm-btn {{!verifyRolePassed ? 'verify-modal-confirm-disabled' : ''}}"
+        bindtap="_submitEnrollmentVerifyCode"
+        hover-class="none"
+      >验证并进入</button>
+    </view>
+  </view>
+</view>
+

@@ -1,0 +1,35 @@
+<view class="container">
+
+  <!-- 课程列表 -->
+  <view class="course-list">
+    <view class="section-title">我的课程</view>
+    <view class="course-items">
+      <view class="course-item" wx:for="{{courses}}" wx:key="course_id">
+        <view class="course-header">
+          <text class="course-name">{{item.course_name}}</text>
+          <text class="course-id">课程ID：{{item.course_id}}</text>
+        </view>
+        <view class="course-detail">
+          <view class="detail-row">
+            <text class="detail-label">考核方式：</text>
+            <text class="detail-value">{{item.exam_method}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">试卷号：</text>
+            <text class="detail-value">{{item.paper_no}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">类型：</text>
+            <text class="detail-value">{{item.direct}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载提示 -->
+  <van-loading wx:if="{{loading}}" />
+  
+  <!-- 空状态 -->
+  <van-empty wx:if="{{!loading && (!courses || courses.length === 0)}}" description="暂无课程信息" />
+</view> 

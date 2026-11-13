@@ -1,0 +1,28 @@
+<view class="signature">
+  <canvas 
+    type="2d" 
+    id="signatureCanvas"
+    class="canvas"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  ></canvas>
+  <view class="btn-group">
+    <button 
+      class="btn cancel-btn"
+      size="mini" 
+      bindtap="cancel"
+    >取消</button>
+    <button 
+      class="btn clear-btn"
+      size="mini" 
+      bindtap="clear"
+    >清除</button>
+    
+    <button 
+      class="btn confirm-btn"
+      size="mini" 
+      bindtap="submit"
+    >确认</button>
+  </view>
+</view> 

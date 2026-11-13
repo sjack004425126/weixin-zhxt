@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "个人中心",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-dialog": "@vant/weapp/dialog/index",
+    "van-icon": "/components/vant-icon/index",
+    "fee-toast": "/components/fee-toast/fee-toast"
+  }
+}

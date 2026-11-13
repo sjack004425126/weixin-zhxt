@@ -1,0 +1,64 @@
+<include src="/utils/common-components.wxml" />
+<view class="page">
+  <!-- 2026-09-29：自定义顶部导航栏（含返回按钮 + 标题）。
+       用 redirectTo 进来时系统导航栏会失效，故手动加一个；同时保留原生导航栏的标题样式。 -->
+  <view class="custom-navbar">
+    <view class="navbar-back" bindtap="goBack" hover-class="navbar-back-hover">
+      <van-icon name="arrow-left" size="36rpx" color="#fff" />
+    </view>
+    <view class="navbar-title">我的反馈</view>
+    <view class="navbar-placeholder"></view>
+  </view>
+
+  <!-- 状态 tabs -->
+  <view class="tabs">
+    <view wx:for="{{tabs}}" wx:key="value" class="tab {{activeStatus===item.value ? 'tab-active' : ''}}"
+          data-value="{{item.value}}" bindtap="onTabTap">
+      <text>{{item.label}}</text>
+    </view>
+  </view>
+
+  <view class="list" wx:if="{{items.length>0}}">
+    <view wx:for="{{items}}" wx:key="id" class="item-card" data-id="{{item.id}}" bindtap="onTap">
+      <view class="item-head">
+        <view class="cat-tag {{item.category==='repair' ? 'cat-repair' : 'cat-suggest'}}">
+          {{item.category==='repair' ? '维修' : '建议'}}
+        </view>
+        <view wx:if="{{item.urgency==='urgent'}}" class="urgent-tag">紧急</view>
+        <view class="status-tag status-{{item.status}}">{{statusLabels[item.status]}}</view>
+      </view>
+      <view class="item-title">{{item.title}}</view>
+      <view class="item-desc">{{item.content}}</view>
+      <view wx:if="{{item.images.length>0}}" class="item-thumbs">
+        <block wx:for="{{item.images}}" wx:for-item="img" wx:key="key">
+          <view wx:if="{{index<3}}" class="thumb-wrap">
+            <view wx:if="{{img.type==='video'}}" class="thumb thumb-video">
+              <image wx:if="{{img.poster}}" src="{{baseUrl}}{{img.poster}}" mode="aspectFill" class="thumb-poster" />
+              <van-icon name="play-circle" size="40rpx" color="#fff" custom-style="position:relative;z-index:1;filter:drop-shadow(0 2rpx 6rpx rgba(0,0,0,0.4));" />
+            </view>
+            <image wx:else src="{{baseUrl}}{{img.url}}" mode="aspectFill" class="thumb" />
+          </view>
+        </block>
+        <view wx:if="{{item.images.length>3}}" class="thumb-more">+{{item.images.length-3}}</view>
+      </view>
+      <view class="item-foot">
+        <view class="foot-left">
+          <van-icon name="location-o" size="24rpx" color="#8C8C8C" />
+          <text class="loc">{{item.location_text_fuzzy || item.location_text || '-'}}</text>
+        </view>
+        <text class="time">{{item.created_at}}</text>
+      </view>
+      <view wx:if="{{item.handle_remark}}" class="reply-box">
+        <view class="reply-label">
+          <van-icon name="chat-o" size="24rpx" color="#52C41A" />
+          <text>处理结果</text>
+        </view>
+        <view class="reply-content">{{item.handle_remark}}</view>
+      </view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{!loading && items.length===0}}" description="暂无反馈记录" />
+
+  <view wx:if="{{noMore && items.length>0}}" class="no-more">— 没有更多了 —</view>
+</view>

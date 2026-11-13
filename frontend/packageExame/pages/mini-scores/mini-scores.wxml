@@ -1,0 +1,195 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="scores-page">
+
+  <!-- 详情模式 -->
+  <block wx:if="{{detailMode && detail}}">
+    <view class="detail-body">
+      <!-- 加载中 -->
+      <view wx:if="{{loading}}" class="loading-tip">
+        <text>加载中...</text>
+      </view>
+
+      <block wx:else>
+        <!-- 英雄得分面板 -->
+        <view class="hero {{detail.is_passed ? 'hero-pass' : 'hero-fail'}}">
+          <view class="hero-deco">🏆</view>
+          <view class="hero-exam-title">{{detail.exam_title}}</view>
+
+          <view class="hero-row">
+            <view class="hero-score">
+              <text class="hero-score-num">{{detail.score}}</text>
+              <text class="hero-score-total">/ {{detail.total_score}} 分</text>
+            </view>
+            <view class="hero-status">
+              <text>{{detail.is_passed ? '✓' : '✕'}}</text>
+              <text>{{detail.is_passed ? '考核通过' : '未达及格线'}}</text>
+            </view>
+          </view>
+
+          <view class="hero-metrics">
+            <view class="metric-cell">
+              <text class="metric-label">考试耗时</text>
+              <text class="metric-value">{{formatDuration(detail.duration_seconds)}}</text>
+            </view>
+            <view class="metric-cell">
+              <text class="metric-label">答题正确率</text>
+              <text class="metric-value">{{accuracyPercent}}%</text>
+            </view>
+            <view class="metric-cell">
+              <text class="metric-label">评卷结果</text>
+              <text class="metric-value">{{detail.grading_status === 'graded' ? '智能即时出分' : '复核中'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 对错全景矩阵 + 筛选 -->
+        <view wx:if="{{detail.questions && detail.questions.length > 0}}" class="matrix-card">
+          <view class="matrix-head">
+            <text class="matrix-title">试卷答题卡对错概览</text>
+            <view class="matrix-filter">
+              <view
+                class="filter-tab {{filterType === 'all' ? 'filter-tab-on' : ''}}"
+                bindtap="setFilter"
+                data-type="all"
+              >全部 ({{detail.questions.length}})</view>
+              <view
+                class="filter-tab filter-tab-wrong {{filterType === 'wrong' ? 'filter-tab-on' : ''}}"
+                bindtap="setFilter"
+                data-type="wrong"
+              >错题 ({{wrongCount}})</view>
+              <view
+                class="filter-tab filter-tab-right {{filterType === 'correct' ? 'filter-tab-on' : ''}}"
+                bindtap="setFilter"
+                data-type="correct"
+              >对题 ({{correctCount}})</view>
+            </view>
+          </view>
+
+          <view class="matrix-grid">
+            <view
+              wx:for="{{detail.questions}}"
+              wx:key="id"
+              class="matrix-cell {{item.is_correct ? 'matrix-cell-right' : 'matrix-cell-wrong'}}"
+            >
+              <text class="matrix-cell-num">{{index + 1}}</text>
+              <text class="matrix-cell-mark">{{item.is_correct ? '✓' : '✕'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 逐题解析 -->
+        <view wx:if="{{filteredQuestions && filteredQuestions.length > 0}}" class="qa-list-head">
+          <text class="qa-list-icon">📚</text>
+          <text>试题深度解析与知识点巩固</text>
+          <text class="qa-list-count">当前呈现 {{filteredQuestions.length}} 道题目</text>
+        </view>
+
+        <view
+          wx:for="{{filteredQuestions}}"
+          wx:key="id"
+          class="question-card {{item.is_correct ? 'qcard-pass' : 'qcard-fail'}}"
+        >
+          <view class="qcard-head">
+            <view class="qcard-head-left">
+              <text class="qcard-num">第 {{item._originalIndex + 1}} 题</text>
+              <text class="qcard-type">{{getTypeLabel(item.type)}}</text>
+            </view>
+            <view class="qcard-score {{item.is_correct ? 'qcard-score-pass' : 'qcard-score-fail'}}">
+              {{item.is_correct ? '+' + (item.got_score || 0) : '0' }} 分
+            </view>
+          </view>
+
+          <view class="qcard-content">{{item.content}}</view>
+
+          <!-- 选项对比（客观题） -->
+          <view wx:if="{{item.options && item.options.length > 0}}" class="qcard-options">
+            <view
+              wx:for="{{item.options}}"
+              wx:for-item="opt"
+              wx:key="label"
+              class="opt-line {{isOptionCorrect(item, opt.label) ? 'opt-line-correct' : (isOptionSelected(item, opt.label) ? 'opt-line-wrong' : '') }}"
+            >
+              <text class="opt-letter">{{opt.label}}.</text>
+              <text class="opt-content">{{opt.content}}</text>
+            </view>
+          </view>
+
+          <!-- 答案对比（小程序端不显示标准答案，避免泄题） -->
+          <view class="qcard-answers">
+            <view class="ans-cell">
+              <text class="ans-label">您的作答：</text>
+              <text class="ans-value {{item.is_correct ? 'ans-pass' : 'ans-fail'}}">{{item.user_answer || '（未作答）'}}</text>
+            </view>
+          </view>
+          <!-- 解析：学生端不展示 -->
+        </view>
+
+        <!-- 底部按钮 -->
+        <view class="detail-foot">
+          <view class="btn-foot btn-foot-primary" bindtap="onRetake">重新测验一次</view>
+          <view class="btn-foot btn-foot-share" bindtap="onShare">分享报告</view>
+        </view>
+      </block>
+    </view>
+  </block>
+
+  <!-- 列表模式 -->
+  <block wx:else>
+    <view wx:if="{{loading && records.length === 0}}" class="loading-tip">
+      <text>加载中...</text>
+    </view>
+
+    <block wx:elif="{{records.length > 0}}">
+      <view class="list-head-card">
+        <view class="list-head-title">学业评测成长记录</view>
+        <view class="list-head-sub">系统已安全归档您在校期间所有的期末统考与在线测验记录</view>
+      </view>
+
+      <view
+        wx:for="{{records}}"
+        wx:key="id"
+        class="record-card"
+        data-id="{{item.id}}"
+        bindtap="viewDetail"
+      >
+        <view class="rec-head">
+          <text class="rec-title">{{item.exam_title}}</text>
+          <view class="rec-status {{item.is_passed ? 'rec-status-pass' : 'rec-status-fail'}}">
+            {{item.is_passed ? '✓ 已及格' : '✕ 未及格'}}
+          </view>
+        </view>
+        <view class="rec-meta">
+          <view class="rec-cell">
+            <text class="rec-label">综合得分</text>
+            <text class="rec-value {{item.is_passed ? 'rec-pass' : 'rec-fail'}}">
+              {{item.score || 0}} / {{item.total_score}}
+            </text>
+          </view>
+          <view class="rec-cell">
+            <text class="rec-label">作答耗时</text>
+            <text class="rec-value">{{formatDuration(item.duration_seconds)}}</text>
+          </view>
+          <view class="rec-cell">
+            <text class="rec-label">交卷时间</text>
+            <text class="rec-value">{{item.submitted_at || '-'}}</text>
+          </view>
+        </view>
+        <view class="rec-foot">
+          <text>查看逐题错题本与深度解析</text>
+          <text class="rec-arrow">›</text>
+        </view>
+      </view>
+
+      <view wx:if="{{loadingMore}}" class="loading-tip small">加载更多...</view>
+      <view wx:elif="{{noMore}}" class="loading-tip small">— 没有更多了 —</view>
+    </block>
+
+    <view wx:else class="empty">
+      <text class="empty-icon">🏆</text>
+      <view class="empty-title">暂无任何历史考评记录</view>
+      <view class="empty-sub">完成考试后会自动归档到这里</view>
+    </view>
+  </block>
+</view>

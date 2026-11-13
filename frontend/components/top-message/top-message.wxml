@@ -1,0 +1,24 @@
+<view class="top-message-wrapper position-{{position}}" wx:if="{{visible && message}}">
+  <view
+    class="message-content {{type}} {{isSwiping ? 'swiping' : ''}} {{isSwipingOut ? 'swiping-out' : ''}}"
+    style="transform: translateX({{translateX}}px);"
+    catchtap="onMessageTap"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  >
+    <view class="message-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#fff;">{{iconChar}}</text>
+    </view>
+    <text class="message-text">{{message}}</text>
+    <view class="message-close" wx:if="{{closable}}" catchtap="onCloseTap">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:rgba(255,255,255,0.85);"></text>
+    </view>
+  </view>
+</view>
+<!-- 点击后显示的背景遮罩 -->
+<view
+  class="message-backdrop"
+  wx:if="{{isClicked && message && visible}}"
+  bindtap="onBackgroundTap"
+></view>

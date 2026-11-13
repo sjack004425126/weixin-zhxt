@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "top-message 组件测试",
+  "navigationBarBackgroundColor": "#1890FF",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index",
+    "top-message": "/components/top-message/top-message"
+  }
+}

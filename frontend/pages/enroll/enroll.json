@@ -1,0 +1,7 @@
+{
+  "usingComponents": {},
+  "navigationStyle": "custom",
+  "disableScroll": true,
+  "backgroundColor": "#000000",
+  "backgroundTextStyle": "light"
+}

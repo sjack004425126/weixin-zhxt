@@ -1,0 +1,67 @@
+@import "../../../components/vant-icon/index.wxss";
+
+/* vi 类：直接用 text 渲染 vant-icon 字体（绕过 van-icon 组件 view+::before，见 INCIDENTS/001） */
+.vi{display:inline-block;vertical-align:middle;line-height:1;font-family:vant-icon,sans-serif;}
+
+page{background:#F1F5F9;}
+.container{min-height:100vh;padding:150rpx 24rpx 60rpx;}
+
+/* ============ 顶部栏 ============ */
+.page-header{padding:32rpx 0 24rpx;background:rgba(255,255,255,.95);position:fixed;top:0;left:0;right:0;z-index:1000;box-shadow:0 2rpx 8rpx rgba(0,0,0,.06);}
+.header-content{display:flex;align-items:center;gap:16rpx;padding:0 24rpx;}
+.header-icon{line-height:1;width:80rpx;height:80rpx;background:linear-gradient(135deg,#047857,#0D9488);border-radius:24rpx;display:flex;align-items:center;justify-content:center;color:#fff;font-size:40rpx;}
+.header-text{flex:1;}
+.header-title{font-size:34rpx;font-weight:700;color:#0F172A;}
+.header-subtitle{font-size:24rpx;color:#64748B;margin-top:4rpx;}
+.header-nav-action{width:64rpx;height:64rpx;background:#F1F5F9;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#047857;font-size:32rpx;}
+
+/* ============ 卡片 ============ */
+.card{background:#fff;border:1rpx solid #E2E8F0;border-radius:24rpx;padding:28rpx;margin-bottom:24rpx;box-shadow:0 1rpx 3rpx rgba(0,0,0,.04);}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:20rpx;border-bottom:1rpx solid #F1F5F9;margin-bottom:20rpx;}
+.card-title-text{font-size:28rpx;font-weight:700;color:#0F172A;}
+.muted-tip{font-size:22rpx;color:#94A3B8;}
+.link{font-size:22rpx;color:#047857;}
+.empty{font-size:26rpx;color:#94A3B8;text-align:center;padding:40rpx 0;}
+
+/* ============ 卡片1：我的预约 ============ */
+.my-code-wrap{text-align:center;padding:20rpx 0 12rpx;display:flex;align-items:center;justify-content:center;gap:16rpx;}
+.my-code{font-size:110rpx;font-weight:900;letter-spacing:12rpx;color:#0F172A;line-height:1.2;font-family:Menlo,monospace;}
+.status-tag{font-size:22rpx;padding:6rpx 16rpx;border-radius:10rpx;}
+.status-tag.booked{background:#FEF3C7;color:#92400E;}
+.status-tag.attended{background:#DCFCE7;color:#166534;}
+.status-tag.cancelled{background:#FEE2E2;color:#B91C1C;}
+.my-meta{text-align:center;font-size:24rpx;color:#64748B;display:flex;align-items:center;justify-content:center;gap:10rpx;flex-wrap:wrap;margin-bottom:8rpx;}
+
+.tip-warn{background:#FFFBEB;color:#92400E;border:1rpx solid #FDE68A;border-radius:16rpx;padding:20rpx;font-size:24rpx;text-align:center;margin:16rpx 0;}
+.tip-muted{font-size:22rpx;color:#94A3B8;text-align:center;margin-top:18rpx;}
+.tip-muted.center{display:block;}
+
+.stat-grid{display:flex;gap:16rpx;margin-top:16rpx;}
+.stat-box{flex:1;background:#F8FAFC;border:1rpx solid #E2E8F0;border-radius:20rpx;padding:24rpx;text-align:center;}
+.stat-lbl{font-size:22rpx;color:#64748B;display:block;}
+.stat-val{font-size:34rpx;font-weight:800;color:#047857;display:block;margin-top:8rpx;font-family:Menlo,monospace;}
+.stat-box:nth-child(2) .stat-val{color:#0F172A;}
+
+.no-ticket{text-align:center;padding:20rpx 0;}
+.no-ticket-t{font-size:28rpx;font-weight:700;color:#334155;display:block;}
+.no-ticket-s{font-size:24rpx;color:#94A3B8;display:block;margin-top:10rpx;}
+
+/* ============ 卡片2：预约号段 ============ */
+.slot-row{display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;border:1rpx solid #E2E8F0;border-radius:20rpx;padding:22rpx;margin-bottom:14rpx;gap:16rpx;}
+.q-mid{flex:1;min-width:0;}
+.slot-date{display:flex;align-items:center;gap:12rpx;font-size:24rpx;color:#334155;font-weight:600;margin-bottom:6rpx;}
+.slot-tag-chip{font-size:20rpx;background:#DBEAFE;color:#1D4ED8;padding:2rpx 12rpx;border-radius:8rpx;font-weight:600;}
+.slot-time{font-size:30rpx;font-weight:700;color:#0F172A;font-family:Menlo,monospace;display:block;}
+.slot-sub{font-size:22rpx;color:#94A3B8;margin-top:8rpx;display:flex;align-items:center;gap:8rpx;flex-wrap:wrap;}
+.slot-sub .ok{color:#047857;font-weight:600;}
+.slot-sub .full{color:#E11D48;}
+.slot-btn{min-height:76rpx;padding:0 28rpx;background:#047857;color:#fff;border-radius:16rpx;display:flex;align-items:center;justify-content:center;font-size:26rpx;font-weight:600;flex-shrink:0;}
+.slot-btn:active{opacity:.85;}
+.slot-btn-off{background:#E2E8F0;color:#94A3B8;}
+
+.quick-row{margin-top:20rpx;padding-top:20rpx;border-top:1rpx solid #F1F5F9;text-align:center;}
+.quick-link{font-size:24rpx;color:#64748B;padding:12rpx 0;}
+.quick-form{display:flex;align-items:center;gap:12rpx;}
+.form-input{flex:1;background:#F8FAFC;border:1rpx solid #E2E8F0;border-radius:16rpx;padding:20rpx;font-size:26rpx;color:#0F172A;}
+.form-input.mono{font-family:Menlo,monospace;}
+.quick-close{width:56rpx;height:56rpx;background:#E2E8F0;color:#64748B;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34rpx;}

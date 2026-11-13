@@ -1,0 +1,106 @@
+page {
+  --primary-color: #E86433;
+  --text-primary: #262626;
+  --text-secondary: #595959;
+}
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.info {
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--primary-color);
+  margin-bottom: 12rpx;
+}
+
+.debug {
+  text-align: center;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 24rpx;
+  word-break: break-all;
+  padding: 0 24rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 32rpx 0 16rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid var(--primary-color);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 12rpx;
+  padding: 24rpx 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.card:active { transform: scale(0.97); }
+
+.card-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.card-desc {
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 方案A: border + box-shadow 发光 */
+.selected-a {
+  border-color: #52c41a !important;
+  background: #f6ffed !important;
+  box-shadow: 0 0 0 4rpx rgba(82, 196, 26, 0.25), 0 4rpx 16rpx rgba(82, 196, 26, 0.3) !important;
+}
+
+/* 方案B: 纯 box-shadow，不改 border */
+.selected-b {
+  background: #f0f5ff !important;
+  box-shadow: 0 0 0 6rpx rgba(24, 144, 255, 0.4), 0 4rpx 20rpx rgba(24, 144, 255, 0.3) !important;
+}
+
+/* 方案C: 背景色 + 粗左边框 */
+.selected-c {
+  background: #fff7e6 !important;
+  border-left: 8rpx solid #fa8c16 !important;
+  box-shadow: 0 4rpx 16rpx rgba(250, 140, 22, 0.2) !important;
+}
+
+/* 方案D: outline (不占空间) */
+.selected-d {
+  outline: 6rpx solid #722ed1;
+  outline-offset: -2rpx;
+  background: #f9f0ff !important;
+  box-shadow: 0 0 16rpx rgba(114, 46, 209, 0.3) !important;
+}

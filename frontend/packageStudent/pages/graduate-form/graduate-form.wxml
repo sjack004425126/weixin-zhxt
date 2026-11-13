@@ -1,0 +1,393 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <van-icon name="certificate" size="40rpx" />
+    </view>
+    <view class="header-text">
+      <view class="header-title">毕业申请</view>
+      <view class="header-subtitle">Graduate Form</view>
+    </view>
+    <view class="header-nav-action">
+      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 修改顶部提示栏 -->
+  <block wx:if="{{isLocked}}">
+    <view class="notice-bar notice-locked">
+      <view class="notice-content">
+        <van-icon name="passed" size="32rpx" color="#52C41A" />
+        <text>您的毕业生登记表已审核通过且已锁定，无法修改</text>
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="notice-bar {{isGraduate ? 'notice-graduate' : ''}}" wx:if="{{!isLocked}}">
+      <view class="notice-content">
+        <van-icon name="info-o" size="32rpx" color="{{isGraduate ? '#FAAD14' : '#1890FF'}}" />
+        <text wx:if="{{!isGraduate}}">您还未毕业，还不需要填写毕业生登记表</text>
+        <text wx:else>您已毕业，请抓紧填写毕业生登记表以便后期领证。所有信息都需要填写，没有的必须填“无”</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="form">
+    <!-- 基本信息 -->
+    <view class="form-group" id="basic-info">
+      <view class="form-title">基本信息</view>
+      <van-field
+        label="姓名"
+        value="{{ formData.xm }}"
+        data-field="xm"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'xm' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="性别"
+        value="{{ formData.xb }}"
+        data-field="xb"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        required
+        class="{{ focusField === 'xb' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="出生日期"
+        value="{{ formData.csrq }}"
+        data-field="csrq"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        required
+        class="{{ focusField === 'csrq' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="民族"
+        value="{{ formData.mz }}"
+        data-field="mz"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        required
+        class="{{ focusField === 'mz' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="政治面貌"
+        value="{{ formData.zzmm }}"
+        data-field="zzmm"
+        readonly="{{true}}"
+        is-link
+        bind:tap="showPoliticalStatusPicker"
+        placeholder="请选择政治面貌"
+        required
+        class="{{ focusField === 'zzmm' ? 'field-highlight' : '' }}"
+      />
+    </view>
+
+    <!-- 证件信息 -->
+    <view class="form-group" id="id-info">
+      <view class="form-title">证件信息</view>
+      <van-field
+        label="证件类型"
+        value="{{ formData.zjlx }}"
+        data-field="zjlx"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'zjlx' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="证件号"
+        value="{{ formData.zjh }}"
+        data-field="zjh"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'zjh' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="电子注册号"
+        value="{{ formData.dzzch }}"
+        data-field="dzzch"
+        bind:change="onInputChange"
+        required
+        class="{{ focusField === 'dzzch' ? 'field-highlight' : '' }}"
+      />
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="form-group" id="contact-info">
+      <view class="form-title">联系方式</view>
+      <van-field
+        label="手机"
+        value="{{ formData.sj }}"
+        data-field="sj"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'sj' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="家庭电话"
+        value="{{ formData.jtdh }}"
+        data-field="jtdh"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        class="{{ focusField === 'jtdh' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="邮箱"
+        value="{{ formData.yx }}"
+        data-field="yx"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        class="{{ focusField === 'yx' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="单位电话"
+        value="{{ formData.dwdh }}"
+        data-field="dwdh"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        class="{{ focusField === 'dwdh' ? 'field-highlight' : '' }}"
+      />
+    </view>
+
+    <!-- 学习信息 -->
+    <view class="form-group" id="study-info">
+      <view class="form-title">学习信息</view>
+      <van-field
+        label="学历层次"
+        value="{{ formData.xlcc }}"
+        data-field="xlcc"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'xlcc' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="学生类别"
+        value="{{ formData.xslb }}"
+        data-field="xslb"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'xslb' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="学习专业"
+        value="{{ formData.xxzy }}"
+        data-field="xxzy"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'xxzy' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="入学年份"
+        value="{{ formData.rxsjn }}"
+        data-field="rxsjn"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'rxsjn' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="入学季节"
+        value="{{ formData.rxsjj }}"
+        data-field="rxsjj"
+        bind:change="onInputChange"
+        readonly="{{true}}"
+        required
+        class="{{ focusField === 'rxsjj' ? 'field-highlight' : '' }}"
+      />
+    </view>
+
+    <!-- 学习经历 -->
+    <view class="form-group">
+      <view class="form-title-row">
+        <text class="form-title">学习经历</text>
+        <text class="form-subtitle">至少高中填起，最多填5条</text>
+      </view>
+      <view class="study-list">
+        <view class="study-item" wx:for="{{formData.study_experience}}" wx:key="index">
+          <view class="study-header">
+            <text>经历{{index + 1}}</text>
+            <van-icon
+              name="clear"
+              class="delete-btn"
+              bind:click="deleteStudyExp"
+              data-index="{{index}}"
+              wx:if="{{formData.study_experience.length > 1}}"
+            />
+          </view>
+          <van-field
+            label="起始时间"
+            value="{{item.qsj}}"
+            readonly="{{true}}"
+            data-index="{{index}}"
+            data-type="qsj"
+            bind:tap="showDatePicker"
+            placeholder="请选择起始时间"
+            required
+          />
+          <van-field
+            label="终止时间"
+            value="{{item.zsj}}"
+            readonly="{{true}}"
+            data-index="{{index}}"
+            data-type="zsj"
+            bind:tap="showDatePicker"
+            placeholder="请选择终止时间"
+            required
+          />
+          <van-field
+            label="学习经历"
+            value="{{item.xx}}"
+            data-index="{{index}}"
+            data-type="xx"
+            bind:change="onStudyExpChange"
+            placeholder="在何地、何校学习（限25字）"
+            readonly="{{isLocked}}"
+            required
+            maxlength="25"
+            show-word-limit
+          />
+        </view>
+      </view>
+      <van-button
+        wx:if="{{formData.study_experience.length < 5}}"
+        type="default"
+        size="small"
+        bind:click="addStudyExp"
+        class="add-btn"
+        disabled="{{isLocked}}"
+      >添加学习经历</van-button>
+    </view>
+
+    <!-- 毕业信息 -->
+    <view class="form-group" id="graduate-info">
+      <view class="form-title">毕业信息</view>
+      <van-field
+        label="毕业年份"
+        value="{{ formData.bysjn }}"
+        data-field="bysjn"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        required
+        class="{{ focusField === 'bysjn' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="毕业月份"
+        value="{{ formData.bysjy }}"
+        data-field="bysjy"
+        bind:change="onInputChange"
+        readonly="{{isLocked}}"
+        required
+        class="{{ focusField === 'bysjy' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="毕业论文题目"
+        value="{{ formData.bylwtm }}"
+        data-field="bylwtm"
+        bind:change="onInputChange"
+        placeholder="限25字"
+        readonly="{{isLocked}}"
+        required
+        maxlength="25"
+        show-word-limit
+        class="{{ focusField === 'bylwtm' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="毕业实习单位"
+        value="{{ formData.bysxdw }}"
+        data-field="bysxdw"
+        bind:change="onInputChange"
+        placeholder="限25字"
+        readonly="{{isLocked}}"
+        maxlength="25"
+        show-word-limit
+        class="{{ focusField === 'bysxdw' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="工作单位"
+        value="{{ formData.gzdw }}"
+        data-field="gzdw"
+        bind:change="onInputChange"
+        placeholder="限25字"
+        readonly="{{isLocked}}"
+        maxlength="25"
+        show-word-limit
+        class="{{ focusField === 'gzdw' ? 'field-highlight' : '' }}"
+      />
+      <van-field
+        label="奖励或处分"
+        value="{{ formData.jlhcf }}"
+        data-field="jlhcf"
+        bind:change="onInputChange"
+        placeholder="限25字"
+        readonly="{{isLocked}}"
+        maxlength="25"
+        show-word-limit
+        class="{{ focusField === 'jlhcf' ? 'field-highlight' : '' }}"
+      />
+    </view>
+
+    <!-- 自我鉴定 -->
+    <view class="form-group" id="self-evaluation">
+      <view class="form-title">自我鉴定</view>
+      <van-field
+        type="textarea"
+        value="{{ formData.zwjd }}"
+        data-field="zwjd"
+        bind:change="onInputChange"
+        autosize
+        readonly="{{isLocked}}"
+        placeholder="请填写自我鉴定，字数控制在200字左右"
+        required
+        class="{{ focusField === 'zwjd' ? 'field-highlight' : '' }}"
+      />
+    </view>
+
+    <!-- 政治面貌选择器弹窗 -->
+    <van-popup 
+      show="{{ showPoliticalStatusPicker }}" 
+      position="bottom"
+      bind:close="onPoliticalStatusPickerClose"
+    >
+      <van-picker
+        show-toolbar
+        title="选择政治面貌"
+        columns="{{ politicalStatusOptions }}"
+        bind:confirm="onPoliticalStatusConfirm"
+        bind:cancel="onPoliticalStatusPickerClose"
+      />
+    </van-popup>
+
+    <!-- 日期选择器弹窗 -->
+    <van-popup 
+      show="{{ showDatePicker }}" 
+      position="bottom"
+      bind:close="onDatePickerClose"
+    >
+      <van-datetime-picker
+        type="year-month"
+        value="{{ currentDate }}"
+        min-date="{{ minDate }}"
+        max-date="{{ maxDate }}"
+        bind:confirm="onDatePickerConfirm"
+        bind:cancel="onDatePickerClose"
+      />
+    </van-popup>
+
+    <view class="btn-submit" wx:if="{{isGraduate && !isLocked}}">
+      <van-button type="primary" block loading="{{ loading }}" bind:click="submitForm">提交</van-button>
+    </view>
+  </view>
+</view>

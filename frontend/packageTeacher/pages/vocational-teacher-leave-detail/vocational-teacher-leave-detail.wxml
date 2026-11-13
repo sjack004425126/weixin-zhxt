@@ -1,0 +1,152 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <van-icon name="description" size="40rpx" />
+    </view>
+    <view class="header-text">
+      <view class="header-title">请假详情</view>
+      <view class="header-subtitle">Leave Detail</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack">
+      <van-icon name="arrow-left" size="32rpx" />
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+  <view wx:else class="detail-content">
+    <!-- 学生信息 -->
+    <view class="info-card">
+      <view class="card-title">学生信息</view>
+      <view class="info-row">
+        <text class="info-label">姓名</text>
+        <text class="info-value">{{detail.xm}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">学号</text>
+        <text class="info-value">{{detail.xh}}</text>
+      </view>
+      <view class="info-row" wx:if="{{detail.class_name}}">
+        <text class="info-label">班级</text>
+        <text class="info-value">{{detail.class_name}}</text>
+      </view>
+    </view>
+
+    <!-- 请假信息 -->
+    <view class="info-card">
+      <view class="card-title">请假信息</view>
+      <view class="info-row">
+        <text class="info-label">请假类型</text>
+        <van-tag type="{{detail.qjlb === '病假' ? 'danger' : detail.qjlb === '事假' ? 'warning' : 'primary'}}">{{detail.qjlb}}</van-tag>
+      </view>
+      <view class="info-row">
+        <text class="info-label">请假事由</text>
+        <text class="info-value">{{detail.qjsy}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">开始时间</text>
+        <text class="info-value">{{detail.qjkssj}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">结束时间</text>
+        <text class="info-value">{{detail.qjjssj}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">离校线路</text>
+        <text class="info-value">{{detail.xslxxl}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">交通工具</text>
+        <text class="info-value">{{detail.xslxjtgj}}</text>
+      </view>
+    </view>
+
+    <!-- 审批流程 -->
+    <view class="info-card">
+      <view class="card-title">审批流程</view>
+      
+      <!-- 第一步：班主任审批 -->
+      <view class="approval-step">
+        <view class="step-indicator">
+          <view class="step-number {{detail.bzr_zt === 1 ? 'step-done' : detail.bzr_zt === 2 ? 'step-rejected' : 'step-pending'}}">1</view>
+          <view class="step-line {{detail.bzr_zt === 1 ? 'line-done' : ''}}"></view>
+        </view>
+        <view class="step-content">
+          <view class="step-header">
+            <text class="step-title">班主任审批</text>
+            <van-tag size="medium" type="{{detail.bzr_zt === 0 ? 'default' : detail.bzr_zt === 1 ? 'success' : 'danger'}}">
+              {{detail.bzr_zt === 0 ? '待审批' : detail.bzr_zt === 1 ? '已通过' : '已拒绝'}}
+            </van-tag>
+          </view>
+          <view class="step-desc" wx:if="{{detail.bzr_zt !== 0}}">
+            <van-icon name="manager-o" size="24rpx" />
+            <text>审批人：{{detail.sp_bzr_xm || '未知'}}</text>
+          </view>
+          <view class="step-desc step-waiting" wx:else>
+            <van-icon name="clock-o" size="24rpx" />
+            <text>等待班主任审批中...</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 第二步：学生科审批 -->
+      <view class="approval-step">
+        <view class="step-indicator">
+          <view class="step-number {{detail.xsk_zt === 1 ? 'step-done' : detail.xsk_zt === 2 ? 'step-rejected' : 'step-pending'}}">2</view>
+        </view>
+        <view class="step-content">
+          <view class="step-header">
+            <text class="step-title">学生科审批</text>
+            <van-tag size="medium" type="{{detail.xsk_zt === 0 ? 'default' : detail.xsk_zt === 1 ? 'success' : 'danger'}}">
+              {{detail.xsk_zt === 0 ? '待审批' : detail.xsk_zt === 1 ? '已通过' : '已拒绝'}}
+            </van-tag>
+          </view>
+          <view class="step-desc" wx:if="{{detail.xsk_zt !== 0}}">
+            <van-icon name="manager-o" size="24rpx" />
+            <text>审批人：{{detail.sp_xsk_xm || '未知'}}</text>
+          </view>
+          <view class="step-desc step-waiting" wx:elif="{{detail.bzr_zt !== 1}}">
+            <van-icon name="info-o" size="24rpx" />
+            <text>需班主任审批通过后进入此环节</text>
+          </view>
+          <view class="step-desc step-waiting" wx:else>
+            <van-icon name="clock-o" size="24rpx" />
+            <text>等待学生科审批中...</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 销假状态 -->
+    <view class="info-card">
+      <view class="info-row">
+        <text class="info-label">销假状态</text>
+        <van-tag type="{{detail.xj_zt === 1 ? 'success' : 'warning'}}">
+          {{detail.xj_zt === 1 ? '已销假' : '未销假'}}
+        </van-tag>
+      </view>
+      <view class="info-row">
+        <text class="info-label">申请时间</text>
+        <text class="info-value">{{detail.qjsqsj}}</text>
+      </view>
+    </view>
+
+    <!-- 审批操作按钮 -->
+    <view class="action-card" wx:if="{{detail.bzr_zt === 0 || (detail.bzr_zt === 1 && detail.xsk_zt === 0 && isXsk)}}">
+      <view class="action-hint">
+        <van-icon name="info-o" size="28rpx" />
+        <text>{{detail.bzr_zt === 0 ? '待班主任审批' : '待学生科审批'}}</text>
+      </view>
+      <view class="action-buttons">
+        <van-button size="small" type="danger" plain bindtap="handleReject">拒绝</van-button>
+        <van-button size="small" type="primary" color="{{detail.bzr_zt === 0 ? '#EB2F96' : '#722ED1'}}" bindtap="handleApprove">通过</van-button>
+      </view>
+    </view>
+  </view>
+</view>

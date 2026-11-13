@@ -1,0 +1,116 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <!-- 切换身份按钮 -->
+  <view class="switch-role-btn" bindtap="goToUserCenter">
+    <view class="switch-role-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:18rpx;color:#E86433;"></text>
+    </view>
+    <text>切换身份</text>
+  </view>
+
+  <view class="login-box">
+    <!-- 学校标识 -->
+    <view class="school-badge university">
+      <view class="badge-icon"><text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#fff;"></text></view>
+      <view class="badge-text">开放学生端</view>
+    </view>
+    <!-- 标题 -->
+    <view class="title">黔东南开大-智慧教务平台</view>
+
+    <!-- 登录方式切换 -->
+    <view class="login-type">
+      <view
+        class="type-icon {{loginType === 'password' ? 'active' : ''}}"
+        bindtap="switchLoginType"
+        data-type="password"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;"></text>
+      </view>
+      <view
+        class="type-icon {{loginType === 'openid' ? 'active' : ''}}"
+        bindtap="switchLoginType"
+        data-type="openid"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;"></text>
+      </view>
+      <view
+        class="type-icon {{loginType === 'quick' ? 'active' : ''}}"
+        bindtap="switchLoginType"
+        data-type="quick"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;"></text>
+      </view>
+    </view>
+
+    <!-- openid 快捷登录（默认） -->
+    <view class="login-form" wx:if="{{loginType === 'openid'}}">
+      <view class="quick-login-tip">微信已绑定，可直接使用微信一键登录</view>
+      <button
+        class="phone-login-btn"
+        bindtap="handleOpenidLogin"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+        微信一键登录
+      </button>
+      <view class="quick-login-note">首次使用请先用「手机号快捷登录」绑定微信</view>
+    </view>
+
+    <!-- 手机号快捷登录 -->
+    <view class="login-form" wx:if="{{loginType === 'quick'}}">
+      <view class="quick-login-tip">请使用手机号快捷登录</view>
+      <button
+        class="phone-login-btn"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="getPhoneNumber"
+      >
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
+        手机号快捷登录
+      </button>
+    </view>
+
+    <!-- 密码登录表单 -->
+    <view class="login-form" wx:if="{{loginType === 'password'}}">
+      <view class="custom-input-cell">
+        <text class="vi custom-input-icon" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:#E86433;"></text>
+        <input
+          class="custom-input"
+          value="{{ username }}"
+          placeholder="请输入用户名"
+          bindinput="onUsernameChange"
+        />
+      </view>
+      <view class="custom-input-cell">
+        <text class="vi custom-input-icon" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:#E86433;"></text>
+        <input
+          class="custom-input"
+          value="{{ password }}"
+          type="password"
+          placeholder="请输入密码"
+          bindinput="onPasswordChange"
+        />
+      </view>
+      <van-button
+        type="primary"
+        block
+        color="linear-gradient(135deg, #E86433, #FFB067)"
+        bind:click="handlePasswordLogin"
+      >登录</van-button>
+    </view>
+
+    <!-- 底部协议 -->
+    <view class="agreement">
+      <checkbox-group bindchange="handleAgreeChange">
+        <checkbox value="agree" checked="{{isAgree}}">我已阅读并同意</checkbox>
+      </checkbox-group>
+      <view class="agreement-links">
+        <text class="link" bindtap="navigateToUserAgreement">《用户协议》</text>
+        <text>和</text>
+        <text class="link" bindtap="navigateToPrivacyPolicy">《隐私政策》</text>
+      </view>
+      <view class="version">
+        <text>版本：{{version}}</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,184 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<!-- 页面头部 -->
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;color:inherit;"></text>
+    </view>
+    <view class="header-text">
+      <view class="header-title">请假审批</view>
+      <view class="header-subtitle">Leave Approval</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:inherit;"></text>
+    </view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 审批模式切换（仅学生科角色可见） -->
+  <view class="mode-switch" wx:if="{{isXsk}}">
+    <view class="mode-btn {{approveMode === 'bzr' ? 'mode-active' : ''}}" data-mode="bzr" bindtap="onModeChange">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:inherit;"></text>
+      <text>班主任审批</text>
+    </view>
+    <view class="mode-btn {{approveMode === 'xsk' ? 'mode-active mode-active-xsk' : ''}}" data-mode="xsk" bindtap="onModeChange">
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:inherit;"></text>
+      <text>学生科审批</text>
+    </view>
+  </view>
+
+  <!-- 当前模式提示 -->
+  <view class="mode-hint" wx:if="{{approveMode === 'xsk'}}">
+    <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#722ED1;"></text>
+    <text>当前为学生科审批模式，显示班主任已通过但学生科未审批的假条</text>
+  </view>
+
+  <!-- 标签页 -->
+  <van-tabs active="{{ activeTab }}" bind:change="onTabChange" color="{{approveMode === 'xsk' ? '#722ED1' : '#EB2F96'}}">
+    <van-tab title="待审批"></van-tab>
+    <van-tab title="已通过"></van-tab>
+    <van-tab title="已拒绝"></van-tab>
+  </van-tabs>
+
+  <!-- 列表内容 -->
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+
+    <view wx:elif="{{leaveList.length === 0}}" class="empty-state">
+      <van-empty description="暂无请假记录" />
+    </view>
+
+    <view wx:else class="leave-list">
+      <view
+        class="leave-item {{approveMode === 'xsk' ? 'leave-item-xsk' : ''}}"
+        wx:for="{{leaveList}}"
+        wx:key="id"
+        bindtap="goToDetail"
+        data-id="{{item.id}}"
+      >
+        <!-- 顶部：照片 + 姓名学号班级 + 请假类型 + 时长徽标 -->
+        <view class="leave-top">
+          <view class="student-photo" catchtap="onPhotoTap" data-url="{{item.photo_url}}" data-name="{{item.xm}}">
+            <image wx:if="{{item.photo_url}}" src="{{item.photo_url}}" mode="aspectFill" class="photo-img" binderror="onPhotoError" data-idx="{{index}}"></image>
+            <view wx:else class="photo-placeholder">
+              <text class="placeholder-text">{{item.xm[0]}}</text>
+            </view>
+          </view>
+          <view class="student-meta">
+            <view class="meta-row">
+              <text class="student-name">{{item.xm}}</text>
+              <van-tag type="{{item.qjlb === '病假' ? 'danger' : item.qjlb === '事假' ? 'warning' : 'primary'}}">{{item.qjlb}}</van-tag>
+            </view>
+            <view class="meta-row meta-row-sub">
+              <text class="student-id">{{item.xh}}</text>
+              <text wx:if="{{item.class_name}}" class="class-name">{{item.class_name}}</text>
+            </view>
+          </view>
+          <!-- 时长徽标：单独悬挂在右上 -->
+          <view wx:if="{{item.duration_text}}" class="duration-chip">
+            <text class="duration-text">{{item.duration_text}}</text>
+          </view>
+        </view>
+
+        <!-- 学生科模式下显示班级和班主任审批人 -->
+        <view class="xsk-extra-info" wx:if="{{approveMode === 'xsk'}}">
+          <view class="extra-item" wx:if="{{item.class_name}}">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+            <text>{{item.class_name}}</text>
+          </view>
+          <view class="extra-item">
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+            <text>班主任已批：{{item.sp_bzr_xm || '未知'}}</text>
+          </view>
+        </view>
+
+        <!-- 请假原因（独立块，加底色，最醒目） -->
+        <view class="reason-block">
+          <view class="reason-label">请假原因</view>
+          <view class="reason-text">{{item.qjsy || '—'}}</view>
+        </view>
+
+        <!-- 请假时间：起 / 止 分两行 -->
+        <view class="time-block">
+          <view class="time-row">
+            <text class="time-label">起</text>
+            <text class="time-value">{{item.qjkssj || '—'}}</text>
+          </view>
+          <view class="time-row">
+            <text class="time-label">止</text>
+            <text class="time-value">{{item.qjjssj || '—'}}</text>
+          </view>
+        </view>
+
+        <!-- 离校线路 + 交通工具（合并到一行更紧凑） -->
+        <view class="route-block" wx:if="{{item.xslxxl || item.xslxjtgj}}">
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:#1890FF;"></text>
+          <text class="route-text">{{item.xslxxl || '—'}}</text>
+          <text wx:if="{{item.xslxjtgj}}" class="route-divider">·</text>
+          <text wx:if="{{item.xslxjtgj}}" class="route-text">{{item.xslxjtgj}}</text>
+        </view>
+
+        <!-- 待审批状态显示操作按钮 -->
+        <view class="leave-actions" wx:if="{{statusFilter === 'pending'}}" catchtap="stopPropagation">
+          <van-button
+            size="small"
+            type="danger"
+            plain
+            data-id="{{item.id}}"
+            bind:click="handleReject"
+          >拒绝</van-button>
+          <van-button
+            size="small"
+            type="primary"
+            color="{{approveMode === 'xsk' ? '#722ED1' : '#EB2F96'}}"
+            data-id="{{item.id}}"
+            bind:click="handleApprove"
+          >通过</van-button>
+        </view>
+
+        <!-- 已审批状态显示审批信息和销假状态 -->
+        <view class="leave-footer" wx:else>
+          <view class="footer-top">
+            <text class="apply-time">申请时间：{{item.qjsqsj}}</text>
+            <view class="view-detail-hint">
+              <text>查看详情</text>
+              <text class="vi" style="font-family:vant-icon,sans-serif;font-size:24rpx;color:inherit;"></text>
+            </view>
+          </view>
+          <!-- 班主任模式已通过的显示销假状态 -->
+          <view class="footer-cancel" wx:if="{{approveMode === 'bzr' && statusFilter === 'approved'}}">
+            <view class="cancel-status">
+              <block wx:if="{{item.xj_zt === 1}}">
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#52C41A;"></text>
+              </block>
+              <block wx:else>
+                <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#FAAD14;"></text>
+              </block>
+              <text class="cancel-text {{item.xj_zt === 1 ? 'cancel-done' : 'cancel-pending'}}">{{item.xj_zt === 1 ? '已销假' : '未销假'}}</text>
+            </view>
+            <van-button
+              wx:if="{{item.xj_zt !== 1 && item.bzr_zt === 1 && item.xsk_zt === 1}}"
+              size="small"
+              type="warning"
+              plain
+              data-id="{{item.id}}"
+              data-xm="{{item.xm}}"
+              catchtap="handleTeacherCancel"
+            >代销假</van-button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分页加载提示 -->
+    <view class="load-more" wx:if="{{loadingMore}}">
+      <van-loading size="24px">加载更多...</van-loading>
+    </view>
+    <view class="no-more" wx:if="{{noMore && leaveList.length > 0}}">
+      <text>— 没有更多了 —</text>
+    </view>
+  </view>
+</view>

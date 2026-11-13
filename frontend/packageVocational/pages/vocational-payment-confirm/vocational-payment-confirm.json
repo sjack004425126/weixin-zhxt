@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "缴费确认",
+  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f5f5f5",
+  "usingComponents": {
+    "van-icon": "/components/vant-icon/index"
+  }
+}

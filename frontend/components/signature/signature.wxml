@@ -1,0 +1,22 @@
+<view class="signature">
+  <canvas 
+    type="2d" 
+    id="signatureCanvas"
+    class="canvas"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  ></canvas>
+  <view class="btn-group">
+    <van-button 
+      type="default" 
+      size="small" 
+      bind:click="clear"
+    >清除</van-button>
+    <van-button 
+      type="primary" 
+      size="small" 
+      bind:click="submit"
+    >确认</van-button>
+  </view>
+</view> 

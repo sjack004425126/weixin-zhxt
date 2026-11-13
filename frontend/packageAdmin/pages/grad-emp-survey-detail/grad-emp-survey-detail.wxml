@@ -1,0 +1,164 @@
+<!--packageAdmin/pages/grad-emp-survey-detail/grad-emp-survey-detail.wxml-->
+<include src="/utils/common-components.wxml" />
+
+<view wx:if="{{loading && !detail}}" class="loading-tip">加载中...</view>
+
+<view wx:elif="{{error}}" class="loading-tip">{{error}}</view>
+
+<view wx:elif="{{detail}}" class="detail-wrap">
+  <!-- 头部：姓名 + 学号 + 批次 + 查询码 -->
+  <view class="detail-header">
+    <view class="row">
+      <view class="row-label">姓名</view>
+      <view class="row-value">
+        <text>{{detail.student_name || '匿名'}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">学号</view>
+      <view class="row-value">{{detail.student_no || '-'}}</view>
+    </view>
+    <view class="row" wx:if="{{detail.batch}}">
+      <view class="row-label">批次</view>
+      <view class="row-value">{{detail.batch}}</view>
+    </view>
+    <view class="row" wx:if="{{detail.query_code}}">
+      <view class="row-label">查询码</view>
+      <view class="row-value">
+        <text class="query-code">{{detail.query_code}}</text>
+        <text class="copy-tip" bindtap="onCopyCode">复制</text>
+      </view>
+    </view>
+    <view class="row" wx:if="{{detail.phone}}">
+      <view class="row-label">手机号</view>
+      <view class="row-value">{{detail.phone}}</view>
+    </view>
+    <view class="row">
+      <view class="row-label">提交时间</view>
+      <view class="row-value">{{detail.submit_time || '-'}}</view>
+    </view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="card">
+    <view class="card-title">基本信息</view>
+    <view class="kv">
+      <view class="kv-k">毕业去向</view>
+      <view class="kv-v">{{destinationLabel}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">是否精准服务</view>
+      <view class="kv-v">{{detail.precise_service === '1' ? '是' : detail.precise_service === '2' ? '否' : '-'}}</view>
+    </view>
+  </view>
+
+  <!-- 应征义务兵 -->
+  <view wx:if="{{detail.destination === '2'}}" class="card">
+    <view class="card-title">应征义务兵</view>
+    <view class="kv">
+      <view class="kv-k">征兵办公室</view>
+      <view class="kv-v">{{detail.military_office || '-'}}</view>
+    </view>
+  </view>
+
+  <!-- 升学 -->
+  <view wx:if="{{isStudy}}" class="card">
+    <view class="card-title">升学信息</view>
+    <view class="kv">
+      <view class="kv-k">升学层次</view>
+      <view class="kv-v">{{educationLevelLabel}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">录取分数</view>
+      <view class="kv-v">{{detail.admission_score || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">录取高校</view>
+      <view class="kv-v">{{detail.college_name || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">录取专业</view>
+      <view class="kv-v">{{detail.major_name || '-'}}</view>
+    </view>
+  </view>
+
+  <!-- 就业 -->
+  <view wx:if="{{isEmployed}}" class="card">
+    <view class="card-title">就业信息</view>
+    <view class="kv">
+      <view class="kv-k">合同情况</view>
+      <view class="kv-v">{{detail.contract_type || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">就业渠道</view>
+      <view class="kv-v">{{detail.employment_channel || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">工作单位</view>
+      <view class="kv-v">{{detail.company_name || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">单位地址</view>
+      <view class="kv-v">{{detail.work_province_city || ''}}{{detail.work_address ? ' ' + detail.work_address : ''}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">单位性质</view>
+      <view class="kv-v">{{detail.company_nature || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">所处行业</view>
+      <view class="kv-v">{{detail.industry || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">工作岗位</view>
+      <view class="kv-v">{{detail.position_name || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">月薪</view>
+      <view class="kv-v">{{detail.monthly_salary ? detail.monthly_salary + ' 元' : '-'}}</view>
+    </view>
+  </view>
+
+  <!-- 反馈与凭证 -->
+  <view class="card">
+    <view class="card-title">就业反馈</view>
+    <view class="kv">
+      <view class="kv-k">满意度</view>
+      <view class="kv-v">{{detail.satisfaction || '-'}}</view>
+    </view>
+    <view class="kv">
+      <view class="kv-k">需要推荐</view>
+      <view class="kv-v">
+        <text wx:if="{{detail.need_recommendation === '1'}}" style="color:#ff4d4f">需要</text>
+        <text wx:elif="{{detail.need_recommendation === '2'}}">不需要</text>
+        <text wx:else>-</text>
+      </view>
+    </view>
+    <view class="kv kv-multiline">
+      <view class="kv-k">意见建议</view>
+      <view class="kv-v">{{detail.feedback || '-'}}</view>
+    </view>
+  </view>
+
+  <!-- 就业凭证：核心图片加载区 -->
+  <view class="card">
+    <view class="card-title">就业凭证</view>
+    <view wx:if="{{certificateUrl}}" class="cert-wrap">
+      <image
+        class="cert-img"
+        src="{{certificateUrl}}"
+        mode="widthFix"
+        bindtap="onPreviewCert"
+        data-url="{{certificateUrl}}"
+        binderror="onCertImageError"
+      />
+      <view class="cert-actions">
+        <view class="action-btn" bindtap="onPreviewCert" data-url="{{certificateUrl}}">
+          <van-icon name="photo-o" size="28rpx" />
+          <text>预览</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="no-cert">该学生未上传就业凭证</view>
+  </view>
+</view>

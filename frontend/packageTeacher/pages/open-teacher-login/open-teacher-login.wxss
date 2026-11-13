@@ -1,0 +1,299 @@
+/* INCIDENTS/001: 修复 vant-icon 不显示问题 */
+@import "../../../components/vant-icon/index.wxss";
+
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+
+/* type-icon 内的图标样式 */
+.type-icon .vi {
+  color: #999;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.type-icon.active .vi {
+  color: currentColor;
+  transform: scale(1.2);
+}
+
+/* 登录方式切换（openid / 手机号） */
+.login-type {
+  display: flex;
+  justify-content: space-around;
+  margin: 0 20rpx 60rpx;
+  padding: 20rpx 0;
+}
+
+.type-icon {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF6F2 0%, #F7F8FA 100%);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2rpx solid rgba(232, 100, 51, 0.1);
+  box-shadow: 0 4rpx 12rpx rgba(232, 100, 51, 0.08);
+}
+
+.type-icon.active {
+  background: linear-gradient(135deg, rgba(232, 100, 51, 0.15) 0%, rgba(255, 176, 103, 0.15) 100%);
+  border-color: #E86433;
+  box-shadow: 0 6rpx 20rpx rgba(232, 100, 51, 0.2);
+  transform: translateY(-4rpx);
+}
+
+/* 开放教育教师登录 - 橙色学术风格 */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFF6F2 0%, #F7F8FA 50%, #FFF9F6 100%);
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23E86433' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+/* 切换身份按钮 */
+.switch-role-btn {
+  position: absolute;
+  top: 40rpx;
+  left: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 14rpx 28rpx 14rpx 14rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 52rpx;
+  box-shadow: 0 4rpx 16rpx rgba(232, 100, 51, 0.12), 0 1rpx 4rpx rgba(232, 100, 51, 0.08);
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1rpx solid rgba(232, 100, 51, 0.1);
+  cursor: pointer;
+}
+
+.switch-role-btn:active {
+  transform: scale(0.96);
+}
+
+.switch-role-icon {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(232, 100, 51, 0.1) 0%, rgba(255, 176, 103, 0.15) 100%);
+  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.switch-role-btn:active .switch-role-icon {
+  transform: rotate(180deg);
+}
+
+.switch-role-btn text {
+  font-size: 26rpx;
+  color: #E86433;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.login-box {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 32rpx;
+  padding: 80rpx 40rpx 60rpx;
+  box-shadow: 0 8rpx 32rpx rgba(232, 100, 51, 0.15);
+  backdrop-filter: blur(10rpx);
+  border: 2rpx solid rgba(232, 100, 51, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.login-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6rpx;
+  background: linear-gradient(90deg, #E86433 0%, #FFB067 50%, #E86433 100%);
+  border-radius: 32rpx 32rpx 0 0;
+}
+
+.school-badge {
+  position: absolute;
+  top: -20rpx;
+  right: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 40rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  background: linear-gradient(135deg, #E86433 0%, #FFB067 100%);
+  color: white;
+}
+
+.badge-icon { font-size: 28rpx; }
+.badge-text { font-size: 22rpx; letter-spacing: 1rpx; }
+
+.title {
+  font-size: 52rpx;
+  font-weight: 700;
+  background: linear-gradient(135deg, #E86433 0%, #FF9B4E 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-align: center;
+  margin-bottom: 10rpx;
+  letter-spacing: 2rpx;
+}
+
+.title.sub {
+  font-size: 40rpx;
+  margin-bottom: 60rpx;
+}
+
+.login-form {
+  margin-bottom: 40rpx;
+  min-height: 300rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.quick-login-tip {
+  text-align: center;
+  color: #666;
+  font-size: 28rpx;
+  padding: 60rpx 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 快捷登录下方的补充说明（如"首次使用请先绑定微信"） */
+.quick-login-note {
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
+  padding: 20rpx 0 0;
+  line-height: 1.6;
+}
+
+.phone-login-btn {
+  width: 100%;
+  min-width: 480rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  padding: 0 40rpx;
+  box-sizing: border-box;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  background: linear-gradient(135deg, #E86433 0%, #FFB067 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(232, 100, 51, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.phone-login-btn::after { border: none; }
+
+.phone-login-btn:active {
+  transform: translateY(2rpx) scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(232, 100, 51, 0.3);
+}
+
+.agreement {
+  margin-top: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+  text-align: center;
+}
+
+.agreement-links {
+  margin-top: 10rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.link { color: #1890ff; display: inline; }
+
+checkbox { transform: scale(0.8); margin-right: 4rpx; }
+
+/* 动画 */
+.login-box { animation: slideInUp 0.6s ease-out; }
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(60rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title { animation: fadeInDown 0.8s ease-out 0.2s both; }
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.school-badge { animation: bounceIn 0.8s ease-out 0.4s both; }
+@keyframes bounceIn {
+  0% { opacity: 0; transform: scale(0.3) rotate(-5deg); }
+  50% { opacity: 1; transform: scale(1.05) rotate(-5deg); }
+  70% { transform: scale(0.9) rotate(-5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-5deg); }
+}
+
+.switch-role-btn { animation: switchBtnIn 0.6s ease-out 0.3s both; }
+@keyframes switchBtnIn {
+  0% { opacity: 0; transform: translateX(-30rpx) scale(0.8); }
+  60% { transform: translateX(6rpx) scale(1.02); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.switch-role-icon { animation: iconPulse 3s ease-in-out 1.5s infinite; }
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.login-form { animation: slideInRight 0.6s ease-out 0.9s both; }
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40rpx); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.agreement { animation: fadeInUp 0.6s ease-out 1s both; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-box::before { animation: expandWidth 0.8s ease-out 0.2s both; }
+@keyframes expandWidth {
+  from { width: 0; }
+  to { width: 100%; }
+}

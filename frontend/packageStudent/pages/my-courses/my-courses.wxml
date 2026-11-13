@@ -1,0 +1,178 @@
+<include src="/utils/common-components.wxml" />
+
+<!-- 顶部导航 -->
+<view class="nav-bar">
+  <view class="nav-inner">
+    <view class="nav-icon-wrap">
+      <van-icon name="orders-o" size="36rpx" color="#fff" />
+    </view>
+    <view class="nav-title-wrap">
+      <text class="nav-title">教学计划课程</text>
+      <text class="nav-sub">My Courses</text>
+    </view>
+    <view class="nav-home" bindtap="goHome">
+      <van-icon name="wap-home-o" size="36rpx" />
+    </view>
+  </view>
+</view>
+
+<view class="page-body">
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <van-loading size="48rpx" color="#1890FF" vertical>加载中...</van-loading>
+  </view>
+
+  <block wx:if="{{!loading}}">
+
+    <!-- 统计概览 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.total}}</text>
+        <text class="stat-label">总课程</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num learned-num">{{stats.learned}}</text>
+        <text class="stat-label">已学习</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num passed-num">{{stats.passed}}</text>
+        <text class="stat-label">已及格</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num failed-num">{{stats.failed}}</text>
+        <text class="stat-label">不及格</text>
+      </view>
+    </view>
+
+    <!-- 不及格课程 -->
+    <view class="section" wx:if="{{failedCourses.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot failed-dot"></view>
+          <text class="section-title">不及格课程</text>
+          <text class="section-count">{{failedCourses.length}}门</text>
+        </view>
+      </view>
+
+      <view class="course-card" wx:for="{{failedCourses}}" wx:key="kcid">
+        <view class="card-accent accent-red"></view>
+        <view class="card-body">
+          <view class="card-top">
+            <view class="card-name-wrap">
+              <text class="card-name">{{item.kcmc}}</text>
+              <view class="card-tags">
+                <text class="tag tag-id">{{item.kcid}}</text>
+                <text class="tag tag-type">{{item.kcxz}}</text>
+                <text class="tag tag-xf">{{item.kcxf}}学分</text>
+              </view>
+            </view>
+            <view class="score-badge fail-badge">
+              {{item.zh_score}}
+            </view>
+          </view>
+          <view class="card-bottom">
+            <view class="meta-wrap">
+              <text class="meta-item">第{{item.ksxq}}学期</text>
+              <text class="meta-item">{{item.kclx}}</text>
+              <text class="meta-item">{{item.ksdw}}</text>
+            </view>
+          </view>
+          <!-- 详细成绩 -->
+          <view class="score-detail" wx:if="{{item.source === 'tzd_cj_z'}}">
+            <view class="score-detail-item" wx:if="{{item.xk_score !== null}}">
+              <text class="score-detail-label">形考({{item.xk_bl}}%)</text>
+              <text class="score-detail-val {{item.xk_score < 60 ? 'fail-val' : ''}}">{{item.xk_score}}</text>
+            </view>
+            <view class="score-detail-item" wx:if="{{item.zk_score !== null}}">
+              <text class="score-detail-label">终考</text>
+              <text class="score-detail-val {{item.zk_score < 60 ? 'fail-val' : ''}}">{{item.zk_score}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 未学习课程 -->
+    <view class="section" wx:if="{{unlearnedCourses.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-dot unlearned-dot"></view>
+          <text class="section-title">未学习课程</text>
+          <text class="section-count">{{unlearnedCourses.length}}门</text>
+        </view>
+      </view>
+
+      <view class="course-card" wx:for="{{unlearnedCourses}}" wx:key="kcid">
+        <view class="card-accent accent-gray"></view>
+        <view class="card-body">
+          <view class="card-top">
+            <view class="card-name-wrap">
+              <text class="card-name">{{item.kcmc}}</text>
+              <view class="card-tags">
+                <text class="tag tag-id">{{item.kcid}}</text>
+                <text class="tag tag-type">{{item.kcxz}}</text>
+                <text class="tag tag-xf">{{item.kcxf}}学分</text>
+              </view>
+            </view>
+            <view class="status-pill">未学习</view>
+          </view>
+          <view class="card-bottom">
+            <view class="meta-wrap">
+              <text class="meta-item">第{{item.ksxq}}学期</text>
+              <text class="meta-item">{{item.kclx}}</text>
+              <text class="meta-item">{{item.ksdw}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 已及格课程（可折叠） -->
+    <view class="section" wx:if="{{passedCourses.length > 0}}">
+      <view class="section-header" bindtap="togglePassed">
+        <view class="section-title-wrap">
+          <view class="section-dot passed-dot"></view>
+          <text class="section-title">已及格课程</text>
+          <text class="section-count">{{passedCourses.length}}门</text>
+        </view>
+        <van-icon name="{{showPassed ? 'arrow-up' : 'arrow-down'}}" size="28rpx" color="#8C8C8C" />
+      </view>
+
+      <block wx:if="{{showPassed}}">
+        <view class="course-card" wx:for="{{passedCourses}}" wx:key="kcid">
+          <view class="card-accent accent-green"></view>
+          <view class="card-body">
+            <view class="card-top">
+              <view class="card-name-wrap">
+                <text class="card-name passed-name">{{item.kcmc}}</text>
+                <view class="card-tags">
+                  <text class="tag tag-id">{{item.kcid}}</text>
+                  <text class="tag tag-type">{{item.kcxz}}</text>
+                  <text class="tag tag-xf">{{item.kcxf}}学分</text>
+                </view>
+              </view>
+              <view class="score-badge pass-badge">
+                {{item.zh_score}}
+              </view>
+            </view>
+            <view class="card-bottom">
+              <view class="meta-wrap">
+                <text class="meta-item">第{{item.ksxq}}学期</text>
+                <text class="meta-item">{{item.kclx}}</text>
+                <text class="meta-item">{{item.ksdw}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="empty-wrap" wx:if="{{coursesList.length === 0}}">
+      <van-empty description="暂无课程数据" />
+    </view>
+
+  </block>
+</view>

@@ -1,0 +1,205 @@
+/* 开放教育教师中心 - 橙色主题 */
+page {
+  --primary-color: #E86433;
+  --primary-light: #FFF6F2;
+  --primary-gradient: linear-gradient(135deg, #E86433 0%, #FFB067 100%);
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+  --border-color: #F0F0F0;
+  --bg-color: #FAFAFA;
+  --card-shadow: 0 4rpx 12rpx rgba(232, 100, 51, 0.08);
+  --border-radius: 16rpx;
+  --error-color: #FF4D4F;
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg-color) 200rpx);
+  padding: 30rpx;
+}
+
+.user-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 40rpx 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4rpx;
+  background: var(--primary-gradient);
+}
+
+.user-info {
+  display: flex;
+  align-items: flex-start;
+}
+
+.avatar-container {
+  margin-right: 30rpx;
+  position: relative;
+}
+
+.avatar-wrapper {
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.avatar-badge {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: #ff976a;
+  color: #fff;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  text-align: center;
+  border: 3rpx solid #fff;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(232, 100, 51, 0.2);
+}
+
+.avatar-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid rgba(232, 100, 51, 0.2);
+}
+
+.info-wrap { flex: 1; }
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.status-tag.teacher {
+  background: var(--primary-gradient);
+  color: #fff;
+  font-weight: bold;
+}
+
+.user-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 16rpx;
+  color: #666;
+  font-size: 28rpx;
+}
+
+.user-detail van-icon {
+  margin-right: 12rpx;
+  color: #999;
+}
+
+.function-list { margin-top: 24rpx; }
+
+.section { margin-bottom: 32rpx; }
+
+.section-title {
+  margin-bottom: 20rpx;
+  padding: 0 20rpx;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  position: relative;
+  padding-left: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.title-text::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 32rpx;
+  background: var(--primary-gradient);
+  border-radius: 3rpx;
+  box-shadow: 0 2rpx 8rpx rgba(232, 100, 51, 0.3);
+}
+
+.logout-text { color: var(--error-color) !important; }
+
+/* Vant 覆盖 */
+.van-cell-group {
+  margin: 0 16rpx !important;
+  border-radius: var(--border-radius) !important;
+  overflow: hidden !important;
+  box-shadow: var(--card-shadow) !important;
+  border: 1rpx solid var(--border-color) !important;
+}
+
+.van-cell {
+  padding: 24rpx !important;
+  transition: all 0.3s ease !important;
+  border-bottom: 1rpx solid var(--border-color) !important;
+}
+
+.van-cell:last-child { border-bottom: none !important; }
+
+.van-cell__left-icon-wrap .van-icon {
+  color: var(--primary-color) !important;
+}
+
+.van-cell__left-icon-wrap .van-icon-close {
+  color: #ff4d4f !important;
+}
+
+/* 动画 */
+.user-card { animation: fadeInUp 0.6s ease-out 0.1s both; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section:nth-child(1) { animation: slideInLeft 0.6s ease-out 0.2s both; }
+.section:nth-child(2) { animation: slideInLeft 0.6s ease-out 0.3s both; }
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30rpx); }
+  to { opacity: 1; transform: translateX(0); }
+}

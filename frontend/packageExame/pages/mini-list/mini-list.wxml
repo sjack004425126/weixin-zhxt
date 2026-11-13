@@ -1,0 +1,146 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+
+<view class="list-page">
+  <!-- 用户身份头部 -->
+  <view class="user-header">
+    <view class="user-row">
+      <view class="avatar">{{userNameFirst || '考'}}</view>
+      <view class="user-info">
+        <view class="user-line1">
+          <text class="user-name">{{userInfo.name || '考生'}}</text>
+          <view class="online-dot"></view>
+          <text class="user-class">{{userInfo.className || ''}}</text>
+        </view>
+        <view class="user-line2">
+          <text class="user-meta">学号：{{userInfo.studentId || userInfo.xh || '-'}} · {{userInfo.major || ''}}</text>
+        </view>
+      </view>
+      <view class="refresh-btn {{isRefreshing ? 'is-spinning' : ''}}" bindtap="handleRefresh" hover-class="refresh-btn--hover">
+        <view class="refresh-arrow"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ⭐ 3 个功能入口：icon + 文字，同一行 -->
+  <view class="quick-row">
+    <view class="quick-btn" bindtap="goToScores" hover-class="cell-hover">
+      <van-icon name="medal-o" size="24px" class="quick-btn-icon" />
+      <text class="quick-btn-text">历史成绩</text>
+    </view>
+    <view class="quick-btn" bindtap="showNoticeAgain" hover-class="cell-hover">
+      <van-icon name="notes-o" size="24px" class="quick-btn-icon" />
+      <text class="quick-btn-text">考场须知</text>
+    </view>
+    <view class="quick-btn" bindtap="handleLogout" hover-class="cell-hover">
+      <van-icon name="revoke" size="24px" class="quick-btn-icon quick-btn-icon--danger" />
+      <text class="quick-btn-text quick-btn-text--danger">退出登录</text>
+    </view>
+  </view>
+
+  <!-- 考试列表 -->
+  <view class="list-body">
+    <view wx:if="{{loading && exams.length === 0}}" class="loading-tip">
+      <text>加载中...</text>
+    </view>
+
+    <block wx:elif="{{filteredExams.length > 0}}">
+      <view
+        wx:for="{{filteredExams}}"
+        wx:key="id"
+        wx:for-index="idx"
+        class="exam-card"
+        data-id="{{item.id}}"
+        data-title="{{item.title}}"
+        bindtap="goToExam"
+      >
+        <!-- 顶部彩色装饰条 -->
+        <view class="card-band {{item.type === 1 ? 'band-blue' : 'band-orange'}}"></view>
+
+        <view class="card-head">
+          <text class="card-title">{{item.title}}</text>
+          <view class="card-type {{item.type === 1 ? 'tag-blue' : 'tag-orange'}}">
+            {{item.type === 1 ? '正式考核' : '随堂模拟'}}
+          </view>
+        </view>
+
+        <view class="card-desc" wx:if="{{item.description}}">{{item.description}}</view>
+
+        <view class="card-meta">
+          <view class="meta-cell">
+            <text class="meta-label">答题限时</text>
+            <text class="meta-value">{{item.duration}} 分钟</text>
+          </view>
+          <view class="meta-cell">
+            <text class="meta-label">试卷分值</text>
+            <text class="meta-value">{{item.total_score}} 分</text>
+          </view>
+          <view class="meta-cell">
+            <text class="meta-label">及格门槛</text>
+            <text class="meta-value meta-pass">{{item.pass_score}} 分</text>
+          </view>
+        </view>
+
+        <view class="card-foot">
+          <text class="foot-left">已考 <text class="foot-num">{{item.attempt_count || 0}}/{{item.max_attempts == 0 ? '∞' : item.max_attempts || 99}}</text> 次</text>
+          <view class="foot-go">
+            <text>开始进入答题</text>
+            <text class="foot-arrow">›</text>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{loadingMore}}" class="loading-tip small">加载更多...</view>
+      <view wx:elif="{{noMore && exams.length > 0}}" class="loading-tip small">— 没有更多了 —</view>
+    </block>
+
+    <view wx:else class="empty">
+      <text class="empty-icon">📭</text>
+      <view class="empty-title">当前分类下暂无考务任务</view>
+      <view class="empty-sub">请切换标签或稍后重试</view>
+    </view>
+  </view>
+
+  <!-- 考试须知弹层 -->
+  <view wx:if="{{showNotice}}" class="notice-mask" catchtap="hideNotice">
+    <view class="notice-panel" catchtap="noop">
+      <view class="notice-header">
+        <view class="notice-icon-wrap">📝</view>
+        <view class="notice-title">在线考试考场须知</view>
+        <view class="notice-sub">开考前请务必确认以下学术诚信规则</view>
+      </view>
+
+      <scroll-view scroll-y class="notice-body">
+        <view class="notice-line">
+          <view class="line-num">1</view>
+          <view class="line-text">点击"开始进入答题"后，<text class="line-strong">倒计时将自动启动</text>，中途退出不暂停，倒计时清零将触发强制自动交卷。</view>
+        </view>
+        <view class="notice-line">
+          <view class="line-num">2</view>
+          <view class="line-text">考试全程开启<text class="line-danger">防作弊切屏侦测</text>，切出微信或切换应用将被系统即时记录异常报警。</view>
+        </view>
+        <view class="notice-line">
+          <view class="line-num">3</view>
+          <view class="line-text">客观题（单选/多选/判断/填空）交卷后由云端<text class="line-pass">实时自动判分并展示深度名师解析</text>。</view>
+        </view>
+        <view class="notice-line">
+          <view class="line-num">4</view>
+          <view class="line-text">可在考场中开启<text class="line-strong">"答题后自动下一题"</text>，做完单选题/判断题无需手动点击翻页，答题更沉浸。</view>
+        </view>
+        <view class="notice-line">
+          <view class="line-num">5</view>
+          <view class="line-text">随时可点击底部<text class="line-strong">全景答题卡</text>一览作答完整度，漏答题有智能确认提示。</view>
+        </view>
+      </scroll-view>
+
+      <view class="notice-footer">
+        <view class="notice-checkbox" bindtap="toggleDontShowAgain">
+          <view class="checkbox {{dontShowAgain ? 'checkbox-checked' : ''}}">
+            <text wx:if="{{dontShowAgain}}">✓</text>
+          </view>
+          <text>本学期不再自动弹出此说明</text>
+        </view>
+        <view class="btn-notice-ok" bindtap="hideNotice">我已明确考纪，准备答题</view>
+      </view>
+    </view>
+  </view>
+</view>

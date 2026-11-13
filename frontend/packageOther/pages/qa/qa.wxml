@@ -1,0 +1,127 @@
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header-section">
+    <view class="header-content">
+      <view class="header-icon">❓</view>
+      <view class="header-title">常见问题</view>
+      <view class="header-subtitle">Frequently Asked Questions</view>
+      <view class="header-description">为您解答学习过程中的常见疑问</view>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-section">
+    <view class="search-box">
+      <view class="search-icon">🔍</view>
+      <input class="search-input" placeholder="搜索问题关键词..." bindinput="onSearchInput" value="{{searchKeyword}}" />
+      <view class="search-clear {{searchKeyword ? 'show' : ''}}" bindtap="clearSearch">✕</view>
+    </view>
+  </view>
+
+  <!-- 分类标签 -->
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x="true" show-scrollbar="false">
+      <view class="category-list">
+        <view
+          wx:for="{{categories}}"
+          wx:key="*this"
+          class="category-tag {{selectedCategory === item ? 'active' : ''}}"
+          bindtap="selectCategory"
+          data-category="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 问答列表 -->
+  <view class="qa-list">
+    <view wx:for="{{filteredQaList}}" wx:key="index" class="qa-item {{item.expanded ? 'expanded' : ''}}" bindtap="toggleExpand" data-index="{{index}}">
+      <!-- 问题部分 -->
+      <view class="question-section">
+        <view class="question-header">
+          <view class="q-icon-wrapper">
+            <text class="q-icon">Q</text>
+          </view>
+          <view class="question-content">
+            <text class="q-text">{{item.question}}</text>
+            <view class="question-meta">
+              <text class="category-badge">{{item.category}}</text>
+              <text class="question-id">#{{index + 1}}</text>
+            </view>
+          </view>
+          <view class="expand-icon {{item.expanded ? 'rotated' : ''}}">
+            <text>▼</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 答案部分 -->
+      <view class="answer-section {{item.expanded ? 'show' : ''}}">
+        <view class="answer-header">
+          <view class="a-icon-wrapper">
+            <text class="a-icon">A</text>
+          </view>
+        </view>
+        <view class="answer-content">
+          <view wx:if="{{item.type === 'simple'}}" class="simple-answer">
+            <text>{{item.answer}}</text>
+          </view>
+          <view wx:elif="{{item.type === 'detailed'}}" class="detailed-answer">
+            <text class="answer-intro">{{item.intro}}</text>
+            <view wx:for="{{item.steps}}" wx:key="stepIndex" wx:for-item="step" wx:for-index="stepIndex" class="step-item">
+              <view class="step-number">{{stepIndex + 1}}</view>
+              <view class="step-content">
+                <view class="step-title">{{step.title}}</view>
+                <view class="step-description">{{step.description}}</view>
+                <view wx:if="{{step.highlight}}" class="step-highlight">
+                  <view wx:for="{{step.highlight}}" wx:key="highlightIndex" class="highlight-item">
+                    {{item}}
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="answer-actions">
+          <view class="action-btn helpful" bindtap="markHelpful" data-index="{{index}}">
+            <text class="action-icon">👍</text>
+            <text>有帮助 ({{item.helpful || 0}})</text>
+          </view>
+          <view class="action-btn copy" bindtap="copyAnswer" data-index="{{index}}">
+            <text class="action-icon">📋</text>
+            <text>复制答案</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{filteredQaList.length === 0}}" class="empty-state">
+      <view class="empty-icon">🔍</view>
+      <view class="empty-title">未找到相关问题</view>
+      <view class="empty-description">请尝试其他关键词或联系客服</view>
+      <view class="contact-btn" bindtap="contactService">
+        <text>联系客服</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部帮助 -->
+  <view class="help-section">
+    <view class="help-card">
+      <view class="help-icon">💡</view>
+      <view class="help-content">
+        <view class="help-title">没有找到您的问题？</view>
+        <view class="help-description">我们的客服团队随时为您提供帮助</view>
+      </view>
+      <view class="help-actions">
+        <view class="help-btn primary" bindtap="contactService">联系客服</view>
+        <view class="help-btn secondary" bindtap="submitQuestion">提交问题</view>
+      </view>
+    </view>
+  </view>
+</view>

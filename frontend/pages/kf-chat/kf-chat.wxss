@@ -1,0 +1,239 @@
+/* ==================== 页面布局 ==================== */
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f8fa;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-body {
+  padding: 32rpx 32rpx 0;
+  max-width: 1200rpx;
+  margin: 0 auto;
+}
+
+.bottom-spacer {
+  height: 180rpx;
+}
+
+/* ==================== 用户消息 ==================== */
+.segment-user {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 32rpx;
+}
+
+.segment-content-box {
+  max-width: 70%;
+  background: #d4e8ff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.user-content {
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #1a1a1a;
+  word-break: break-word;
+}
+
+/* ==================== AI消息 ==================== */
+.segment-assistant {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 48rpx;
+}
+
+.segment-avatar {
+  flex-shrink: 0;
+  margin-right: 20rpx;
+}
+
+.avatar-img {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.segment-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.markdown-container {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #1a1a1a;
+  word-break: break-word;
+}
+
+/* ==================== AI 思考动画 ==================== */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx 0;
+}
+
+.typing-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #c0c0c0;
+  animation: typingPulse 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingPulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* ==================== 输入框 ==================== */
+.chat-input-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1rpx solid #e5e5e5;
+  padding: 16rpx 24rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  max-width: 1200rpx;
+  margin: 0 auto;
+}
+
+.chat-input-field {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 24rpx;
+  padding: 18rpx 28rpx;
+  font-size: 28rpx;
+  line-height: 44rpx;
+  color: #1a1a1a;
+}
+
+.send-btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.send-btn.active {
+  background: #5c5cff;
+}
+
+.send-icon {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* ==================== towxml 样式覆盖 ==================== */
+.markdown-container .h1 {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin: 32rpx 0 16rpx;
+  color: #1a1a1a;
+}
+
+.markdown-container .h2 {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin: 28rpx 0 14rpx;
+  color: #1a1a1a;
+}
+
+.markdown-container .h3 {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin: 24rpx 0 12rpx;
+  color: #1a1a1a;
+}
+
+.markdown-container .p {
+  margin: 12rpx 0;
+  line-height: 1.8;
+}
+
+.markdown-container .code {
+  background: #f6f8fa;
+  padding: 2rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 26rpx;
+  color: #d63384;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.markdown-container .pre {
+  background: #f6f8fa;
+  border-left: 4rpx solid #d0d7de;
+  padding: 20rpx 24rpx;
+  margin: 16rpx 0;
+  border-radius: 8rpx;
+  overflow-x: auto;
+}
+
+.markdown-container .ul,
+.markdown-container .ol {
+  padding-left: 28rpx;
+  margin: 12rpx 0;
+}
+
+.markdown-container .li {
+  margin: 8rpx 0;
+  line-height: 1.7;
+}
+
+.markdown-container .blockquote {
+  border-left: 6rpx solid #d0d7de;
+  padding: 12rpx 20rpx;
+  margin: 16rpx 0;
+  background: #f6f8fa;
+  color: #666;
+  border-radius: 0 8rpx 8rpx 0;
+}
+
+.markdown-container .a {
+  color: #5c5cff;
+  text-decoration: underline;
+}
+

@@ -1,0 +1,83 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><van-icon name="records" size="40rpx" /></view>
+    <view class="header-text">
+      <view class="header-title">新生信息核对</view>
+      <view class="header-subtitle">Information Verify</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+  </view>
+</view>
+
+<view class="container">
+  <view class="filter-bar">
+    <van-dropdown-menu>
+      <van-dropdown-item value="{{ selectedClassId }}" bind:change="onClassChange" options="{{ classOptions }}" />
+      <van-dropdown-item value="{{ statusFilter }}" bind:change="onStatusFilterChange" options="{{ statusOptions }}" />
+    </van-dropdown-menu>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <van-icon name="search" size="28rpx" color="#999" />
+    <input class="search-input" placeholder="搜索姓名、学号、身份证号" value="{{searchKeyword}}" bindinput="onSearchInput" confirm-type="search" />
+    <van-icon wx:if="{{searchKeyword}}" name="clear" size="28rpx" color="#ccc" bindtap="clearSearch" />
+  </view>
+
+  <!-- 统计 + 导出 -->
+  <view class="stats-bar" wx:if="{{!loading && allCount > 0}}">
+    <view class="stats-row">
+      <view class="stats-item"><text class="stats-label">全班</text><text class="stats-value">{{allCount}}</text><text class="stats-label">人</text></view>
+      <view class="stats-item status-pending"><text class="stats-label">待核对</text><text class="stats-value">{{pendingCount}}</text></view>
+      <view class="stats-item status-verified"><text class="stats-label">已核对</text><text class="stats-value">{{verifiedCount}}</text></view>
+      <view class="stats-item status-modified"><text class="stats-label">有修改</text><text class="stats-value">{{modifiedCount}}</text></view>
+    </view>
+    <view class="actions-row">
+      <view class="export-btn" bindtap="onExport">
+        <van-icon name="down" size="26rpx" /><text>导出修改记录</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+    <view wx:elif="{{!hasLoaded && !loading}}" class="empty-state">
+      <van-empty description="请选择班级、状态或输入关键字进行筛选" />
+    </view>
+    <view wx:elif="{{studentList.length === 0 && !loading}}" class="empty-state">
+      <van-empty description="暂无学生数据" />
+    </view>
+    <view wx:else class="student-wall">
+      <view
+        class="student-card status-{{item.status}} {{item.modification_count > 0 ? 'has-modification' : ''}}"
+        wx:for="{{studentList}}"
+        wx:key="id"
+        bindtap="onCardTap"
+        data-id="{{item.id}}"
+      >
+        <view class="card-badge badge-{{item.status}}">
+          <van-icon
+            name="{{item.status === 'verified' ? 'passed' : item.status === 'pending' ? 'clock-o' : 'edit'}}"
+            size="24rpx"
+          />
+        </view>
+        <view class="card-name">{{item.xm}}</view>
+        <view class="card-xh">{{item.xh}}</view>
+        <view class="card-status tag-{{item.status}}">{{item.status_text}}</view>
+        <view wx:if="{{item.modification_count > 0}}" class="mod-tag">改 {{item.modification_count}} 项</view>
+        <view class="card-time" wx:if="{{item.submitted_at}}">{{item.submitted_at}}</view>
+        <view
+          wx:if="{{item.status !== 'pending'}}"
+          class="reset-btn"
+          data-id="{{item.id}}"
+          data-name="{{item.xm}}"
+          catchtap="onResetStudent"
+        >重置</view>
+      </view>
+    </view>
+    <view class="load-more" wx:if="{{loadingMore}}"><van-loading size="20px">加载更多...</van-loading></view>
+    <view class="no-more" wx:if="{{noMore && studentList.length > 0}}"><text>— 已加载全部 —</text></view>
+  </view>
+</view>

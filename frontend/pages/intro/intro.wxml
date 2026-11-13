@@ -1,0 +1,174 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<scroll-view class="intro-container" scroll-y enhanced show-scrollbar="{{false}}" bindscroll="onPageScroll">
+  <!-- 顶部英雄区域 -->
+  <view class="hero-section">
+    <image class="hero-bg-img" src="{{heroBg}}" mode="aspectFill" />
+    <view class="hero-overlay"></view>
+    <view class="hero-content">
+      <view class="hero-badge">EST. 1979</view>
+      <view class="hero-title">{{content.title}}</view>
+      <view class="hero-subtitle">Qiandongnan Open University</view>
+      <view class="hero-tagline">培养实用型人才 · 服务终身教育</view>
+    </view>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <view class="main-content">
+
+    <!-- 学校概况 -->
+    <view class="section-card anim-card" style="animation-delay: 0.1s">
+      <view class="card-header">
+        <view class="card-icon-wrap">
+          <van-icon name="description" size="36rpx" color="#1890FF" />
+        </view>
+        <view class="card-title">学校概况</view>
+      </view>
+      <view class="card-body">
+        <!-- 段落1：创建历史 -->
+        <view class="paragraph-block">
+          <view class="paragraph-text">
+            <text class="text-highlight">黔东南开放大学</text>创建于<text class="text-accent">1979年6月</text>，前身是黔东南广播电视大学。1979年，贵州广播电视大学黔东南州工作站成立，1986年经省人民政府批准更名为贵州广播电视大学黔东南州分校，并在全州各县设立电大工作站。
+          </view>
+        </view>
+
+        <!-- 段落2：发展历程 -->
+        <view class="paragraph-block">
+          <view class="timeline-label">
+            <van-icon name="clock-o" size="24rpx" color="#1890FF" />
+            <text>发展历程</text>
+          </view>
+          <view class="paragraph-text">
+            2000年随着<text class="text-highlight">"中央广播电视大学人才培养模式改革和开放教育试点"</text>项目在我校的实施，黔东南电大的发展有了质的飞跃。2002年6月，黔东南州电大与原州粮食学校合并。2007年1月，原黔东南州教育学院并入黔东南州电大。2010年12月经州人民政府批准成立<text class="text-accent">"黔东南中等职业技术学校"</text>，同年更名为"黔东南广播电视大学"，实行两块牌子一套人马，2016年9月1日搬迁到<text class="text-accent">凯开大道1001号</text>新校区办学，2017年12月"黔东南州社区教育服务指导中心"在我校挂牌成立，<text class="text-highlight">2023年12月更名为黔东南开放大学</text>。
+          </view>
+        </view>
+
+        <!-- 段落3：校园设施 -->
+        <view class="paragraph-block">
+          <view class="timeline-label">
+            <van-icon name="shop-o" size="24rpx" color="#1890FF" />
+            <text>校园设施</text>
+          </view>
+          <view class="paragraph-text">
+            学校占地面积<text class="text-number">82,983.6㎡</text>，建筑面积<text class="text-number">69,810㎡</text>，建有综合楼、崇技楼、尚德楼、风雨操场、学生宿舍、学生食堂等建筑群，能够满足成人教育<text class="text-accent">5000人</text>的教学需求和<text class="text-accent">2300人</text>寄宿制中职教育的需求，建有会计、影视与影像、烹饪、民族歌舞、旅游与酒店管理、建筑工程、汽车维修与营销、电子商务等专业的实训设施设备，同时还建有普通话测试站。
+          </view>
+        </view>
+
+        <!-- 段落4：师资力量 -->
+        <view class="paragraph-block">
+          <view class="timeline-label">
+            <van-icon name="friends-o" size="24rpx" color="#1890FF" />
+            <text>师资与成就</text>
+          </view>
+          <view class="paragraph-text">
+            学校内设<text class="text-number">13个</text>科室，定编67人，现有在编教职工<text class="text-number">62人</text>，其中专业技术岗45人，<text class="text-accent">教授1人，副教授9人，讲师22人</text>，外聘教师55人。学校自成立以来，累计为全州培养各类层次的毕业生<text class="text-highlight">48000余人</text>。全州现有成人教育在校生近万人，中职在校生1300余人，每年开展各种技能培训<text class="text-accent">5000余人次</text>，为黔东南州经济社会培养了一大批<text class="text-highlight">"留得住、用得上"</text>的实用型人才。
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据统计 -->
+    <view class="section-card anim-card" style="animation-delay: 0.2s">
+      <view class="card-header">
+        <view class="card-icon-wrap">
+          <van-icon name="chart-trending-o" size="36rpx" color="#1890FF" />
+        </view>
+        <view class="card-title">办学成果</view>
+      </view>
+      <view class="stats-grid" bindtap="replayStatsAnimation">
+        <view class="stat-card stat-card-1">
+          <view class="stat-value">{{animYear}}<text class="stat-suffix">年</text></view>
+          <view class="stat-desc">建校年份</view>
+          <view class="stat-bar"></view>
+        </view>
+        <view class="stat-card stat-card-2">
+          <view class="stat-value">{{animGraduates}}<text class="stat-suffix">+</text></view>
+          <view class="stat-desc">累计毕业生</view>
+          <view class="stat-bar"></view>
+        </view>
+        <view class="stat-card stat-card-3">
+          <view class="stat-value">{{animStudents}}<text class="stat-suffix">+</text></view>
+          <view class="stat-desc">在校学生</view>
+          <view class="stat-bar"></view>
+        </view>
+        <view class="stat-card stat-card-4">
+          <view class="stat-value">{{animTraining}}<text class="stat-suffix">+</text></view>
+          <view class="stat-desc">年培训人次</view>
+          <view class="stat-bar"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 荣誉称号 -->
+    <view class="section-card anim-card" style="animation-delay: 0.3s">
+      <view class="card-header">
+        <view class="card-icon-wrap icon-wrap-gold">
+          <van-icon name="medal-o" size="36rpx" color="#FAAD14" />
+        </view>
+        <view class="card-title">荣誉称号</view>
+      </view>
+      <view class="honors-list">
+        <view wx:for="{{content.honors}}" wx:key="*this" class="honor-item anim-honor" style="animation-delay: {{0.4 + index * 0.08}}s">
+          <view class="honor-medal">
+            <van-icon name="certificate" size="32rpx" color="#FAAD14" />
+          </view>
+          <view class="honor-name">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系信息 -->
+    <view class="section-card anim-card" style="animation-delay: 0.4s">
+      <view class="card-header">
+        <view class="card-icon-wrap icon-wrap-green">
+          <van-icon name="location-o" size="36rpx" color="#52C41A" />
+        </view>
+        <view class="card-title">联系我们</view>
+      </view>
+      <view class="contact-list">
+        <view class="contact-row" bindtap="copyContact" data-text="凯开大道1001号">
+          <view class="contact-icon-box">
+            <van-icon name="shop-o" size="32rpx" color="#1890FF" />
+          </view>
+          <view class="contact-info">
+            <view class="contact-label">学校地址</view>
+            <view class="contact-value">凯开大道1001号</view>
+          </view>
+          <view class="contact-action">
+            <van-icon name="records" size="28rpx" color="#BFBFBF" />
+          </view>
+        </view>
+        <view class="contact-row">
+          <view class="contact-icon-box">
+            <van-icon name="expand-o" size="32rpx" color="#1890FF" />
+          </view>
+          <view class="contact-info">
+            <view class="contact-label">占地面积</view>
+            <view class="contact-value">82,983.6 ㎡</view>
+          </view>
+        </view>
+        <view class="contact-row">
+          <view class="contact-icon-box">
+            <van-icon name="home-o" size="32rpx" color="#1890FF" />
+          </view>
+          <view class="contact-info">
+            <view class="contact-label">建筑面积</view>
+            <view class="contact-value">69,810 ㎡</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部 -->
+  <view class="footer-section">
+    <view class="footer-line"></view>
+    <view class="footer-text">黔东南开放大学 · 始于1979</view>
+    <view class="footer-line"></view>
+  </view>
+
+  <!-- 返回顶部 -->
+  <view class="back-top {{showBackTop ? 'show' : ''}}" bindtap="scrollToTop">
+    <van-icon name="back-top" size="36rpx" color="#fff" />
+  </view>
+</scroll-view>

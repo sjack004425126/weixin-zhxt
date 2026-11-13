@@ -1,0 +1,154 @@
+<include src="/utils/common-components.wxml" />
+
+<view class="page-header">
+  <view class="header-content">
+    <view class="header-icon"><van-icon name="cluster-o" size="40rpx" /></view>
+    <view class="header-text">
+      <view class="header-title">班级管理</view>
+      <view class="header-subtitle">Class Management</view>
+    </view>
+    <view class="header-nav-action" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+  </view>
+</view>
+
+<view class="container">
+  <!-- 统计 + 短信按钮 -->
+  <view class="stats-bar" wx:if="{{!loading && classList.length > 0}}">
+    <view class="stats-row">
+      <view class="stats-item">
+        <text class="stats-label">班级</text>
+        <text class="stats-value">{{classList.length}}</text>
+        <text class="stats-label">个</text>
+      </view>
+      <view class="stats-item selected-info" wx:if="{{selectedCount > 0}}">
+        <text class="stats-label">已选</text>
+        <text class="stats-value">{{selectedCount}}</text>
+        <text class="stats-label">个</text>
+      </view>
+    </view>
+    <view class="actions-row">
+      <view class="select-actions">
+        <view class="select-btn" bindtap="selectAll"><text>全选</text></view>
+        <view class="select-btn" bindtap="deselectAll"><text>清空</text></view>
+      </view>
+      <view class="sms-trigger" bindtap="openSmsPopup">
+        <van-icon name="comment-o" size="28rpx" />
+        <text>短信</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="list-content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+    <view wx:elif="{{classList.length === 0 && !loading}}" class="empty-state">
+      <van-empty description="暂无班级数据" />
+    </view>
+    <view wx:else class="class-wall">
+      <view
+        class="class-card {{selectedMap[item.id] ? 'selected' : ''}}"
+        wx:for="{{classList}}" wx:key="id"
+        bindtap="toggleSelect" data-id="{{item.id}}"
+      >
+
+        <!-- 班级名称 -->
+        <view class="card-title">{{item.name}}</view>
+
+        <!-- 学期 -->
+        <view class="card-xq" wx:if="{{item.xq}}">{{item.xq}}</view>
+
+        <!-- 统计数据 -->
+        <view class="card-stats">
+          <view class="stat-row">
+            <text class="stat-label">总人数</text>
+            <text class="stat-val">{{item.total}}</text>
+          </view>
+          <view class="stat-row">
+            <text class="stat-label">毕业</text>
+            <text class="stat-val grad">{{item.graduated}}</text>
+          </view>
+          <view class="stat-row">
+            <text class="stat-label">毕业率</text>
+            <text class="stat-val rate">{{item.grad_rate}}%</text>
+          </view>
+        </view>
+
+        <!-- 专业层次 -->
+        <view class="card-meta" wx:if="{{item.zy}}">{{item.cc}} · {{item.zy}}</view>
+
+        <!-- 查看学生按钮 -->
+        <view class="card-student-btn" catchtap="goToStudents" data-id="{{item.id}}" data-name="{{item.name}}">
+          <van-icon name="friends-o" size="24rpx" color="#E86433" />
+          <text>查看学生</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 短信弹窗 -->
+<van-popup show="{{ showSmsPopup }}" position="bottom" round closeable bind:close="closeSmsPopup" custom-style="height: 70vh;">
+  <view class="sms-popup">
+    <!-- 头部信息 -->
+    <view class="sms-header">
+      <view class="sms-header-icon">
+        <van-icon name="comment-o" size="40rpx" color="#E86433" />
+      </view>
+      <view class="sms-header-info">
+        <view class="sms-title">班级短信通知</view>
+        <view class="sms-subtitle">将发送给 {{selectedCount}} 个班级的所有学生</view>
+      </view>
+    </view>
+
+    <!-- 输入区域（无违禁词时显示） -->
+    <view class="sms-input-wrap" wx:if="{{!smsHasBanned}}">
+      <view class="sms-input-label">短信内容</view>
+      <textarea class="sms-textarea" placeholder="请输入短信内容..." value="{{smsContent}}" bindinput="onSmsInput" maxlength="200" auto-height="{{false}}"></textarea>
+      <view class="sms-input-footer">
+        <view class="sms-tip">
+          <van-icon name="info-o" size="24rpx" color="#bbb" />
+          <text>内容将自动检测违禁词</text>
+        </view>
+        <view class="sms-count {{smsContent.length > 180 ? 'warn' : ''}}">{{smsContent.length}}/200</view>
+      </view>
+    </view>
+
+    <!-- 高亮预览区域（有违禁词时显示） -->
+    <view class="sms-preview-wrap" wx:if="{{smsHasBanned}}">
+      <view class="sms-preview-header">
+        <van-icon name="warning-o" size="28rpx" color="#ff4d4f" />
+        <text class="sms-preview-label">检测到违禁词，请处理后再发送</text>
+      </view>
+      <view class="sms-preview-box">
+        <text wx:for="{{smsHighlightParts}}" wx:key="index" class="{{item.banned ? 'hl-banned' : 'hl-normal'}}">{{item.text}}</text>
+      </view>
+    </view>
+
+    <!-- 违禁词处理列表 -->
+    <view class="banned-list-wrap" wx:if="{{smsHasBanned}}">
+      <view class="banned-list-title">违禁词处理：</view>
+      <view class="banned-item" wx:for="{{bannedHandleList}}" wx:key="word">
+        <view class="banned-item-header">
+          <text class="banned-item-word">{{item.word}}</text>
+          <view class="banned-action-toggle">
+            <text class="toggle-opt {{item.action === 'delete' ? 'active' : ''}}" bindtap="onBannedActionChange" data-idx="{{index}}">删除</text>
+            <text class="toggle-opt {{item.action === 'replace' ? 'active' : ''}}" bindtap="onBannedActionChange" data-idx="{{index}}">替换</text>
+          </view>
+        </view>
+        <view class="banned-replace-row" wx:if="{{item.action === 'replace'}}">
+          <input class="banned-replace-input" placeholder="替换为..." value="{{item.replacement}}" bindinput="onBannedReplacementInput" data-idx="{{index}}" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部按钮 -->
+    <view class="sms-footer">
+      <view class="sms-btn-row" wx:if="{{smsHasBanned}}">
+        <van-button type="default" custom-class="sms-btn-half" bind:click="onBackToEdit" icon="arrow-left">返回编辑</van-button>
+        <van-button type="warning" custom-class="sms-btn-half" bind:click="applyBannedHandle" icon="passed">应用修改</van-button>
+      </view>
+      <van-button wx:else type="warning" block round loading="{{smsSending}}" disabled="{{smsSending || smsContent.length === 0}}" bind:click="sendSms" custom-style="height: 88rpx; font-size: 30rpx; font-weight: 600;">
+        发送短信
+      </van-button>
+    </view>
+  </view>
+</van-popup>

@@ -1,0 +1,111 @@
+<!-- 顶部消息提示组件（双实例：顶部 + 底部） -->
+<top-message id="top-message-top" position="top"></top-message>
+<top-message id="top-message-bottom" position="bottom"></top-message>
+<top-message id="top-message-closable" position="top" closable="{{true}}"></top-message>
+
+<view class="page">
+  <view class="header">
+    <view class="title">top-message 组件测试</view>
+    <view class="subtitle">覆盖 4 种类型 / 自定义图标 / 位置 / 交互 / 边界</view>
+  </view>
+
+  <!-- ===== 1. 基础类型 ===== -->
+  <view class="section">
+    <view class="section-title">1. 基础类型（默认 3 秒）</view>
+    <view class="btn-row">
+      <button class="btn btn-success" bindtap="showSuccess">showSuccess</button>
+      <button class="btn btn-error" bindtap="showError">showError</button>
+      <button class="btn btn-warning" bindtap="showWarning">showWarning</button>
+      <button class="btn btn-info" bindtap="showInfo">showInfo</button>
+    </view>
+  </view>
+
+  <!-- ===== 2. showTopMessage 通用 API ===== -->
+  <view class="section">
+    <view class="section-title">2. showTopMessage 通用 API</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="callShowTopMessage">showTopMessage(默认)</button>
+      <button class="btn btn-default" bindtap="callShowTopMessageLong">长文本</button>
+      <button class="btn btn-default" bindtap="callShowTopMessageCustomIcon">自定义图标</button>
+      <button class="btn btn-default" bindtap="callShowTopMessageInBottom">底部位置</button>
+    </view>
+  </view>
+
+  <!-- ===== 3. duration 控制 ===== -->
+  <view class="section">
+    <view class="section-title">3. duration 控制</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="showDuration1s">1 秒</button>
+      <button class="btn btn-default" bindtap="showDuration5s">5 秒</button>
+      <button class="btn btn-default" bindtap="showDuration10s">10 秒</button>
+      <button class="btn btn-default" bindtap="showDurationForever">永不消失(duration=0)</button>
+    </view>
+  </view>
+
+  <!-- ===== 4. 交互测试 ===== -->
+  <view class="section">
+    <view class="section-title">4. 交互测试</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="showThenHide5s">显示后 5s 主动 hide()</button>
+      <button class="btn btn-default" bindtap="showThenHideNow">显示后立即 hide()</button>
+    </view>
+    <view class="hint">点击消息卡片 → 暂停自动消失，显示遮罩；点击遮罩 → 3 秒后消失</view>
+    <view class="hint">按住消息卡片 → 左滑滑出消失</view>
+  </view>
+
+  <!-- ===== 5. closable 关闭按钮 ===== -->
+  <view class="section">
+    <view class="section-title">5. closable 关闭按钮</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="showClosableSuccess">显示可关闭成功</button>
+      <button class="btn btn-default" bindtap="showClosableError">显示可关闭错误</button>
+      <button class="btn btn-default" bindtap="showClosableWarning">显示可关闭警告</button>
+      <button class="btn btn-default" bindtap="showClosableInfo">显示可关闭信息</button>
+    </view>
+  </view>
+
+  <!-- ===== 6. 连续调用 / 覆盖 ===== -->
+  <view class="section">
+    <view class="section-title">6. 连续调用 / 覆盖</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="showBurst">连续 5 次（应只显示最后一条）</button>
+      <button class="btn btn-default" bindtap="showRapid">快速切换类型</button>
+    </view>
+  </view>
+
+  <!-- ===== 7. 边界场景 ===== -->
+  <view class="section">
+    <view class="section-title">7. 边界场景</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="showEmptyString">空字符串</button>
+      <button class="btn btn-default" bindtap="showUndefined">undefined</button>
+      <button class="btn btn-default" bindtap="showNull">null</button>
+      <button class="btn btn-default" bindtap="showNumber">纯数字</button>
+    </view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="showEmoji">emoji 文本</button>
+      <button class="btn btn-default" bindtap="showVeryLong">超长文本（多行换行）</button>
+      <button class="btn btn-default" bindtap="showErrorObject">error 对象</button>
+      <button class="btn btn-default" bindtap="showInvalidType">非法 type（应回退 error）</button>
+    </view>
+  </view>
+
+  <!-- ===== 8. 模拟业务场景 ===== -->
+  <view class="section">
+    <view class="section-title">8. 模拟业务场景</view>
+    <view class="btn-row">
+      <button class="btn btn-default" bindtap="simulateSaveSuccess">模拟保存成功</button>
+      <button class="btn btn-default" bindtap="simulateNetworkError">模拟网络错误</button>
+      <button class="btn btn-default" bindtap="simulateFormValidation">模拟表单校验</button>
+      <button class="btn btn-default" bindtap="simulateConfirmAction">模拟确认操作</button>
+    </view>
+  </view>
+
+  <!-- ===== 工具按钮 ===== -->
+  <view class="toolbar">
+    <button class="tool-btn" bindtap="hideAll">立即隐藏所有</button>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="footer"></view>
+</view>
