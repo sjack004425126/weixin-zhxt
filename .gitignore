@@ -1,0 +1,33 @@
+# 真密钥绝不进仓
+backend/.env
+
+# 日志/运行时数据
+logs/
+**/logs/
+*.log
+backend/task_store/
+backend/exports/
+backend/export_temp/
+task_store/
+exports/
+export_temp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 前端/小程序
+node_modules/
+frontend/dist/
+dist/
+
+# 系统
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.idea/
+.vscode/

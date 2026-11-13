@@ -1,0 +1,88 @@
+# ============================================================
+# zhpt / backend  ——  Docker 运行依赖
+#
+# 与 requirements.txt 的差异（都是 Docker 化必须改的，不是业务变更）：
+#   1. + python-dotenv   utils/minio_client.py、services/hikvision_client.py
+#      用 load_dotenv 读 backend/.env；不装则 .env 里的 MINIO_* 全部丢失，
+#      MinIO 网关会静默降级（业务接口 500），海康 AK/SK 也读不到。
+#   2. + pypinyin         controllers/student_zzbm.py、adult_enrollment.py 直接 import
+#      （原文件写的是 `pinyin`，包名其实是 pypinyin，PyPI 上 `pinyin` 是另一个包）
+#   3. + bcrypt<4.1 钉死 passlib 1.7.4 与 bcrypt>=4.1 有已知不兼容：
+#      passlib 自检用 255 字节口令，bcrypt>=4.1 直接抛
+#      "ValueError: password cannot be longer than 72 bytes" → 登录接口 500。
+#      common/auth.py 与 utils/auth.py 都建了 CryptContext(schemes=['bcrypt'])。
+#   4. opencv-python → opencv-python-headless
+#      官方 opencv-python 依赖 libGL/libglib，slim 镜像里没有会启动即崩
+#      "ImportError: libGL.so.1: cannot open shared object file"。
+#   5. fastapi 0.111.0 → 保持不变（与本地开发环境一致）；
+#      pydantic 由 fastapi 传递引入，不单独钉版本。
+#
+#   6. ~~gradio / huggingface_hub 已移除~~（2026-11 美颜改造）
+#      历史上 hivision/plugin/beauty/whitening.py 与 grind_skin.py 在**模块顶层**
+#      `import gradio as gr`，且 grind_skin.py 顶层还执行 `with gr.Blocks(...)`，
+#      导致 gradio 成为运行期硬依赖：
+#        - 连带把 fastapi 钉死在 0.111.0（gradio>=5.35 要求 fastapi>=0.115.2）
+#        - 连带必须钉 huggingface_hub==0.25.2（gradio/oauth.py 需要 HfFolder）
+#      现已把 gradio 全部改为 **__main__ 块内惰性 import**（纯手动调参用），
+#      `import hivision` 及其全部美颜子模块都不再拉起 gradio（已实测验证）。
+#      → gradio / huggingface_hub 从本文件移除，fastapi 版本钉死解除。
+#      唯一保留的依赖约束：gradio 4.44.1 需配 fastapi<1.0，
+#      本项目 fastapi==0.111.0 本就在此范围内，不冲突。
+#
+#   7. reportlab==4.4.7 钉死
+#      与服务器现网 venv 一致，避免解析到 5.x 造成报表接口行为变化。
+#
+# 不安装的（代码内均为函数级延迟 import，运行时不触发）：
+#   torch / MNN / hivisionai / tortoise-orm / aiosqlite / gradio
+#   - torch/MNN：human_matting.py 只在选 MNN 或 torch 后端时才 import，默认走 onnx
+#   - hivisionai：hivision/creator/move_image.py 里引用，但该模块不在调用链上
+#   - gradio：仅 hivision/plugin/beauty/{whitening,grind_skin,base_adjust}.py
+#     的 `if __name__ == "__main__"` 演示块里用，运行期不触发
+# ============================================================
+
+# ---------- Web 框架 ----------
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+gunicorn==21.2.0
+waitress==3.0.0
+python-multipart>=0.0.20
+pydantic-settings==2.3.0
+
+# ---------- 数据库 ----------
+sqlalchemy==2.0.23
+pyodbc==5.0.1
+PyMySQL==1.1.0
+alembic==1.13.1
+tortoise-orm==0.21.3
+
+# ---------- 认证 / 权限 ----------
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+bcrypt>=4.0.1,<4.1
+PyJWT
+
+# ---------- 缓存 ----------
+redis==5.0.0
+
+# ---------- 对象存储 ----------
+minio==7.2.7
+
+# ---------- HTTP 客户端 / 工具 ----------
+httpx==0.27.0
+slowapi==0.1.9
+psutil==5.9.8
+requests
+tqdm
+python-dotenv
+flask
+PyPDF2
+reportlab==4.4.7
+pypinyin
+
+# ---------- 图像 / 证件照处理（本地 hivision 包）----------
+numpy<=1.26.4
+opencv-python-headless==4.9.0.80
+onnxruntime>=1.15.0
+mtcnn-runtime>=1.0.0
+Pillow==10.2.0
+qrcode==8.2

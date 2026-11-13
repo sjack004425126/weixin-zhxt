@@ -1,0 +1,54 @@
+# 配套 wxss 样式（INCIDENTS/001）
+
+把 vant-icon 替换为 text 后，需要在 `pages/login/login.wxss` 中添加以下样式：
+
+```css
+/* vi 类：用于直接用 text 渲染 vant-icon 字体的 unicode 字符（绕过 van-icon 组件） */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+
+/* type-icon 内的图标样式（替换原 .type-icon .van-icon） */
+.type-icon .vi {
+  color: #999;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.type-icon.active .vi {
+  color: #E86433;
+  transform: scale(1.2);
+}
+```
+
+## 必须保留的样式
+
+`pages/login/login.wxss` 开头**必须保留** `@import vant-icon`：
+
+```css
+/* 关键：import vant-icon 组件样式（字体图标定义） */
+@import "../../components/vant-icon/index.wxss";
+```
+
+> 注意：保留 `@import` 是为了让 `@font-face` 字体声明被引入。
+> 即使不使用 van-icon 组件本身，字体定义仍然需要加载。
+
+## 自定义 icon 样式示例
+
+如果需要针对特定图标自定义样式（如输入框内的图标），可以这样：
+
+```css
+/* 输入框内的 vi 图标（替换原 .custom-input-icon） */
+.custom-input-cell .vi {
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+/* 切换身份按钮的 vi 图标 */
+.switch-role-icon .vi {
+  font-size: 18rpx;
+  color: #E86433;
+}
+```

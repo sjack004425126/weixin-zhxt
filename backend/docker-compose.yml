@@ -1,0 +1,205 @@
+# ============================================================
+# zhpt —— 一键起服务（生产）
+#
+#   cd /www/wwwroot/zhpt/backend
+#   docker compose up -d --build
+#   docker compose logs -f zhpt-backend
+#
+# ⚠️ 外部依赖（SQL Server / Redis / MinIO / 海康）都是**已有的外部服务**，
+#    地址写在 .env 里，compose 只编排应用自己。
+#    部署机必须能访问这些内网地址（172.16.100.101 / 172.16.100.102）。
+# ============================================================
+
+# 项目名：决定 compose 资源名前缀（网络 zhpt_default、容器等）。
+# ⚠️ 不写这一行的话，compose 默认拿**当前目录名**当项目名 ——
+#    部署到 /www/wwwroot/zhpt/backend 就会得到 "backend_default"。
+name: zhpt
+
+services:
+  zhpt-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # ⚠️ 必须显式指定 target: runtime
+      #
+      # Dockerfile 现在只有两个 stage：builder → runtime。
+      # （2026-11-03 已删除 dev stage —— 它让生产误跑了 uvicorn --reload，
+      #   且用 USER root 掩盖了 bind mount 属主不匹配的问题。）
+      #
+      # 显式写 target: runtime 是双保险：万一将来又加了别的 stage，
+      # Docker 默认构建「最后一个 stage」，不写就会构建错的那个。
+      target: runtime
+      args:
+        # 国内源；内网离线或需回官方时：
+        # docker compose build --build-arg APT_MIRROR=deb.debian.org
+        APT_MIRROR: "mirrors.aliyun.com"
+        PIP_INDEX_URL: "https://mirrors.aliyun.com/pypi/simple/"
+        # ⚠️ 容器内 app 用户的 uid/gid 必须等于宿主机部署目录的属主 uid/gid
+        #    （/www/wwwroot/zhpt/backend 是 1001:1001，宝塔建的站点用户）。
+        #    不匹配的话，bind mount 进来的 logs/ uploads/ data/ 写不进去，
+        #    表现为 worker 启动即崩：
+        #        PermissionError: [Errno 13] Permission denied: '/app/logs/xjxt.log'
+        #
+        #    兜底：容器入口脚本 docker-entrypoint.sh 会以 root 进入，
+        #    把挂载目录属主修正成 APP_UID:APP_GID，再降权回 app。
+        #    所以即使这里填错，容器也能起来（只是宿主机目录属主会被改）。
+        APP_UID: "1001"
+        APP_GID: "1001"
+      # ⚠️ 构建期必须用 host 网络，否则 pip 解析不了域名 → 构建直接失败：
+      #
+      #    现象：docker build 报
+      #        Temporary failure in name resolution
+      #        ERROR: Could not find a version that satisfies the requirement fastapi
+      #
+      #    根因：本机 /etc/resolv.conf 的 nameserver 是 **172.16.100.102**
+      #    （Technitium DNS，宿主机自己的 IP，53 端口由 dns-server 容器发布）。
+      #    Docker 默认 bridge 网络里的容器**访问不到宿主机的 53 端口**
+      #    （docker-proxy 的 UDP 转发对容器出站不可达）→ 容器内 DNS 全部失败。
+      #    实测：docker run 默认 bridge → 解析失败；
+      #          docker run --network host → 解析正常；
+      #          docker run --dns 223.5.5.5 → 解析正常。
+      #
+      #    构建阶段用 host 网络最简单、最可靠（构建不需要容器间互访）。
+      #    运行阶段的 DNS 用下面的 `dns:` 段解决，两者各管各的。
+      network: host
+    image: zhpt-backend:latest
+    container_name: zhpt-backend
+    restart: unless-stopped
+
+    # ⚠️ 必须显式指定 DNS 解析器，否则容器内一切域名解析失败。
+    #
+    #   现象：容器启动后连不上 Redis / MinIO / SQL Server，
+    #         报 "Temporary failure in name resolution"。
+    #
+    #   根因：本机 /etc/resolv.conf 的 nameserver 是 **172.16.100.102**
+    #   （Technitium DNS，就是这台机器自己的 IP，53 端口由 dns-server 容器发布）。
+    #   Docker 会把宿主机的 nameserver 原样抄进容器，但**容器访问不到宿主机的
+    #   53 端口**（docker-proxy 的 UDP 转发对容器出站不可达）→ 解析全部失败。
+    #   实测：docker run 默认 bridge → 解析失败；
+    #         docker run --dns 223.5.5.5 → 解析正常。
+    #
+    #   这里显式指定公网 DNS 作为上游。⚠️ 不会影响容器**内部**的服务名解析 ——
+    #   Docker 内嵌解析器 127.0.0.11 仍然在 resolv.conf 里，
+    #   容器名/服务名照常解析（已实测 dnstest-a 能解析到 172.30.25.2）。
+    #
+    #   代价：内网域名（*.qdndd.com.cn 等由 Technitium 托管的记录）解析不到。
+    #   本项目依赖的都是**内网 IP 直连**（SQL Server 172.16.100.101、
+    #   Redis/MinIO 172.16.100.102），不依赖内网域名，所以无影响。
+    dns:
+      - 223.5.5.5
+      - 119.29.29.29
+
+    ports:
+      # 宿主机 3050 → 容器 3050
+      #
+      # ⚠️ 3050 是本应用的**默认端口**，也是对外的正式端口：
+      #    init/config.py 的 AppConfig.PORT 默认就是 3050，
+      #    ProductionConfig 显式覆盖为 3050（见 config.py:141）。
+      #    反向代理（OpenResty/Nginx）指向 127.0.0.1:3050，端口不能动。
+      #
+      #    之前为避免与宝塔的 Python 项目（gunicorn，4 workers）抢端口，
+      #    临时改用过 3150 做并行验证；现在宝塔那套进程已停用，
+      #    已恢复为正式端口 3050。
+      - "3050:3050"
+
+    # 直接注入真实环境变量，优先级高于镜像内 .env
+    # 好处：改配置只需 restart，不用重新 build
+    env_file:
+      - .env
+
+    environment:
+      # --- 运行环境 ---
+      # ⚠️ FASTAPI_ENV 决定 init/config.py 走 DevelopmentConfig 还是
+      #    ProductionConfig。生产必须 production（DEBUG=False）。
+      #    DEBUG=true 会让 main.py 在启动时自动 create_all() 建表 ——
+      #    生产库上跑这个很危险。
+      FASTAPI_ENV: "production"
+      APP_ENV: "production"
+      DEBUG: "false"
+      HOST: "0.0.0.0"
+      PORT: "3050"
+      TZ: "Asia/Shanghai"
+
+      # --- 关键：ODBC 驱动名 ---
+      #
+      # init/config.py 的 DB_PARAMS 里写死了 'DRIVER': '{ODBC Driver 17 for SQL Server}'，
+      # 代码本身没有从环境变量读驱动名的逻辑。
+      # 但镜像里 **17 和 18 都装了**（见 Dockerfile 的 mssql 段），
+      # 所以连接串**一个字都不用改** —— 这是本项目与通用模板不同的地方，
+      # 也避免了"维护两份连接串"的陷阱。
+      #
+      # 保留这两个变量只为将来改成「驱动名单独配置」时留出接口，
+      # 当前代码不读它们。
+      DB_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+      DB_ODBC_TRUST_SERVER_CERT: "true"
+
+      # --- 腾讯云短信回调的受信代理 IP ---
+      #
+      # controllers/sms_callback.py 用这个变量判断哪些来源 IP 的
+      # X-Forwarded-For 可以采信。默认值是 '172.16.100.102'（本机 OpenResty）。
+      # ⚠️ 如果 OpenResty 与本容器不在同一台机器上，必须改成实际的反代 IP，
+      #    否则回调来源 IP 会退化成 nginx 自身 IP，被腾讯云白名单拦截。
+      SMS_TRUSTED_PROXY_IPS: "${SMS_TRUSTED_PROXY_IPS:-172.16.100.102}"
+
+      # --- 外部服务（.env 里已配置 MINIO_* / HIKVISION_*）---
+      # Redis / MinIO / SQL Server 都是已有的外部内网服务，
+      # 不在本 compose 里编排（见文件末尾说明）。
+
+      # --- CPU 密集型保护：证件照抠图（OpenCV + onnxruntime + MTCNN）---
+      # 不限制线程数会瞬间吃满宿主全部核心导致整台机器变卡
+      OMP_NUM_THREADS: "${OMP_NUM_THREADS:-4}"
+      OPENBLAS_NUM_THREADS: "${OMP_NUM_THREADS:-4}"
+      MKL_NUM_THREADS: "${OMP_NUM_THREADS:-4}"
+
+      # --- 挂载目录属主修正 ---
+      # 1 = 入口脚本以 root 进入，把 logs/ uploads/ data/ 属主修正成
+      # APP_UID:APP_GID 后再降权。解决 bind mount 属主不匹配导致的
+      #     PermissionError: [Errno 13] Permission denied: '/app/logs/xjxt.log'
+      # 0 = 跳过修正（宿主机目录属主必须保持原样时用）。
+      FIX_MOUNT_OWNER: "${FIX_MOUNT_OWNER:-1}"
+
+    volumes:
+      # 应用日志（access.log / error.log / sms_requests.log / xjxt.log）
+      # ⚠️ 必须持久化：docker logs 只能看到 stdout，
+      #    而 gunicorn 的 access-logfile 写的是这个目录下的文件。
+      - ./logs:/app/logs
+      # 上传目录（main.py 挂载 /static 静态文件服务，指向 uploads/）
+      - ./uploads:/app/uploads
+      # 运行期数据目录（Redis 兜底/临时产物）
+      - ./data:/app/data
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3050/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "10"
+        compress: "true"
+
+# ==========================================================================
+# 说明：
+#
+# 1) 为什么 --workers 1（写在 Dockerfile 的 CMD 里）：
+#    应用用 SQLAlchemy QueuePool（pool_size=30, max_overflow=50），
+#    4 个 worker 会各自建 30+ 条 SQL Server 连接，对数据库压力过大；
+#    且腾讯云短信回调会并发写同一张 sms_log 表。
+#    需要横向扩容时，拆成多个容器（或用同一 compose 起多个 service）。
+#
+# 2) 本项目**不**自带 Redis / MinIO / SQL Server，
+#    全部是已有的外部内网服务（172.16.100.101 / 172.16.100.102），
+#    所以 compose 里不编排它们，也没有 shared 外部网络。
+#    若日后把 Redis/MinIO 也容器化，改用 infra compose + shared 外部网络。
+#
+# 3) 与原宝塔 Python 项目的关系：
+#    原先现网是宝塔管的 gunicorn（4 workers）跑在 3050，现已停用，
+#    3050 由本容器接管（容器内同样监听 3050）。
+#    两者共用同一套外部依赖（SQL Server / Redis / MinIO）。
+#    如需回退：docker compose down 后重新启动宝塔的 Python 项目即可，
+#    两者不同时占用 3050，不会冲突。
+# ==========================================================================
