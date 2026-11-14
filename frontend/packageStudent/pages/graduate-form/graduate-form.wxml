@@ -5,14 +5,14 @@
 <view class="page-header">
   <view class="header-content">
     <view class="header-icon">
-      <van-icon name="certificate" size="40rpx" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;"></text>
     </view>
     <view class="header-text">
       <view class="header-title">毕业申请</view>
       <view class="header-subtitle">Graduate Form</view>
     </view>
     <view class="header-nav-action">
-      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;" bindtap="goHome"></text>
     </view>
   </view>
 </view>
@@ -22,7 +22,7 @@
   <block wx:if="{{isLocked}}">
     <view class="notice-bar notice-locked">
       <view class="notice-content">
-        <van-icon name="passed" size="32rpx" color="#52C41A" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:#52C41A;"></text>
         <text>您的毕业生登记表已审核通过且已锁定，无法修改</text>
       </view>
     </view>
@@ -30,7 +30,7 @@
   <block wx:else>
     <view class="notice-bar {{isGraduate ? 'notice-graduate' : ''}}" wx:if="{{!isLocked}}">
       <view class="notice-content">
-        <van-icon name="info-o" size="32rpx" color="{{isGraduate ? '#FAAD14' : '#1890FF'}}" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;color:{{isGraduate ? '#FAAD14' : '#1890FF'}};"></text>
         <text wx:if="{{!isGraduate}}">您还未毕业，还不需要填写毕业生登记表</text>
         <text wx:else>您已毕业，请抓紧填写毕业生登记表以便后期领证。所有信息都需要填写，没有的必须填“无”</text>
       </view>
@@ -219,13 +219,7 @@
         <view class="study-item" wx:for="{{formData.study_experience}}" wx:key="index">
           <view class="study-header">
             <text>经历{{index + 1}}</text>
-            <van-icon
-              name="clear"
-              class="delete-btn"
-              bind:click="deleteStudyExp"
-              data-index="{{index}}"
-              wx:if="{{formData.study_experience.length > 1}}"
-            />
+            <text class="vi delete-btn" style="font-family:vant-icon,sans-serif;" bind:click="deleteStudyExp" data-index="{{index}}" wx:if="{{formData.study_experience.length > 1}}"></text>
           </view>
           <van-field
             label="起始时间"

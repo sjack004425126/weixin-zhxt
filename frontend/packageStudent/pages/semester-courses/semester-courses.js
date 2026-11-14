@@ -4,7 +4,9 @@ const app = getApp();
 
 createPage({
   data: {
-    coursesList: []
+    coursesList: [],
+    showDetail: false,
+    currentCourse: null
   },
 
   onLoad() {
@@ -33,6 +35,24 @@ createPage({
     }
   },
 
+  // 打开课程详情弹窗
+  openDetail(e) {
+    const index = e.currentTarget.dataset.index;
+    const course = this.data.coursesList[index];
+    if (!course) return;
+    this.setData({
+      currentCourse: course,
+      showDetail: true
+    });
+  },
+
+  // 关闭课程详情弹窗
+  closeDetail() {
+    this.setData({
+      showDetail: false
+    });
+  },
+
   // 下拉刷新
   onPullDownRefresh() {
     this.getCoursesList();
@@ -40,4 +60,4 @@ createPage({
   }
 },{
   requireAuth: true // 🔑 方式1：通过选项指定需要登录
-}); 
+});

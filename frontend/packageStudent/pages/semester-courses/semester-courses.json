@@ -3,7 +3,9 @@
   "usingComponents": {
     "van-loading": "@vant/weapp/loading/index",
     "van-empty": "@vant/weapp/empty/index",
-    "van-icon": "/components/vant-icon/index"
+    "van-icon": "/components/vant-icon/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-notice-bar": "@vant/weapp/notice-bar/index"
   },
   "enablePullDownRefresh": true
 }

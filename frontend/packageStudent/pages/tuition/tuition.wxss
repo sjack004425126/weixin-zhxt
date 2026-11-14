@@ -1,3 +1,11 @@
+@import "../../../components/vant-icon/index.wxss";
+/* vi 类：001 方案，text 直渲 vant-icon 字体，绕过 view+::before */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
 /* 主题色彩变量 - 使用蓝色主题 */
 page {
   --primary-color: #1890FF;
@@ -509,7 +517,7 @@ page {
   border: 1rpx solid;
 }
 
-.notice-wrap .van-icon {
+.notice-wrap .vi {
   margin-right: 16rpx;
   font-size: 40rpx;
 }
@@ -520,7 +528,7 @@ page {
   border-color: rgba(250, 173, 20, 0.2);
 }
 
-.notice-wrap.warning .van-icon {
+.notice-wrap.warning .vi {
   color: var(--warning-color);
 }
 
@@ -530,7 +538,7 @@ page {
   border-color: rgba(24, 144, 255, 0.2);
 }
 
-.notice-wrap.success .van-icon {
+.notice-wrap.success .vi {
   color: var(--primary-color);
 }
 
@@ -540,7 +548,7 @@ page {
   border-color: rgba(82, 196, 26, 0.2);
 }
 
-.notice-wrap.complete .van-icon {
+.notice-wrap.complete .vi {
   color: var(--success-color);
 }
 

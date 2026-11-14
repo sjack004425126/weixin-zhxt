@@ -29,7 +29,7 @@ createPage({
       });
 
     }catch(err){
-      this.showError(err.message || "获取考试通知失败");
+      this.showError(err);
     }
   }
 },{

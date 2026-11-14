@@ -1,3 +1,11 @@
+@import "../../../components/vant-icon/index.wxss";
+/* vi 类：001 方案，text 直渲 vant-icon 字体，绕过 view+::before */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
 /* 蓝色主题色彩变量 */
 page {
   --primary-color: #1890FF;

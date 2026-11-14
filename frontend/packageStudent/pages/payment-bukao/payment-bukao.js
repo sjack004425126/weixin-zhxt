@@ -3,8 +3,6 @@ const { tokenGet, tokenPost } = require('../../../utils/request');
 
 createPage({
   data: {
-    // 学生信息
-    student: null,
     // 报考状态
     registrationOpen: false,
     reexamDeadline: '',
@@ -69,7 +67,6 @@ createPage({
       const needPayCount = failed.filter(c => c.register_status === '已报考' && c.pay_status !== '已支付').length;
 
       this.setData({
-        student: d.student,
         registrationOpen: d.registration_open,
         reexamDeadline: d.reexam_deadline || '',
         failedCourses: failed,

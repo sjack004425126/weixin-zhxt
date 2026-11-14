@@ -7,7 +7,7 @@
     <view class="page-header">
       <view class="header-content">
         <view class="header-icon">
-          <van-icon name="chart-trending-o" size="40rpx" />
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;"></text>
         </view>
         <view class="header-text">
           <view class="header-title">成绩列表</view>
@@ -17,7 +17,7 @@
     </view>
 
     <view wx:if="{{loading}}" class="loading-tip">
-      <van-icon name="loading" size="36rpx" color="#1890FF" />
+      <van-loading size="36rpx" color="#1890FF" />
       <text>加载中...</text>
     </view>
 
@@ -47,7 +47,7 @@
       </view>
 
       <view wx:if="{{!loading && records.length === 0}}" class="empty-tip">
-        <van-icon name="info-o" size="48rpx" color="#909399" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:48rpx;color:#909399;"></text>
         <view style="margin-top: 16rpx;">暂无成绩记录</view>
       </view>
     </view>
@@ -58,10 +58,10 @@
     <view class="page-header">
       <view class="header-content">
         <view class="back-button" bindtap="goToExameList">
-          <van-icon name="arrow-left" size="32rpx" />
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;"></text>
         </view>
         <view class="header-icon">
-          <van-icon name="award-o" size="40rpx" />
+          <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;"></text>
         </view>
         <view class="header-text">
           <view class="header-title">成绩详情</view>
@@ -71,7 +71,7 @@
     </view>
 
     <view wx:if="{{loading}}" class="loading-tip">
-      <van-icon name="loading" size="36rpx" color="#1890FF" />
+      <van-loading size="36rpx" color="#1890FF" />
       <text>加载中...</text>
     </view>
 

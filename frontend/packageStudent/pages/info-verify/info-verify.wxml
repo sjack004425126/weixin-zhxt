@@ -6,7 +6,7 @@
   <scroll-view class="page-scroll" scroll-y="true">
     <!-- 顶部标题 -->
     <view class="hd">
-      <view class="hd-title">学生信息核对</view>
+
       <view class="hd-sub">请逐项确认，有误项可点击修改</view>
     </view>
 

@@ -25,21 +25,7 @@
 
   <block wx:if="{{scoreInfo}}">
 
-    <!-- 学生信息卡 -->
-    <view class="stu-card">
-      <view class="stu-row">
-        <view class="stu-avatar">
-          <text class="stu-avatar-text">{{scoreInfo.student_info.name[0] || '学'}}</text>
-        </view>
-        <view class="stu-info">
-          <text class="stu-name">{{scoreInfo.student_info.name}}</text>
-          <text class="stu-detail">{{scoreInfo.student_info.student_no}}</text>
-        </view>
-        <view class="stu-status active">
-          {{scoreInfo.student_info.status}}
-        </view>
-      </view>
-    </view>
+
 
     <!-- 统计概览 -->
     <view class="stats-row">

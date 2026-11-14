@@ -1,7 +1,7 @@
 <!-- 顶部消息提示组件 -->
 <include src="/utils/common-components.wxml" />
 <view class="container">
-  <!-- 页面头部 -->
+  <!-- 页面头部（配色保持不变） -->
   <view class="page-header">
     <view class="header-content">
       <view class="header-icon">
@@ -31,17 +31,21 @@
 
   <view class="courses-list">
     <block wx:if="{{coursesList.length > 0}}">
-      <view class="course-card" wx:for="{{coursesList}}" wx:key="kcid">
-        <!-- 课程头部 -->
-        <view class="course-header">
-          <view class="course-title-section">
-            <view class="course-icon">
-              <van-icon name="bookmark" size="32rpx" color="#409eff" />
-            </view>
-            <view class="course-title-content">
-              <text class="course-name">{{item.kcmc}}</text>
-              <text class="course-id">课程ID: {{item.kcid}}</text>
-            </view>
+      <!-- 精简卡片：只展示核心 4 项，点击弹出详情 -->
+      <view
+        class="course-mini-card"
+        wx:for="{{coursesList}}"
+        wx:key="kcid"
+        bindtap="openDetail"
+        data-index="{{index}}"
+      >
+        <view class="mini-top">
+          <view class="course-icon">
+            <van-icon name="bookmark" size="32rpx" color="#409eff" />
+          </view>
+          <view class="mini-title-wrap">
+            <text class="course-name">{{item.kcmc}}</text>
+            <text class="course-id">课程ID: {{item.kcid}}</text>
           </view>
           <view class="course-type-tag">
             <van-icon name="label-o" size="20rpx" />
@@ -49,88 +53,20 @@
           </view>
         </view>
 
-        <!-- 课程主体内容 -->
-        <view class="course-body">
-          <!-- 基础信息网格 -->
-          <view class="info-grid">
-            <view class="info-item">
-              <view class="item-icon">
-                <van-icon name="manager-o" size="28rpx" color="#409eff" />
-              </view>
-              <view class="item-content">
-                <text class="label">考试单位</text>
-                <text class="value">{{item.ksdw}}</text>
-              </view>
-            </view>
-
-            <view class="info-item">
-              <view class="item-icon">
-                <van-icon name="edit" size="28rpx" color="#409eff" />
-              </view>
-              <view class="item-content">
-                <text class="label">考试方式</text>
-                <text class="value">{{item.ksfs}}</text>
-              </view>
-            </view>
-
-            <view class="info-item">
-              <view class="item-icon">
-                <van-icon name="orders-o" size="28rpx" color="#409eff" />
-              </view>
-              <view class="item-content">
-                <text class="label">试卷号</text>
-                <text class="value">{{item.sjh}}</text>
-              </view>
-            </view>
+        <view class="mini-meta">
+          <view class="meta-chip">
+            <van-icon name="clock-o" size="24rpx" color="#409eff" />
+            <text class="meta-text">{{item.kssj || '时间待定'}}</text>
           </view>
-
-          <!-- 考试时间地点 -->
-          <view class="exam-section">
-            <view class="section-title">
-              <van-icon name="calendar-o" size="24rpx" color="#e86433" />
-              <text>考试安排</text>
-            </view>
-            <view class="exam-details">
-              <view class="exam-item">
-                <van-icon name="clock-o" size="24rpx" color="#666" />
-                <view class="exam-content">
-                  <text class="exam-label">考试时间</text>
-                  <text class="exam-value time">{{item.kssj}}</text>
-                </view>
-              </view>
-              <view class="exam-item">
-                <van-icon name="location-o" size="24rpx" color="#666" />
-                <view class="exam-content">
-                  <text class="exam-label">考试地点</text>
-                  <text class="exam-value time">{{item.ksdd}}</text>
-                </view>
-              </view>
-            </view>
+          <view class="meta-chip warm">
+            <van-icon name="location-o" size="24rpx" color="#e86433" />
+            <text class="meta-text">{{item.ksdd || '地点待定'}}</text>
           </view>
+        </view>
 
-          <!-- 考核方式 -->
-          <view class="assessment-section">
-            <view class="section-title">
-              <van-icon name="chart-trending-o" size="24rpx" color="#e86433" />
-              <text>考核方式</text>
-            </view>
-            <view class="assessment-grid">
-              <view class="assessment-item">
-                <view class="assessment-type">形考</view>
-                <view class="assessment-details">
-                  <text class="assessment-method">{{item.xkfs}}</text>
-                  <text class="assessment-ratio">{{item.xkbl}}</text>
-                </view>
-              </view>
-              <view class="assessment-item">
-                <view class="assessment-type">终考</view>
-                <view class="assessment-details">
-                  <text class="assessment-method">{{item.zkfs}}</text>
-                  <text class="assessment-ratio">{{item.zkbl}}</text>
-                </view>
-              </view>
-            </view>
-          </view>
+        <view class="mini-footer">
+          <text class="more-text">查看课程详情</text>
+          <van-icon name="arrow" size="24rpx" color="#999" />
         </view>
       </view>
     </block>
@@ -148,4 +84,104 @@
       </view>
     </view>
   </view>
+
+  <!-- 课程详情弹出层 -->
+  <van-popup
+    show="{{showDetail}}"
+    position="bottom"
+    round
+    closeable
+    close-on-click-overlay
+    bind:close="closeDetail"
+    custom-style="max-height: 82vh;"
+  >
+    <view class="detail-sheet" wx:if="{{currentCourse}}">
+      <view class="sheet-handle"></view>
+      <view class="sheet-header">
+        <view class="course-icon large">
+          <van-icon name="bookmark" size="36rpx" color="#409eff" />
+        </view>
+        <view class="sheet-title-wrap">
+          <text class="sheet-title">{{currentCourse.kcmc}}</text>
+          <text class="sheet-sub">课程ID: {{currentCourse.kcid}} · {{currentCourse.kmlx}}</text>
+        </view>
+      </view>
+
+      <scroll-view scroll-y="{{true}}" class="sheet-body">
+        <!-- 基础信息 -->
+        <view class="detail-section">
+          <view class="section-title">
+            <van-icon name="orders-o" size="24rpx" color="#409eff" />
+            <text>基础信息</text>
+          </view>
+          <view class="detail-rows">
+            <view class="detail-row">
+              <text class="row-label">考试单位</text>
+              <text class="row-value">{{currentCourse.ksdw || '—'}}</text>
+            </view>
+            <view class="detail-row">
+              <text class="row-label">考试方式</text>
+              <text class="row-value">{{currentCourse.ksfs || '—'}}</text>
+            </view>
+            <view class="detail-row">
+              <text class="row-label">试卷号</text>
+              <text class="row-value">{{currentCourse.sjh || '—'}}</text>
+            </view>
+            <view class="detail-row">
+              <text class="row-label">课程类型</text>
+              <text class="row-value">{{currentCourse.kmlx || '—'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 考试安排 -->
+        <view class="detail-section">
+          <view class="section-title warm">
+            <van-icon name="calendar-o" size="24rpx" color="#e86433" />
+            <text>考试安排</text>
+          </view>
+          <view class="exam-details">
+            <view class="exam-item">
+              <van-icon name="clock-o" size="24rpx" color="#666" />
+              <view class="exam-content">
+                <text class="exam-label">考试时间</text>
+                <text class="exam-value time">{{currentCourse.kssj || '待定'}}</text>
+              </view>
+            </view>
+            <view class="exam-item">
+              <van-icon name="location-o" size="24rpx" color="#666" />
+              <view class="exam-content">
+                <text class="exam-label">考试地点</text>
+                <text class="exam-value time">{{currentCourse.ksdd || '待定'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 考核方式 -->
+        <view class="detail-section last">
+          <view class="section-title warm">
+            <van-icon name="chart-trending-o" size="24rpx" color="#e86433" />
+            <text>考核方式</text>
+          </view>
+          <view class="assessment-grid">
+            <view class="assessment-item">
+              <view class="assessment-type">形考</view>
+              <view class="assessment-details">
+                <text class="assessment-method">{{currentCourse.xkfs || '—'}}</text>
+                <text class="assessment-ratio">{{currentCourse.xkbl || ''}}</text>
+              </view>
+            </view>
+            <view class="assessment-item">
+              <view class="assessment-type">终考</view>
+              <view class="assessment-details">
+                <text class="assessment-method">{{currentCourse.zkfs || '—'}}</text>
+                <text class="assessment-ratio">{{currentCourse.zkbl || ''}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
 </view>

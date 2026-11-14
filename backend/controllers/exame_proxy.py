@@ -221,26 +221,6 @@ def list_exams(
     )
 
 
-@router.get("/exams/{exam_id}")
-def get_exam_detail(
-    exam_id: int,
-    payload: dict = Depends(verify_token_and_get_payload),
-):
-    """获取考试详情（基于列表 + 单条）"""
-    # exame 后端没有专门的 detail 接口；用列表里取一条
-    data = _proxy_request(
-        "GET",
-        "/api/v1/student/exams",
-        payload,
-        params={"page": 1, "page_size": 100},
-    )
-    items = (data.get("data") or {}).get("list") or []
-    for item in items:
-        if int(item.get("id", -1)) == int(exam_id):
-            return {"success": True, "msg": "ok", "data": item}
-    return {"success": False, "msg": "考试不存在或您无权查看", "data": None}
-
-
 class _StartExamBody(BaseModel):
     exam_id: int
 
@@ -316,6 +296,30 @@ def get_record_paper(
         f"/api/v1/student/exams/record/{record_id}/paper",
         payload,
     )
+
+
+@router.get("/exams/{exam_id}")
+def get_exam_detail(
+    exam_id: int,
+    payload: dict = Depends(verify_token_and_get_payload),
+):
+    """获取考试详情（基于列表 + 单条）
+
+    注意：必须放在所有 /exams/静态子路由（start/submit/records）
+    之后定义，否则 "records" 会被误匹配为 exam_id。
+    """
+    # exame 后端没有专门的 detail 接口；用列表里取一条
+    data = _proxy_request(
+        "GET",
+        "/api/v1/student/exams",
+        payload,
+        params={"page": 1, "page_size": 100},
+    )
+    items = (data.get("data") or {}).get("list") or []
+    for item in items:
+        if int(item.get("id", -1)) == int(exam_id):
+            return {"success": True, "msg": "ok", "data": item}
+    return {"success": False, "msg": "考试不存在或您无权查看", "data": None}
 
 
 # ============= 调试接口（可选上线时关闭） =============

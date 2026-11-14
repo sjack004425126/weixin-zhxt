@@ -6,6 +6,6 @@
   "usingComponents": {
     "van-loading": "@vant/weapp/loading/index",
     "van-empty": "@vant/weapp/empty/index",
-    "van-icon": "/components/vant-icon/index"
+    "top-message": "/components/top-message/top-message"
   }
 }

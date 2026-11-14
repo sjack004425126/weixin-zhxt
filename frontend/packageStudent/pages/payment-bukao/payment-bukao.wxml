@@ -4,14 +4,14 @@
 <view class="nav-bar">
   <view class="nav-inner">
     <view class="nav-icon-wrap">
-      <van-icon name="notes-o" size="36rpx" color="#fff" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#fff;"></text>
     </view>
     <view class="nav-title-wrap">
       <text class="nav-title">补考报考</text>
       <text class="nav-sub">Makeup Exam Registration</text>
     </view>
     <view class="nav-home" bindtap="goHome">
-      <van-icon name="wap-home-o" size="36rpx" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;"></text>
     </view>
   </view>
 </view>
@@ -23,23 +23,7 @@
     <van-loading size="48rpx" color="#1890FF" vertical>加载中...</van-loading>
   </view>
 
-  <block wx:if="{{!isLoading && student}}">
-
-    <!-- 学生信息卡 -->
-    <view class="stu-card">
-      <view class="stu-row">
-        <view class="stu-avatar">
-          <text class="stu-avatar-text">{{student.xm[0] || '学'}}</text>
-        </view>
-        <view class="stu-info">
-          <text class="stu-name">{{student.xm}}</text>
-          <text class="stu-detail">{{student.xh}} · {{student.bj_mc}}</text>
-        </view>
-        <view class="stu-status {{student.xjzt === '1' ? 'active' : 'inactive'}}">
-          {{student.xjzt_desc}}
-        </view>
-      </view>
-    </view>
+  <block wx:if="{{!isLoading}}">
 
     <!-- 统计概览 -->
     <view class="stats-row">
@@ -67,7 +51,7 @@
     <!-- 截止时间 + 报考状态 -->
     <view class="deadline-bar">
       <view class="deadline-left">
-        <van-icon name="clock-o" size="28rpx" color="{{registrationOpen ? '#E86433' : '#FF4D4F'}}" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:{{registrationOpen ? '#E86433' : '#FF4D4F'}};"></text>
         <text class="deadline-text">截止：{{reexamDeadline || '未设置'}}</text>
       </view>
       <view class="deadline-tag {{registrationOpen ? 'open' : 'closed'}}">
@@ -237,7 +221,7 @@
 
     <!-- 缴费按钮（浮动） -->
     <view class="pay-float" wx:if="{{registrationOpen && needPayCount > 0}}" bindtap="goToPayment">
-      <van-icon name="balance-pay" size="36rpx" color="#fff" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:36rpx;color:#fff;"></text>
       <text class="pay-float-text">去缴费 ({{needPayCount}})</text>
     </view>
 
@@ -249,7 +233,7 @@
           <text class="section-title">已通过课程</text>
           <text class="section-count">{{passedCount}}门</text>
         </view>
-        <van-icon name="{{showPassed ? 'arrow-up' : 'arrow-down'}}" size="28rpx" color="#8C8C8C" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#8C8C8C;" wx:if="{{showPassed}}"></text><text class="vi" style="font-family:vant-icon,sans-serif;font-size:28rpx;color:#8C8C8C;" wx:else></text>
       </view>
 
       <block wx:if="{{showPassed}}">
@@ -283,7 +267,7 @@
 
     <!-- 空状态 -->
     <view class="empty-wrap" wx:if="{{totalCount === 0}}">
-      <van-empty description="暂无课程数据" />
+      <van-empty description="暂无课程数据"></van-empty>
     </view>
 
   </block>

@@ -1,4 +1,13 @@
-page {
+@import "../../../components/vant-icon/index.wxss";
+/* vi 类：001 方案，text 直渲 vant-icon 字体，绕过 view+::before */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+}
+/* ===== 页面根（style v2 下禁用 page 标签选择器，变量挂到 .page-body 继承） ===== */
+.page-body {
   --c-primary: #1890FF;
   --c-primary-light: #E6F7FF;
   --c-primary-bg: #F0F7FF;
@@ -17,6 +26,7 @@ page {
   --radius: 16rpx;
   --shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
   background: var(--c-bg);
+  padding: 140rpx 24rpx 180rpx;
 }
 
 /* ===== 导航栏 ===== */
@@ -64,72 +74,11 @@ page {
   color: var(--c-primary);
 }
 
-/* ===== 页面主体 ===== */
-.page-body {
-  padding: 140rpx 24rpx 180rpx;
-}
+/* ===== 页面主体（合并：变量继承 + 内边距一次写全） ===== */
 .loading-wrap {
   display: flex;
   justify-content: center;
   padding: 200rpx 0;
-}
-
-/* ===== 学生信息卡 ===== */
-.stu-card {
-  background: linear-gradient(135deg, #1890FF 0%, #096DD9 100%);
-  border-radius: var(--radius);
-  padding: 28rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 6rpx 20rpx rgba(24,144,255,0.25);
-}
-.stu-row {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-}
-.stu-avatar {
-  width: 80rpx; height: 80rpx;
-  background: rgba(255,255,255,0.25);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 3rpx solid rgba(255,255,255,0.4);
-}
-.stu-avatar-text {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #fff;
-}
-.stu-info { flex: 1; }
-.stu-name {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #fff;
-  display: block;
-  margin-bottom: 6rpx;
-}
-.stu-detail {
-  font-size: 22rpx;
-  color: rgba(255,255,255,0.8);
-}
-.stu-status {
-  font-size: 22rpx;
-  font-weight: 600;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  flex-shrink: 0;
-}
-.stu-status.active {
-  background: rgba(82,196,26,0.2);
-  color: #B7EB8F;
-  border: 1rpx solid rgba(82,196,26,0.4);
-}
-.stu-status.inactive {
-  background: rgba(255,77,79,0.2);
-  color: #FFA39E;
-  border: 1rpx solid rgba(255,77,79,0.4);
 }
 
 /* ===== 统计概览 ===== */

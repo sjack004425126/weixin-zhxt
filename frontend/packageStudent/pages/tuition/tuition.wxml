@@ -5,14 +5,14 @@
 <view class="page-header-nav">
   <view class="header-nav-content">
     <view class="header-nav-icon">
-      <van-icon name="balance-pay" size="40rpx" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;"></text>
     </view>
     <view class="header-nav-text">
       <view class="header-nav-title">我的学费</view>
       <view class="header-nav-subtitle">My Tuition</view>
     </view>
     <view class="header-nav-action">
-      <van-icon name="home-o" size="32rpx" bindtap="goHome" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;" bindtap="goHome"></text>
     </view>
   </view>
 </view>
@@ -41,7 +41,7 @@
     <!-- 费用详情与缴费状态整合卡片 -->
     <view class="card fee-card">
       <view class="card-title">
-        <van-icon name="balance-list-o" size="32rpx" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;"></text>
         <text>费用详情</text>
       </view>
 
@@ -77,7 +77,7 @@
         <!-- 缴费状态 -->
         <view class="payment-status {{tuitionData.tuition_info.remaining_payment < 0 ? 'overpaid' : tuitionData.tuition_info.remaining_payment === 0 ? 'completed' : 'pending'}}">
           <view class="status-icon">
-            <van-icon name="{{tuitionData.tuition_info.remaining_payment < 0 ? 'gold-coin-o' : tuitionData.tuition_info.remaining_payment === 0 ? 'passed' : 'warning-o'}}" size="40rpx" />
+            <text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;" wx:if="{{tuitionData.tuition_info.remaining_payment < 0}}"></text><text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;" wx:elif="{{tuitionData.tuition_info.remaining_payment === 0}}"></text><text class="vi" style="font-family:vant-icon,sans-serif;font-size:40rpx;" wx:else></text>
           </view>
           <view class="status-content">
             <text class="status-title">{{tuitionData.tuition_info.remaining_payment < 0 ? '多缴费用' : tuitionData.tuition_info.remaining_payment === 0 ? '缴费完成' : '待缴费用'}}</text>
@@ -90,7 +90,7 @@
     <!-- 书费退费详情 - 简化版 -->
     <view class="card refund-card" wx:if="{{tuitionData.refund_info && tuitionData.student.semester >=5 }}">
       <view class="card-title">
-        <van-icon name="gold-coin-o" size="32rpx" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;font-size:32rpx;"></text>
         <text>书费退费</text>
       </view>
       <view class="refund-info">
@@ -146,7 +146,7 @@
     <!-- 提示信息和缴费按钮 -->
     <block wx:if="{{tuitionData.tuition_info.remaining_payment > 0}}">
       <view class="notice-wrap warning">
-        <van-icon name="warning-o" />
+        <text class="vi" style="font-family:vant-icon,sans-serif;"></text>
         <text>您还有未缴费用，请及时缴纳</text>
       </view>
       <view class="pay-button-wrap">
@@ -160,11 +160,11 @@
       </view>
     </block>
     <view class="notice-wrap success" wx:elif="{{tuitionData.tuition_info.remaining_payment < 0}}">
-      <van-icon name="info-o" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;"></text>
       <text>您已多缴费用，您可以在第五个学期后申请退还多余费用</text>
     </view>
     <view class="notice-wrap complete" wx:else>
-      <van-icon name="checked" />
+      <text class="vi" style="font-family:vant-icon,sans-serif;"></text>
       <text>学费已交清</text>
     </view>
   </block>
