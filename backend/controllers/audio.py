@@ -3,7 +3,7 @@
 
 业务路径
 --------
-音乐文件存放在私有桶 ``guizhou-zhpt-prod-private`` 下：
+音乐文件存放在统一桶 ``zhxt`` 下：
 
     audio/Kiss The Rain.mp3    ← 当前招生页背景音乐
 
@@ -55,7 +55,7 @@ async def get_audio_url(
 ):
     """返回招生页背景音乐的 Sig V4 预签名 URL。
 
-    默认 ``key=audio/Kiss The Rain.mp3``，命中私有桶 ``guizhou-zhpt-prod-private``。
+    默认 ``key=audio/Kiss The Rain.mp3``，命中统一桶 ``zhxt``。
     如果音乐文件不存在，返回 404，前端可以降级处理（静默不播放）。
     """
     # 1) 解析 key
@@ -117,13 +117,13 @@ async def get_audio_info():
 
 
 # ============================================================
-# 公共桶图标（无需签名，长期有效）
+# 统一桶 zhxt 内图标（全私有，经后端签发 SigV4 后返回；不再匿名直读）
 #   type=music → images/music.png
 #   type=home  → images/home.png
 #
 # 兜底策略：
-#   1) 优先取公共桶里的 PNG（设计同学随时可更新）
-#   2) 公共桶里没有时，返回内联的 SVG data URL（白底黑房）
+#   1) 优先取统一桶里的 PNG（设计同学随时可更新），返回 SigV4 预签名 URL（5 分钟有效）
+#   2) 统一桶里没有时，返回内联的 SVG data URL（白底黑房）
 # ============================================================
 _PUBLIC_ICONS = {
     "music": {
@@ -154,7 +154,7 @@ async def get_music_icon_url(
     type: str = Query(default="music", description="图标类型：music | home"),
     host: str = Query(default="", description="前端访问域名；缺省时由前端自己拼 host"),
 ):
-    """返回公共桶音乐/返回首页图标的直接 URL（无需签名，长期有效）。"""
+    """返回统一桶（zhxt）音乐/返回首页图标的 SigV4 预签名 URL（5 分钟有效，全私有）。"""
     entry = _PUBLIC_ICONS.get((type or "").lower())
     if not entry:
         raise HTTPException(status_code=400, detail=f"未知图标类型: {type}")
@@ -165,14 +165,14 @@ async def get_music_icon_url(
     try:
         if stat_object(f"{bucket}/{key}"):
             info["exists"] = True
-            rel = f"/object/{bucket}/{key}"
+            rel = sign_object_url(key, bucket=bucket)
             info["url"] = f"{host.rstrip('/')}{rel}" if host else rel
         else:
-            # 公共桶里没有这个 png，使用 SVG fallback
+            # 统一桶里没有这个 png，使用 SVG fallback
             info["usedFallback"] = True
             info["url"] = _svg_to_data_url(entry["fallback_svg"])
     except Exception as e:
-        logger.warning("stat public icon 失败: %s", e)
+        logger.warning("stat 统一桶 icon 失败: %s", e)
         # 出错也给一个 fallback SVG，前端图标永远可用
         info["usedFallback"] = True
         info["url"] = _svg_to_data_url(entry["fallback_svg"])

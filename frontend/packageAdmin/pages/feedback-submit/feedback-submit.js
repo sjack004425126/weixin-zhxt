@@ -6,10 +6,10 @@ const { checkFeatureSwitch } = require('../../../utils/feature-switch');
 // =====================================================================
 // MinIO 反馈附件存储约定（与后端 services/minio_service.py 对齐）
 // ---------------------------------------------------------------------
-// 桶：guizhou-zhpt-prod-private（与 headphoto 业务共用同一私有桶）
+// 桶：zhxt（统一桶；原公有对象已按私有处理，经后端代理/SigV4 访问）
 // 路径前缀：hq/feedback/<uuid>.<ext>
 // 上传入口：FastAPI POST /feedback/upload（由 nginx 80 → 3050 反代）
-// 访问 URL：后端 SigV4 预签名 /object/guizhou-zhpt-prod-private/hq/feedback/<uuid>.<ext>?X-Amz-...
+// 访问 URL：后端 SigV4 预签名 /object/zhxt/hq/feedback/<uuid>.<ext>?X-Amz-...
 // =====================================================================
 const FEEDBACK_AUTH_CACHE_KEY = 'feedback_auth_cache';
 

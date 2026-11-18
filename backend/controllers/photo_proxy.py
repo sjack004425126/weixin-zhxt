@@ -1,8 +1,8 @@
 """
-私有桶代理 / 公共桶兜底代理（统一入口）。
+统一桶代理（统一入口；原私有桶/公共桶已全量并入 zhxt）。
 
 参考 headphoto/backend/app/api/v1/photo_proxy.py 的设计：
-- 所有私有桶对象对外访问统一走本路由
+- 所有统一桶（zhxt）对象对外访问统一走本路由
 - 同步阻塞 IO 丢进专用线程池（隔离默认线程池）
 - 每个 MinIO 操作有硬超时；超时即放弃本次请求
 - 支持 HTTP Range / 206 边下边播
@@ -11,14 +11,14 @@
 
 路由
 ----
-GET /photo/get_headphoto/{sfzh}            头像（私有桶根，{sfzh}.jpg）
-GET /object/{path:path}                    通用私有桶 HMAC 签名代理
+GET /photo/get_headphoto/{sfzh}            头像（统一桶，headphoto/<type>/{sfzh}.jpg）
+GET /object/{path:path}                    通用统一桶 HMAC 签名代理
 GET /feedback/image/{object_key:path}      反馈工单图片（与小程序签名一致）
 GET /brochure/image/{path:path}            招生简章图片
 GET /job/image/{filename:path}             就业推荐配图
 GET /photo/zs_image/{filename}             3+4 报名图片（兼容老路径）
-GET /static/{path:path}                    公共桶静态资源（开发/测试兜底，生产走 nginx）
-GET /public/{path:path}                    公开桶业务公开资源（开发/测试兜底，生产走 nginx）
+GET /static/{path:path}                    统一桶静态资源（后端代理透传，原公有已按私有处理）
+GET /public/{path:path}                    统一桶业务资源（后端代理透传，兼容历史 public/ 前缀）
 """
 import asyncio
 import hashlib
@@ -384,23 +384,32 @@ async def get_feedback_image(
     token: str = Query("", alias="token"),
     admin: Optional[dict] = Depends(_try_admin),
 ):
-    """读取工单图片（私有桶，路径前缀 private/hq/feedback/ 或 feedback/）。
+    """读取工单图片（统一桶 zhxt，路径前缀 hq/feedback/）。
 
     鉴权优先级：
     1. 管理员 Authorization Header Token
     2. URL 中的 token 参数（el-image src 直接加载时使用）
     3. HMAC 签名（t + s 参数，与小程序一致，md5 前 8 位）
+
+    兼容历史前缀：private/hq/feedback/、feedback/（剥离后统一按 hq/feedback/ 读取）。
     """
     object_key = object_key.lstrip("/")
     if not object_key:
         raise HTTPException(400, "Invalid object key")
-    # 允许的私有桶 key 前缀：
-    # - private/hq/feedback/ : 当前规范路径（新工单，与 minio_service._ROUTES 对齐）
-    # - feedback/            : 旧路径（清库前的历史数据，兜底）
-    if not (
-        object_key.startswith("private/hq/feedback/")
-        or object_key.startswith("feedback/")
-    ):
+    # 允许的统一桶（zhxt）key 前缀：
+    # - hq/feedback/          : 当前规范路径（新工单，纯 key 入库格式）
+    # - private/hq/feedback/ : 旧业务前缀，剥离后统一按 hq/feedback/ 读取
+    # - feedback/             : 旧路径（清库前的历史数据，兜底）
+    # - zhxt/hq/feedback/     : 带桶名全路径，剥桶名后读取
+    for _prefix in ("zhxt/",):
+        if object_key.startswith(_prefix):
+            object_key = object_key[len(_prefix):]
+            break
+    if object_key.startswith("private/hq/feedback/"):
+        object_key = object_key[len("private/"):]
+    elif object_key.startswith("feedback/") and not object_key.startswith("hq/feedback/"):
+        object_key = "hq/feedback/" + object_key[len("feedback/"):]
+    if not object_key.startswith("hq/feedback/"):
         raise HTTPException(403, "路径不合法")
 
     if admin is not None:
@@ -424,27 +433,32 @@ async def get_feedback_image(
 
 
 # ============================================================
-# 招生简章图片代理（公开桶 public/zs/brochure/<school_type>/<n>.<ext>）
+# 招生简章图片代理（统一桶 zhxt，key 如 zs/brochure/<school_type>/<n>.<ext>）
+# 兼容历史前缀 public/zs/brochure/...（剥离 public/ 后读取）
 # ============================================================
 @router.get("/brochure/image/{path:path}")
 async def get_brochure_image(
     path: str,
     request: Request,
 ):
-    """读取招生简章图片（公开桶，nginx 接管；这里仅兜底 nginx 故障）。
+    """读取招生简章图片（统一桶 zhxt 全私有；本路由仅兜底 nginx 故障）。
 
-    公开桶对象没有签名校验；如需防盗链，由 nginx secure_link 完成。
+    历史公开访问已收敛：统一走后端代理，不再匿名直读。
     """
     object_key = path.lstrip("/")
     if not object_key:
         raise HTTPException(400, "Invalid path")
-    if not object_key.startswith("public/zs/brochure/"):
+    if object_key.startswith("public/"):
+        object_key = object_key[len("public/"):]
+    if object_key.startswith("zhxt/"):
+        object_key = object_key[len("zhxt/"):]
+    if not object_key.startswith("zs/brochure/"):
         raise HTTPException(403, "路径不合法")
     return _stream_public_object(object_key, default_media="image/jpeg", cache_max_age=3600)
 
 
 # ============================================================
-# 就业推荐配图代理（私有桶 private/jytj/...）
+# 就业推荐配图代理（统一桶 zhxt，key 如 jytj/...；兼容历史前缀 private/jytj/...）
 # ============================================================
 @router.get("/job/image/{filename:path}")
 async def get_job_image(
@@ -454,14 +468,18 @@ async def get_job_image(
     s: str = Query(""),
     admin: Optional[dict] = Depends(_try_admin),
 ):
-    """读取就业推荐文章配图（私有桶，路径前缀 private/jytj/）。
+    """读取就业推荐文章配图（统一桶 zhxt）。
 
     鉴权：HMAC 签名（t + s） 或 管理员 Token
     """
     object_key = filename.lstrip("/")
     if not object_key:
         raise HTTPException(400, "Invalid filename")
-    if not object_key.startswith("private/jytj/"):
+    if object_key.startswith("zhxt/"):
+        object_key = object_key[len("zhxt/"):]
+    if object_key.startswith("private/"):
+        object_key = object_key[len("private/"):]
+    if not (object_key.startswith("jytj/") or object_key.startswith("zs/")):
         raise HTTPException(403, "路径不合法")
 
     if t and s and verify_object_sign(object_key, t, s):
@@ -474,7 +492,7 @@ async def get_job_image(
 
 
 # ============================================================
-# 3+4 报名图片代理（私有桶 private/zs/...）
+# 3+4 报名图片代理（统一桶 zhxt，key 如 zs/...；兼容历史前缀 private/zs/...）
 # ============================================================
 @router.get("/photo/zs_image/{filename:path}")
 async def get_zs_image(
@@ -484,14 +502,19 @@ async def get_zs_image(
     s: str = Query(""),
     admin: Optional[dict] = Depends(_try_admin),
 ):
-    """读取 3+4 报名图片（私有桶，路径前缀 private/zs/）。
+    """读取 3+4 报名图片（统一桶 zhxt）。
 
     鉴权：HMAC 签名（t + s） 或 管理员 Token
+    兼容历史前缀 private/zs/（剥离后统一按 zs/ 读取）。
     """
     object_key = filename.lstrip("/")
     if not object_key:
         raise HTTPException(400, "Invalid filename")
-    if not object_key.startswith("private/zs/"):
+    if object_key.startswith("zhxt/"):
+        object_key = object_key[len("zhxt/"):]
+    if object_key.startswith("private/"):
+        object_key = object_key[len("private/"):]
+    if not object_key.startswith("zs/"):
         raise HTTPException(403, "路径不合法")
 
     if t and s and verify_object_sign(object_key, t, s):
@@ -504,27 +527,41 @@ async def get_zs_image(
 
 
 # ============================================================
-# 公共桶静态资源兜底代理（开发/测试用；生产由 nginx 接管）
+# 统一桶静态资源兜底代理（开发/测试用；生产由 nginx 接管）
+# 统一桶 zhxt 全私有：MinIO 不再匿名直读，本路由经后端凭证读取后透传，
+# 即“经后端代理”访问。生产 nginx /static/ 必须同步改指 zhxt 桶，
+# 且不能再匿名直透 MinIO（否则 403），应转交后端或改用 /object/ SigV4。
 # ============================================================
 @router.get("/static/{path:path}")
 async def static_proxy(path: str):
-    """GET /static/<path> → 公开桶 static/<path>
+    """GET /static/<path> → 统一桶 zhxt/<path>（后端代理透传）
 
-    生产环境此路由应由 nginx 直接代理到 MinIO 并加 secure_link 防盗链；
-    仅当 nginx 命中 404/403 时回落到本路由。
+    映射：/static/images/home_bg.jpg → zhxt/images/home_bg.jpg（剥离 /static/ 前缀）。
+    兼容历史误写 static/static/...（多余前缀一并剥离）。
     """
     if ".." in path:
         raise HTTPException(404, "Not Found")
-    object_key = f"static/{path.lstrip('/')}"
+    object_key = path.lstrip("/").lstrip("/")
+    # 兼容历史“static/”桶内前缀误写：实际键名无 static/ 前缀
+    while object_key.startswith("static/"):
+        object_key = object_key[len("static/"):]
+    if not object_key:
+        raise HTTPException(404, "Not Found")
     return _stream_public_object(object_key, cache_max_age=86400)
 
 
 @router.get("/public/{path:path}")
 async def public_proxy(path: str):
-    """GET /public/<path> → 公开桶 public/<path>"""
+    """GET /public/<path> → 统一桶 zhxt/<path>（后端代理透传，兼容历史 public/ 前缀）"""
     if ".." in path:
         raise HTTPException(404, "Not Found")
-    object_key = f"public/{path.lstrip('/')}"
+    object_key = path.lstrip("/").lstrip("/")
+    while object_key.startswith("public/"):
+        object_key = object_key[len("public/"):]
+    while object_key.startswith("static/"):
+        object_key = object_key[len("static/"):]
+    if not object_key:
+        raise HTTPException(404, "Not Found")
     return _stream_public_object(object_key, cache_max_age=86400)
 
 

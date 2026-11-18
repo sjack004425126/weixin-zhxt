@@ -1,15 +1,15 @@
-// 公共静态图集中表
+// 公共静态图集中表（统一桶 zhxt 全私有，经后端 /static/ 代理透传，不再匿名直读）
 //
-// 所有图实际存放位置：MinIO 桶 guizhou-zhpt-prod-public，对象前缀 static/images/
+// 所有图实际存放位置：MinIO 统一桶 zhxt，对象键如 images/home_bg.jpg；
 // 访问路径：BASE_URL + /static/images/<filename>
 //   - 开发: http://172.16.14.216:3050/static/images/...
 //   - 测试: http://172.16.100.102:3050/static/images/...
 //   - 生产: https://m.qdndd.com.cn/static/images/...
-// 由各环境的 nginx /static/ location 反代到 MinIO 公共桶完成。
+// 由后端 /static/ 代理（带 MinIO 凭证）透传统一桶完成。
 //
 // 维护规范：
-//   1. 任何新增的"和后端业务数据无关、UI 用的静态图"先上传到 MinIO 公共桶
-//      guizhou-zhpt-prod-public/static/images/ 下，然后在此表新增一行。
+//   1. 任何新增的"和后端业务数据无关、UI 用的静态图"先上传到 MinIO 统一桶
+//      zhxt/images/ 下，然后在此表新增一行。
 //   2. WXML/JS 不允许再硬编码图片绝对 URL，统一从此处 require。
 const { BASE_URL } = require('./request');
 

@@ -2,15 +2,15 @@
 招生简章图片管理 API（zhpt-new 重构版）
 
 存储路径：
-  公开桶 public/zs/brochure/<school_type>/<sort>.<ext>
+  统一桶 zhxt/zs/brochure/<school_type>/<sort>.<ext>（全私有，经 SigV4 / 后端代理访问）
 
 访问方式：
-  /brochure/image/<path:path>  → photo_proxy 直读公开桶（无签名）
-  生产环境由 nginx /public/* 直发，并加 secure_link 防盗链；FastAPI 仅兜底
+  /brochure/image/<path:path>  → photo_proxy 读统一桶（兜底 nginx 故障）
+  主链路 /object/zhxt/zs/brochure/...?X-Amz-... → nginx → MinIO SigV4 验签（resolve_url 生成）
 
 重构要点：
-  - 弃用私有桶 + HMAC 签名代理（招生简章是公开资源）
-  - 上传走 services/minio_service.put_brochure_image（公开桶）
+  - 统一走统一桶 zhxt + SigV4 预签名（原公有已按私有处理，不再匿名直读）
+  - 上传走 services/minio_service.put_brochure_image（统一桶）
   - URL 解析走 services.minio_service.resolve_url
   - 排序算法沿用 headphoto 的"客户端下载再上传"方案，避免 server-side copy_object 已知数据损坏
 """
@@ -46,7 +46,7 @@ BROCHURE_DIRS = {
 async def get_brochure_list(school_type: str):
     """获取招生简章图片列表。
 
-    数据源：私有桶 ``guizhou-zhpt-prod-private`` 下的 ``zs/brochure/<school_type>/``
+    数据源：统一桶 ``zhxt`` 下的 ``zs/brochure/<school_type>/``
     目录（与 ``put_brochure_image`` 写入路径一致）。访问通过 ``resolve_url`` 生成
     Sig V4 预签名 URL，浏览器经 ``/object/<bucket>/<key>?X-Amz-...`` → nginx →
     MinIO 验签读取。
@@ -58,7 +58,7 @@ async def get_brochure_list(school_type: str):
         client = gateway.client
         prefix = BROCHURE_DIRS[school_type] + '/'
 
-        # 列私有桶：路径格式 <BUCKET_PRIVATE>/zs/brochure/<school_type>/<n>.<ext>
+        # 列统一桶：路径格式 <BUCKET_PRIVATE>/zs/brochure/<school_type>/<n>.<ext>
         objects = list(client.list_objects(
             BUCKET_PRIVATE,
             prefix=prefix,
@@ -96,7 +96,7 @@ async def get_brochure_list(school_type: str):
 
 @router.post('/upload/{school_type}')
 async def upload_brochure(school_type: str, file: UploadFile = File(...), sort: int = Form(...)):
-    """上传招生简章图片到公开桶 public/zs/brochure/<school_type>/<sort>.<ext>
+    """上传招生简章图片到统一桶 zhxt/zs/brochure/<school_type>/<sort>.<ext>
 
     文件名固定为 <sort>.<ext>，确保只有纯数字文件名。
     """
@@ -130,7 +130,7 @@ async def upload_brochure(school_type: str, file: UploadFile = File(...), sort: 
 
 @router.delete('/delete/{school_type}/{filename}')
 async def delete_brochure(school_type: str, filename: str):
-    """删除招生简章图片（公开桶）。"""
+    """删除招生简章图片（统一桶 zhxt）。"""
     if school_type not in BROCHURE_DIRS:
         raise HTTPException(status_code=400, detail='无效的学校类型')
 

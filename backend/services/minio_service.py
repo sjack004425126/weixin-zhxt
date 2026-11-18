@@ -5,10 +5,12 @@ MinIO 业务语义层（zhpt-new 后端）。
 
 设计原则
 --------
-- 所有对象均为私有（与 headphoto 共用同一桶 MINIO_BUCKET_PRIVATE），无公开不变地址。
+- 所有对象均为私有（统一桶 zhxt，无公开不变地址；原公有对象已按私有处理）。
 - 数据库存储格式：<bucket>/<key>，如
-    ``guizhou-zhpt-prod-private/zs/brochure/vocational/testimg.png``
+    ``zhxt/zs/brochure/vocational/testimg.png``
     第一段为桶名，其余为对象 key，无需路由表。
+    历史桶名（guizhou-zhpt-prod-private / guizhou-zhpt-prod-public / headphoto）
+    在解析/签名时自动剥离并归一到当前桶（zhxt）。
 - resolve_url / sign_object_url 生成 MinIO presigned GET URL（Sig V4），浏览器通过
   nginx 反代访问：
       浏览器  →  GET /object/<bucket>/<key>?X-Amz-...
@@ -20,9 +22,9 @@ MinIO 业务语义层（zhpt-new 后端）。
 
 桶说明
 ------
-zhpt-new 与 headphoto 共用同一私有桶：
-    MINIO_BUCKET_PRIVATE = "guizhou-zhpt-prod-private"
-MINIO_BUCKET_PUBLIC 仅保留为兼容别名（指向同一桶），旧代码 / 旧数据库路径不会报错。
+全量统一桶：zhxt（2026-11-18 迁移完成）。
+MINIO_BUCKET_PRIVATE / MINIO_BUCKET_PUBLIC / MINIO_BUCKET_ZHXT 均指向 zhxt，
+PUBLIC 仅为兼容别名，旧代码 / 旧数据库路径不会报错。
 
 兼容策略
 --------
@@ -78,12 +80,20 @@ MINIO_SECURE: bool = _env("MINIO_SECURE", "false").lower() == "true"
 # ============================================================
 # 桶常量
 # ============================================================
-# 私有桶（业务所有对象）：与 headphoto 共用同一桶
+# 全量统一桶：zhxt（2026-11-18 迁移完成，原 guizhou-zhpt-prod-private /
+# guizhou-zhpt-prod-public 已全量同键名迁入 zhxt；原公有对象一律按私有处理，
+# 经后端代理或 SigV4 预签名访问，不再匿名直读）
 BUCKET_PRIVATE: str = gateway.bucket_private
-# 公开桶：本项目已废弃，统一改为私有桶；为兼容老代码仍指向同一桶
+# 兼容别名：历史代码引用 BUCKET_PUBLIC，迁移后与 PRIVATE 同值（zhxt），仅作兼容
 BUCKET_PUBLIC: str = gateway.bucket_public
-# 业务专用桶（教师头像 zhxt），运维通过 MINIO_BUCKET_ZHXT 配置，未配置时回退到私有桶
+# 统一桶（教师头像等也已并入同一 zhxt）
 BUCKET_ZHXT: str = gateway.bucket_zhxt
+# 历史已迁移桶名：DB 老记录 / 脏数据里可能残留，解析时剥离并归一到当前桶
+_LEGACY_BUCKETS: tuple[str, ...] = (
+    "guizhou-zhpt-prod-private",
+    "guizhou-zhpt-prod-public",
+    "headphoto",
+)
 # 老别名（部分老代码用 MINIO_BUCKET 引用私有桶）
 MINIO_BUCKET: str = BUCKET_PRIVATE
 MINIO_BUCKET_PRIVATE: str = BUCKET_PRIVATE
@@ -107,24 +117,29 @@ def split_bucket_key(path: str) -> tuple[str, str]:
 
     支持两种格式：
       1. 含桶名全路径（历史 / photo_proxy 返回值）：``<bucket>/<key>``
-         例如："guizhou-zhpt-prod-private/zs/brochure/vocational/testimg.png"
+         例如："zhxt/zs/brochure/vocational/testimg.png"
+         历史桶名（guizhou-zhpt-prod-private / guizhou-zhpt-prod-public / headphoto）
+         会被识别并剥离，统一归一到当前桶（zhxt）。
          也支持业务专用桶："zhxt/teacher_head_photo/qdnskh.jpg"
       2. 纯 key（新入库约定）：``hq/feedback/<uuid>.png``
          例如："hq/feedback/abc.png" / "zs/brochure/abc.png"
 
     返回 (bucket, key)：
-      bucket = "guizhou-zhpt-prod-private"（默认私有桶）
+      bucket = "zhxt"（当前统一桶）
       key    = "zs/brochure/vocational/testimg.png"
     """
     p = (path or "").lstrip("/")
     parts = p.split("/", 1)
     if len(parts) == 1:
-        # 纯 key 形式：默认走私有桶
+        # 纯 key 形式：默认走统一桶
         return BUCKET_PRIVATE, p
     bucket, key = parts[0], parts[1]
     # 兼容历史 DB 老记录里的桶名（保证 bucket 是我们认识的桶，否则视为纯 key）
     # 白名单包含 BUCKET_PRIVATE / BUCKET_PUBLIC / BUCKET_ZHXT
     if bucket not in (BUCKET_PRIVATE, BUCKET_PUBLIC, BUCKET_ZHXT):
+        # 历史已迁移桶名：剥离后归一到当前统一桶
+        if bucket in _LEGACY_BUCKETS:
+            return BUCKET_PRIVATE, key
         return BUCKET_PRIVATE, p
     return bucket, key
 
@@ -140,11 +155,12 @@ def resolve_url(path: str) -> str:
     参数
     ----
     path : 数据库存储路径，格式 <bucket>/<key>，如
-           "guizhou-zhpt-prod-private/zs/brochure/vocational/testimg.png"
+           "zhxt/zs/brochure/vocational/testimg.png"
+           历史桶名（guizhou-zhpt-prod-private / guizhou-zhpt-prod-public）会自动归一到 zhxt。
 
     返回
     ----
-    形如 "/object/guizhou-zhpt-prod-private/zs/brochure/vocational/testimg.png?X-Amz-..."
+    形如 "/object/zhxt/zs/brochure/vocational/testimg.png?X-Amz-..."
     的相对路径（host 由前端拼：dev 用 localhost，prod 用实际域名）。
     """
     if not path:
@@ -178,8 +194,9 @@ def sign_object_url(object_key: str, bucket: str | None = None) -> str:
     ----
     object_key : object key。可以是：
                  - 纯 key（新规范）：``zs/brochure/vocational/1.jpg``
-                 - 含桶名全路径（DB 老记录或脏数据）：``guizhou-zhpt-prod-private/zs/...``
-                 - 含前导 /：``/guizhou-zhpt-prod-private/zs/...``
+                 - 含桶名全路径（DB 老记录或脏数据）：``zhxt/zs/...``（历史
+                   guizhou-zhpt-prod-private / guizhou-zhpt-prod-public 会自动归一到 zhxt）
+                 - 含前导 /：``/zhxt/zs/...``
                  - public/<key> 或 private/<key> 业务前缀（旧约定）：自动推断桶
                  - /object/<bucket>/<key>?X-Amz-... 旧签名 URL：剥 /object/ 后再签
                  - 完整 http(s) URL：抽 path 再签
@@ -218,8 +235,8 @@ def sign_object_url(object_key: str, bucket: str | None = None) -> str:
         safe_key = safe_key[len("object/"):]  # noqa: F841
         # safe_key 里可能还有 "?", 上面的 1.5 已经先剥过了；这里仅剥前缀
 
-    # 3) 自动剥桶名（避免双桶名 URL）
-    for cand_bucket in (BUCKET_PRIVATE, BUCKET_PUBLIC):
+    # 3) 自动剥桶名（避免双桶名 URL），历史已迁移桶名同样剥离归一到当前桶
+    for cand_bucket in (BUCKET_PRIVATE, BUCKET_PUBLIC, BUCKET_ZHXT, *_LEGACY_BUCKETS):
         prefix = cand_bucket + "/"
         if safe_key.startswith(prefix):
             safe_key = safe_key[len(prefix):]
@@ -321,7 +338,7 @@ def put_object(content: bytes, filename: str, subdir: str = "") -> str:
 
     返回
     ----
-    数据库存储路径，形如 "guizhou-zhpt-prod-private/<subdir>/<uuid>.<ext>"
+    数据库存储路径，形如 "zhxt/<subdir>/<uuid>.<ext>"
     """
     ext = _ext_of(filename, "bin")
     name = _new_name(ext)
@@ -419,7 +436,7 @@ def upload_photo(
     content_type: str = "image/jpeg",
     subdir: str = HEADPHOTO_DIR_OPEN,
 ) -> str:
-    """上传头像，返回数据库路径（guizhou-zhpt-prod-private/<subdir>/<id_card>.jpg）。
+    """上传头像，返回数据库路径（zhxt/<subdir>/<id_card>.jpg）。
 
     参数
     ----
@@ -661,7 +678,7 @@ def put_brochure_image(
     ext: str | None = None,
     content_type: str | None = None,
 ) -> str:
-    """上传招生简章图片到私有桶，返回数据库路径（guizhou-zhpt-prod-private/zs/brochure/.../...<ext>）。
+    """上传招生简章图片到统一桶，返回数据库路径（zhxt/zs/brochure/.../...<ext>）。
 
     参数
     ----
@@ -695,7 +712,7 @@ def put_brochure_image(
 # ============================================================
 def put_zs_image(content: bytes, ext: str = "jpg",
                  content_type: str | None = None) -> str:
-    """3+4 报名图片上传，返回数据库路径（guizhou-zhpt-prod-private/zs/<uuid>.<ext>）。
+    """3+4 报名图片上传，返回数据库路径（zhxt/zs/<uuid>.<ext>）。
 
     业务路径历史上有 private/zs/ 前缀，本实现统一存 <bucket>/zs/<uuid>.<ext>，
     sign_object_url 对遗留 private/zs/ 也兼容识别。
@@ -716,7 +733,7 @@ def put_zs_image(content: bytes, ext: str = "jpg",
 # ============================================================
 def put_jytj_image(content: bytes, ext: str = "jpg",
                    content_type: str | None = None) -> str:
-    """就业推荐配图上传，返回数据库路径（guizhou-zhpt-prod-private/jytj/<ts>.<ext>）。"""
+    """就业推荐配图上传，返回数据库路径（zhxt/jytj/<ts>.<ext>）。"""
     safe_ext = _ext_of(f"x.{ext}", "jpg")
     obj = f"jytj/{int(time.time() * 1000)}.{safe_ext}"
     full_obj = f"{BUCKET_PRIVATE}/{obj}"
@@ -731,7 +748,7 @@ _FEEDBACK_DIR = "hq/feedback"  # 对象子目录（不含 public/private 前缀�
 
 
 def put_feedback_image(content: bytes, filename: str, content_type: str | None = None) -> str:
-    """上传反馈工单主附件，返回数据库路径（guizhou-zhpt-prod-private/hq/feedback/<uuid>.<ext>）。
+    """上传反馈工单主附件，返回数据库路径（zhxt/hq/feedback/<uuid>.<ext>）。
 
     访问 URL 走 resolve_url() → /object/<bucket>/hq/feedback/<uuid>.<ext>?X-Amz-...
     """
@@ -748,7 +765,7 @@ def put_feedback_poster(video_path: str, content: bytes, content_type: str = "im
     """为视频附件生成同名封面（sidecar），返回数据库路径。
 
     ``video_path`` 须为 put_feedback_image 返回的数据库路径
-    （形如 ``guizhou-zhpt-prod-private/hq/feedback/<uuid>.mp4``）。
+    （形如 ``zhxt/hq/feedback/<uuid>.mp4``）。
     封面 key = ``<video_key>.jpg``（即 sidecar）。
     """
     if not video_path or not content:

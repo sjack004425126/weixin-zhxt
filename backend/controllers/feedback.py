@@ -904,14 +904,16 @@ async def submit(
     # ---------- 规范化已上传的 key ----------
     #
     # 兼容多种历史/当前格式（核心：跟 photo_proxy.feedback_upload 当前实际返回一致）：
-    #   1. 带桶名全路径   : "guizhou-zhpt-prod-private/hq/feedback/<uuid>.jpg"  ← photo_proxy 当前实际返回
+    #   1. 带桶名全路径   : "zhxt/hq/feedback/<uuid>.jpg"  ← photo_proxy 当前实际返回（统一桶）
+    #      历史桶名（guizhou-zhpt-prod-private / guizhou-zhpt-prod-public / headphoto）同样兼容
     #   2. 业务前缀路径   : "private/hq/feedback/<uuid>.jpg"                     ← 注释里的旧规范
     #   3. 旧业务前缀     : "feedback/<uuid>.jpg"                                ← 清库前的旧记录
     #   4. 旧 HMAC URL    : "/feedback/image/<uuid>.jpg?..."                    ← 兜底兼容
     #
     # 出栈侧（_keys_to_images → get_signed_url）能处理带/不带桶名任意格式，
     # 所以这里只做合法性校验，不强行改写。
-    _BUCKET_PRIVATE_NAME = "guizhou-zhpt-prod-private"
+    # 统一桶 zhxt；历史桶名（guizhou-zhpt-prod-private / guizhou-zhpt-prod-public / headphoto）同样兼容剥离。
+    _BUCKET_NAMES = ("zhxt", "guizhou-zhpt-prod-private", "guizhou-zhpt-prod-public", "headphoto")
     _FEEDBACK_DIR = "hq/feedback"
     def _normalize_key(s: str) -> Optional[str]:
         """规范化 key 入库格式。
@@ -941,21 +943,18 @@ async def submit(
             s = s[len("/feedback/image/"):].split("?", 1)[0]
         if "?" in s:
             s = s.split("?", 1)[0]
-        # 1) 带桶名全路径 → 剥桶名 + 剥 private/ 前缀（统一成 hq/feedback/...）
-        if s.startswith(f"{_BUCKET_PRIVATE_NAME}/"):
-            s = s[len(f"{_BUCKET_PRIVATE_NAME}/"):]
-            if s.startswith("private/"):
-                s = s[len("private/"):]
-            if s.startswith(_FEEDBACK_DIR + "/"):
-                tail = s[len(_FEEDBACK_DIR) + 1:]
-                return s if tail and "/" not in tail and "." in tail else None
-            return None
-        # 2) 业务前缀路径 → 剥 private/
-        if s.startswith("private/hq/feedback/"):
-            s = "hq/feedback/" + s[len("private/hq/feedback/"):]
-            tail = s[len("hq/feedback/"):]
+        # 1) 剥桶名（统一桶 zhxt + 历史桶名）+ 剥 private/ 前缀（统一成 hq/feedback/...）
+        #    纯 key（hq/feedback/...）同样在此直接通过
+        for _b in _BUCKET_NAMES:
+            if s.startswith(f"{_b}/"):
+                s = s[len(f"{_b}/"):]
+                break
+        if s.startswith("private/"):
+            s = s[len("private/"):]
+        if s.startswith(_FEEDBACK_DIR + "/"):
+            tail = s[len(_FEEDBACK_DIR) + 1:]
             return s if tail and "/" not in tail and "." in tail else None
-        # 3) 旧业务前缀 → 直接通过
+        # 2) 旧业务前缀 feedback/... → hq/feedback/...
         if s.startswith("feedback/"):
             s = "hq/feedback/" + s[len("feedback/"):]
             tail = s[len("hq/feedback/"):]
@@ -1539,7 +1538,8 @@ async def admin_handle(
         return _fail(f"当前状态({t.status})不可继续处理")
     t.status = req.status
     t.handle_remark = req.remark.strip()
-    _BUCKET_PRIVATE_NAME = "guizhou-zhpt-prod-private"
+    # 统一桶 zhxt；历史桶名同样兼容剥离（与 submit._normalize_key 一致）
+    _BUCKET_NAMES = ("zhxt", "guizhou-zhpt-prod-private", "guizhou-zhpt-prod-public", "headphoto")
     _FEEDBACK_DIR = "hq/feedback"
     def _norm(s: str) -> Optional[str]:
         """与 submit._normalize_key 同语义：把入参规范成 hq/feedback/<uuid>.<ext> 入库。"""
@@ -1550,21 +1550,17 @@ async def admin_handle(
             s = s[len("/feedback/image/"):].split("?", 1)[0]
         if "?" in s:
             s = s.split("?", 1)[0]
-        # 1) 带桶名全路径 → 剥桶名 + 剥 private/
-        if s.startswith(f"{_BUCKET_PRIVATE_NAME}/"):
-            s = s[len(f"{_BUCKET_PRIVATE_NAME}/"):]
-            if s.startswith("private/"):
-                s = s[len("private/"):]
-            if s.startswith(_FEEDBACK_DIR + "/"):
-                tail = s[len(_FEEDBACK_DIR) + 1:]
-                return s if tail and "/" not in tail and "." in tail else None
-            return None
-        # 2) 业务前缀路径 → 剥 private/
-        if s.startswith("private/hq/feedback/"):
-            s = "hq/feedback/" + s[len("private/hq/feedback/"):]
-            tail = s[len("hq/feedback/"):]
+        # 1) 剥桶名（统一桶 zhxt + 历史桶名）+ 剥 private/ 前缀
+        for _b in _BUCKET_NAMES:
+            if s.startswith(f"{_b}/"):
+                s = s[len(f"{_b}/"):]
+                break
+        if s.startswith("private/"):
+            s = s[len("private/"):]
+        if s.startswith(_FEEDBACK_DIR + "/"):
+            tail = s[len(_FEEDBACK_DIR) + 1:]
             return s if tail and "/" not in tail and "." in tail else None
-        # 3) 旧业务前缀
+        # 2) 旧业务前缀 feedback/... → hq/feedback/...
         if s.startswith("feedback/"):
             s = "hq/feedback/" + s[len("feedback/"):]
             tail = s[len("hq/feedback/"):]

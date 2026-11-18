@@ -346,7 +346,7 @@ def create_app(config_name: str = 'development') -> FastAPI:
     from controllers.audio import router as audio_router
     app.include_router(audio_router)
 
-    # MinIO 私有桶 / 公开桶 统一代理（挂根路径）
+    # MinIO 统一桶 zhxt 代理（挂根路径；原私有桶/公有桶已全量并入 zhxt 全私有）
     # 含 /photo/get_headphoto/、/object/、/feedback/、/brochure/image/、/job/image/、
     #    /photo/zs_image/、/static/、/public/
     app.include_router(photo_proxy_router)
@@ -375,7 +375,10 @@ def create_app(config_name: str = 'development') -> FastAPI:
             response.headers["X-Content-Type-Options"] = "nosniff"
             return response
 
-    app.mount("/static", OptimizedStaticFiles(directory=uploads_dir), name="static")
+    # MinIO 统一桶（zhxt）代理已在 photo_proxy 注册 /static/{path}（后端凭证透传），
+    # 本地上传目录改挂 /uploads，避免与 MinIO /static 代理冲突
+    # （文档约定的本地上传 URL 本就是 /uploads/xxx.jpg）。
+    app.mount("/uploads", OptimizedStaticFiles(directory=uploads_dir), name="uploads")
 
     # 健康检查端点（安全版本）
     @app.get("/health")

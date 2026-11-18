@@ -6,7 +6,7 @@ const { get, BASE_URL } = require('../../utils/request');
 // 背景音乐：走 MinIO 私有桶（与 headphoto 同款反向代理预签名方案）
 //
 // 数据源路径：
-//   guizhou-zhpt-prod-private/audio/颁奖音乐.mp3
+//   zhxt/audio/颁奖音乐.mp3
 //
 // 链路：
 //   前端 → GET /audio/url?key=audio/颁奖音乐.mp3 → 后端 sign_object_url()

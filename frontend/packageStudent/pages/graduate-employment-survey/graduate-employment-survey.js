@@ -770,11 +770,12 @@ createPage({
     }
     // 后端 put_zs_image 返回 <bucket>/<uuid>.<ext>；DB 规范要求只存纯 key zs/<uuid>.<ext>
     const rawKey = String(data.key).replace(/^\/+/, '');
-    // 硬编码桶名（与服务端 minio_service.MINIO_BUCKET_PRIVATE 对齐），不依赖后端常量。
-    const _BUCKET_PRIVATE_NAME = 'guizhou-zhpt-prod-private';
-    const dbKey = rawKey.startsWith(_BUCKET_PRIVATE_NAME + '/')
-      ? rawKey.slice(_BUCKET_PRIVATE_NAME.length + 1)
-      : rawKey;
+    // 硬编码桶名（统一桶 zhxt；历史桶名 guizhou-zhpt-prod-private 等同样兼容），不依赖后端常量。
+    const _BUCKET_NAMES = ['zhxt', 'guizhou-zhpt-prod-private', 'guizhou-zhpt-prod-public', 'headphoto'];
+    let dbKey = rawKey;
+    for (const _b of _BUCKET_NAMES) {
+      if (dbKey.startsWith(_b + '/')) { dbKey = dbKey.slice(_b.length + 1); break; }
+    }
     this.setData({ 'formData.certificate_url': dbKey });
     return dbKey;
   },
