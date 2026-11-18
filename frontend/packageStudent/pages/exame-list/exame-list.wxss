@@ -1,3 +1,13 @@
+@import "../../../components/vant-icon/index.wxss";
+/* vi 类：text 直渲 vant-icon 字体，图标不再依赖 ::before，避免错位重叠 */
+.vi {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: vant-icon, sans-serif;
+  font-size: 32rpx;
+  color: inherit;
+}
 /* 蓝色主题色彩变量 */
 page {
   --primary-color: #1890FF;
@@ -23,10 +33,12 @@ page {
   padding-top: 120rpx;
 }
 
-/* 页面头部样式 */
+/* 页面头部样式（fixed 顶栏：不能用负 margin，会把右按钮挤出屏幕） */
 .page-header {
   padding: 32rpx 0 24rpx;
-  margin: 0 -24rpx 32rpx;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10rpx);
   position: fixed;
@@ -41,6 +53,8 @@ page {
   align-items: center;
   gap: 16rpx;
   padding: 0 24rpx;
+  width: 100%;
+  box-sizing: border-box;
   position: relative;
 }
 
@@ -75,6 +89,8 @@ page {
   color: white;
   box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
   animation: pulse 2s infinite;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 @keyframes pulse {
@@ -84,7 +100,10 @@ page {
 
 .header-text {
   flex: 1;
+  min-width: 0;
   margin-left: 8rpx;
+  overflow: hidden;
+  flex-shrink: 1;
 }
 
 .header-title {
@@ -99,6 +118,14 @@ page {
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 1rpx;
+}
+
+/* 头部操作按钮组：成绩 + 首页，两个独立圆按钮 */
+.header-action-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-shrink: 0;
 }
 
 /* 头部操作按钮 */
@@ -294,11 +321,6 @@ page {
 }
 
 /* ============ 新版：exame 考试列表样式 ============ */
-
-.header-action-row {
-  display: flex;
-  align-items: center;
-}
 
 .exam-tabs {
   display: flex;

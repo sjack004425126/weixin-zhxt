@@ -5,16 +5,18 @@
 <view class="page-header">
   <view class="header-content">
     <view class="header-icon">
-      <van-icon name="completed" size="40rpx" />
+      <text class="vi" style="font-size:40rpx;color:inherit;"></text>
     </view>
     <view class="header-text">
       <view class="header-title">考试列表</view>
       <view class="header-subtitle">Exam List</view>
     </view>
-    <view class="header-action">
-      <view class="header-action-row">
-        <van-icon name="records" size="32rpx" bindtap="goToRecords" />
-        <van-icon name="home-o" size="32rpx" bindtap="goToMyCenter" style="margin-left: 24rpx;" />
+    <view class="header-action-group">
+      <view class="header-action" bindtap="goToRecords">
+        <text class="vi" style="font-size:32rpx;color:inherit;"></text>
+      </view>
+      <view class="header-action" bindtap="goToMyCenter">
+        <text class="vi" style="font-size:32rpx;color:inherit;"></text>
       </view>
     </view>
   </view>
@@ -30,7 +32,7 @@
 
   <!-- 加载中 -->
   <view wx:if="{{loading}}" class="loading-tip">
-    <van-icon name="loading" size="36rpx" color="#1890FF" />
+    <van-loading size="36rpx" color="#1890FF" />
     <text>加载中...</text>
   </view>
 
@@ -95,12 +97,12 @@
           <block wx:else>
             <view class="btn-disabled">{{timeStatusText[item.time_status] || '不可考'}}</view>
           </block>
-          <van-icon name="arrow" />
+          <text class="vi" style="font-size:28rpx;color:inherit;"></text>
         </view>
       </view>
     </block>
     <view wx:if="{{!loading && exams.length === 0}}" class="empty-tip">
-      <van-icon name="info-o" size="48rpx" color="#909399" />
+      <text class="vi" style="font-size:48rpx;color:#909399;"></text>
       <view style="margin-top: 16rpx;">暂无考试</view>
     </view>
   </view>
