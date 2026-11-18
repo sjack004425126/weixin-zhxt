@@ -35,7 +35,7 @@ router = APIRouter(prefix="/exame", tags=["exame考试桥接"])
 
 # ============= 配置 =============
 
-EXAME_BASE_URL = os.getenv("EXAME_BASE_URL", "http://localhost:8086").rstrip("/")
+EXAME_BASE_URL = os.getenv("EXAME_BASE_URL", "http://172.16.100.102:8086").rstrip("/")
 EXAME_TIMEOUT = int(os.getenv("EXAME_TIMEOUT", "30"))
 EXAME_TOKEN_TTL = int(os.getenv("EXAME_TOKEN_TTL", str(2 * 3600)))  # 与 exame 一致（默认 24h，此处保守取 2h 强制刷新）
 TOKEN_CACHE_KEY = "exame_token:{xs_xh}"  # Redis 二级缓存
