@@ -48,6 +48,17 @@ createPage({
         { showLoading: false }
       );
       const data = resp && resp.data ? resp.data : resp;
+      const fmt = (s) => {
+        if (!s) return '';
+        const d = new Date(s);
+        if (isNaN(d.getTime())) return s;
+        const p = (n) => (n < 10 ? '0' + n : '' + n);
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+      };
+      if (data) {
+        if (data.start_date) data.start_date = fmt(data.start_date);
+        if (data.end_date) data.end_date = fmt(data.end_date);
+      }
       this.setData({ exam: data, loading: false });
     } catch (err) {
       this.setData({ loading: false });
@@ -64,7 +75,18 @@ createPage({
       );
       const data = resp && resp.data ? resp.data : resp;
       const list = (data && data.list) || [];
-      this.setData({ records: list.filter(r => r.exam_id === this.data.examId) });
+      const fmt = (s) => {
+        if (!s) return '';
+        const d = new Date(s);
+        if (isNaN(d.getTime())) return s;
+        const p = (n) => (n < 10 ? '0' + n : '' + n);
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+      };
+      this.setData({
+        records: list
+          .filter(r => r.exam_id === this.data.examId)
+          .map(r => ({ ...r, submitted_at: fmt(r.submitted_at || r.started_at), started_at: fmt(r.started_at) })),
+      });
     } catch (e) {
       // 静默失败，不影响详情加载
       this.setData({ records: [] });
@@ -89,7 +111,7 @@ createPage({
   goToRecord(e) {
     const recordId = e.currentTarget.dataset.record;
     wx.redirectTo({
-      url: `/packageStudent/pages/score/score?record_id=${recordId}`
+      url: `/packageStudent/pages/score/score?source=exame&record_id=${recordId}`
     });
   },
 

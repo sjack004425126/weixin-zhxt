@@ -19,11 +19,13 @@ createPage({
     questions: [],
     currentIndex: 0,
     countdown: 60 * 60,
-    countdownStr: '',
+    countdownStr: '01:00:00',
     _timer: null,
     isSubmitting: false,
     loading: true,
     submitting: false,
+    showCardPanel: false,
+    answeredCount: 0,
   },
 
   async onLoad(options) {
@@ -62,12 +64,24 @@ createPage({
         this.showError('开始考试失败');
         return;
       }
-      const questions = (data.questions || []).map((q, idx) => this._normalizeQuestion(q, idx));
+      // 后端 start 返回结构：{ record_id, started_at, duration, exam: { id, title, duration, ..., questions: [...] } }
+      const examObj = data.exam || {};
+      const raw = examObj.questions || data.questions || [];
+      const questions = (raw || []).map((q, idx) => this._normalizeQuestion(q, idx));
+      // 按 started_at 计算剩余秒数（续考时扣掉已用时间）
+      let totalSec = Number(data.duration || examObj.duration || 60) * 60;
+      if (data.started_at) {
+        const used = Math.floor((Date.now() - new Date(data.started_at).getTime()) / 1000);
+        if (used > 0) totalSec = Math.max(totalSec - used, 60);
+      }
       this.setData({
         recordId: data.record_id,
-        exam: data.exam || null,
+        exam: examObj.id ? examObj : { title: '考试中' },
         questions,
-        countdown: (data.duration || 60) * 60,
+        countdown: totalSec,
+        countdownStr: this._fmtTime(totalSec),
+        showCardPanel: false,
+        answeredCount: 0,
         loading: false,
       }, () => this._startTimer());
     } catch (err) {
@@ -109,21 +123,28 @@ createPage({
       let c = this.data.countdown - 1;
       if (c <= 0) {
         clearInterval(this.data._timer);
+        this._timer = null;
+        this.setData({ countdown: 0, countdownStr: '00:00:00' });
         this.showError('考试时间到，系统将自动交卷');
         setTimeout(() => this.submitPaper(true), 1000);
         return;
       }
-      const h = Math.floor(c / 3600);
-      const m = Math.floor((c % 3600) / 60);
-      const s = c % 60;
-      const pad = (n) => (n < 10 ? '0' + n : '' + n);
       this.setData({
         countdown: c,
-        countdownStr: `${pad(h)}:${pad(m)}:${pad(s)}`,
+        countdownStr: this._fmtTime(c),
       });
     };
-    tick();
+    this.setData({ countdownStr: this._fmtTime(this.data.countdown) });
     this.data._timer = setInterval(tick, 1000);
+  },
+
+  _fmtTime(totalSec) {
+    const c = Math.max(Number(totalSec) || 0, 0);
+    const h = Math.floor(c / 3600);
+    const m = Math.floor((c % 3600) / 60);
+    const s = c % 60;
+    const pad = (n) => (n < 10 ? '0' + n : '' + n);
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
   },
 
   // 单选/判断：选中
@@ -137,7 +158,7 @@ createPage({
     this.setData({
       [key]: options,
       [`questions[${qindex}].answered`]: true,
-    });
+    }, () => this._updateAnsweredCount());
   },
 
   // 多选：toggle
@@ -150,7 +171,7 @@ createPage({
     this.setData({
       [`questions[${qindex}].options`]: options,
       [`questions[${qindex}].answered`]: anySelected,
-    });
+    }, () => this._updateAnsweredCount());
   },
 
   onTextInput(e) {
@@ -159,8 +180,17 @@ createPage({
     this.setData({
       [`questions[${qindex}].answerText`]: val,
       [`questions[${qindex}].answered`]: !!val && val.trim().length > 0,
-    });
+    }, () => this._updateAnsweredCount());
   },
+
+  _updateAnsweredCount() {
+    const n = this.data.questions.filter(q => q.answered).length;
+    this.setData({ answeredCount: n });
+  },
+
+  openCard() { this.setData({ showCardPanel: true }); },
+  closeCard() { this.setData({ showCardPanel: false }); },
+  noop() {},
 
   prevQuestion() {
     if (this.data.currentIndex > 0) {
@@ -177,11 +207,17 @@ createPage({
   goToQuestion(e) {
     const idx = Number(e.currentTarget.dataset.index);
     if (idx >= 0 && idx < this.data.questions.length) {
-      this.setData({ currentIndex: idx });
+      this.setData({ currentIndex: idx, showCardPanel: false });
+    } else if (e.currentTarget.dataset.index === undefined) {
+      // 答题卡按钮兜底（无 index 时仅关闭浮层）
+      this.setData({ showCardPanel: false });
     }
   },
 
-  async submitPaper(force) {
+  async submitPaper(e) {
+    // bindtap 会传入事件对象，不能当 force 用；只有显式 true 才跳过确认
+    const force = (typeof e === 'boolean') ? e : false;
+    if (e && e.stopPropagation) { /* tap 事件，无需处理 */ }
     if (this.data.submitting) return;
     const list = this.data.questions;
     const answered = list.filter(q => q.answered).length;
@@ -228,7 +264,7 @@ createPage({
         showCancel: false,
         success: () => {
           wx.redirectTo({
-            url: `/packageStudent/pages/score/score?record_id=${this.data.recordId}`
+            url: `/packageStudent/pages/score/score?source=exame&record_id=${this.data.recordId}`
           });
         },
       });

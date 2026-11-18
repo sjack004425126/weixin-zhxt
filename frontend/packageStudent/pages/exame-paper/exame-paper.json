@@ -4,7 +4,6 @@
   "navigationBarTextStyle": "white",
   "backgroundColor": "#E6F7FF",
   "usingComponents": {
-    "mp-html": "mp-html",
     "van-icon": "/components/vant-icon/index"
   }
 }

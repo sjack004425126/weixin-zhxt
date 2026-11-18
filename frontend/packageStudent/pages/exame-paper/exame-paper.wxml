@@ -79,15 +79,15 @@
   <!-- 底部操作 -->
   <view class="exam-bottom">
     <view class="btn-nav" bindtap="prevQuestion">上一题</view>
-    <view class="btn-nav btn-card" bindtap="goToQuestion" data-index="{{questions.length - 1}}">答题卡</view>
+    <view class="btn-nav btn-card" bindtap="openCard">答题卡 {{answeredCount}}/{{questions.length}}</view>
     <view class="btn-nav" bindtap="nextQuestion">下一题</view>
     <view class="btn-nav btn-submit" bindtap="submitPaper">交卷</view>
   </view>
 
   <!-- 答题卡浮层 -->
-  <view class="answer-card-mask" wx:if="{{false}}" bindtap="">
-    <view class="answer-card">
-      <view class="card-title">答题卡</view>
+  <view class="answer-card-mask" wx:if="{{showCardPanel}}" bindtap="closeCard">
+    <view class="answer-card" catchtap="noop">
+      <view class="card-title">答题卡（{{answeredCount}}/{{questions.length}}）</view>
       <view class="card-grid">
         <view
           wx:for="{{questions}}"
@@ -97,6 +97,7 @@
           bindtap="goToQuestion"
         >{{item.order}}</view>
       </view>
+      <view class="btn-nav btn-submit" style="margin-top: 24rpx;" bindtap="submitPaper">检查完毕，交卷</view>
     </view>
   </view>
 </block>
