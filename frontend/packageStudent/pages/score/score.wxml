@@ -96,13 +96,33 @@
       <view wx:if="{{detail.questions && detail.questions.length > 0}}" class="questions-list">
         <view wx:for="{{detail.questions}}" wx:key="id" class="question-row">
           <view class="q-header">
-            <text class="q-type">{{item.type}}</text>
-            <text class="q-order">第 {{index + 1}} 题</text>
+            <text class="q-type">{{item.typeLabel || item.type}}</text>
+            <text class="q-order">第 {{item.order || (index + 1)}} 题</text>
             <text class="q-score" style="color: {{item.is_correct === true ? '#52c41a' : (item.is_correct === false ? '#ff4d4f' : '#909399')}}">
               {{item.student_score != null ? item.student_score : 0}}/{{item.score || 0}}
             </text>
           </view>
           <view class="q-content">{{item.content}}</view>
+          <block wx:if="{{item.options && item.options.length > 0}}">
+            <view
+              wx:for="{{item.options}}"
+              wx:for-item="opt"
+              wx:key="id"
+              class="opt-line {{opt.is_correct ? 'opt-correct' : ''}}"
+            >
+              <text class="opt-label">{{opt.label}}</text>
+              <text class="opt-content">{{opt.content}}{{opt.is_correct ? ' ✓' : ''}}</text>
+            </view>
+          </block>
+          <view class="q-answer" wx:if="{{item.correctText}}">
+            <text class="ans-label">正确答案：</text>
+            <text class="q-answer-right">{{item.correctText}}</text>
+          </view>
+          <view class="q-answer">
+            <text class="ans-label">我的答案：</text>
+            <text class="{{item.is_correct === true ? 'q-answer-right' : (item.is_correct === false ? 'q-answer-wrong' : 'q-answer-mine')}}">{{item.mineText}}</text>
+          </view>
+          <view class="q-analysis" wx:if="{{item.analysis}}">解析：{{item.analysis}}</view>
         </view>
       </view>
     </block>

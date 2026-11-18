@@ -28,12 +28,18 @@
       <text class="q-score">{{questions[currentIndex].score}} 分</text>
     </view>
 
+    <view class="auto-next-row">
+      <text class="auto-next-label">⚡ 答题后自动下一题</text>
+      <van-switch checked="{{autoNext}}" size="40rpx" active-color="#1890FF" bind:change="toggleAutoNext" />
+    </view>
+
     <view class="q-content">
       <text>{{questions[currentIndex].content}}</text>
     </view>
 
     <!-- 选项：单选/判断 -->
     <block wx:if="{{questions[currentIndex].type === '单选题' || questions[currentIndex].type === '判断题'}}">
+      <view wx:if="{{autoNextTip}}" class="auto-next-tip">已记录，去下一题…</view>
       <view
         wx:for="{{questions[currentIndex].options}}"
         wx:key="id"

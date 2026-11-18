@@ -4,6 +4,7 @@
   "navigationBarTextStyle": "white",
   "backgroundColor": "#E6F7FF",
   "usingComponents": {
-    "van-icon": "/components/vant-icon/index"
+    "van-icon": "/components/vant-icon/index",
+    "van-switch": "@vant/weapp/switch/index"
   }
 }

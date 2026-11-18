@@ -84,6 +84,49 @@ createPage({
 
   async loadDetail() {
     this.setData({ loading: true });
+    const fmt = (s) => {
+      if (!s) return '';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      const p = (n) => (n < 10 ? '0' + n : '' + n);
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    };
+    const typeMap = { 1: '单选题', 2: '多选题', 3: '判断题', 4: '填空题', 5: '简答题' };
+    const normalize = (data) => {
+      if (!data) return data;
+      const out = { ...data };
+      if (out.submitted_at) out.submitted_at = fmt(out.submitted_at);
+      if (out.started_at) out.started_at = fmt(out.started_at);
+      out.questions = (out.questions || []).map((q, idx) => {
+        const nq = { ...q };
+        nq.typeLabel = typeMap[q.type] || q.type || '未知';
+        nq.order = idx + 1;
+        // 正确答案文本：客观题从 options.is_correct 提取 label
+        if ((q.type === 1 || q.type === 2 || q.type === 3) && Array.isArray(q.options)) {
+          const corrects = q.options.filter(o => o.is_correct).map(o => o.label || o.content);
+          nq.correctText = corrects.join('、') || '-';
+          // 我的答案文本：student_answer 可能是 id（数字）或 label
+          const mine = q.student_answer ?? q.user_answer;
+          if (mine == null || mine === '') {
+            nq.mineText = '未作答';
+          } else if (Array.isArray(q.options) && q.options.length) {
+            const parts = String(mine).split(',').map(s => s.trim()).filter(s => s !== '');
+            nq.mineText = parts.map(p0 => {
+              const hit = q.options.find(o => String(o.id) === p0 || (o.label || '').toUpperCase() === p0.toUpperCase());
+              return hit ? (hit.label ? `${hit.label} ${hit.content || ''}`.trim() : (hit.content || p0)) : p0;
+            }).join('、');
+          } else {
+            nq.mineText = String(mine);
+          }
+        } else {
+          const mine = q.student_answer ?? q.user_answer ?? '';
+          nq.mineText = mine === '' || mine == null ? '未作答' : String(mine);
+          nq.correctText = '';
+        }
+        return nq;
+      });
+      return out;
+    };
     try {
       const resp = await tokenGet(
         API.EXAME_SCORE.PAPER(this.data.recordId),
@@ -91,7 +134,7 @@ createPage({
         { loadingTitle: '获取成绩详情...' }
       );
       const data = resp && resp.data ? resp.data : resp;
-      this.setData({ detail: data, loading: false });
+      this.setData({ detail: normalize(data), loading: false });
     } catch (err) {
       try {
         const resp2 = await tokenGet(
@@ -100,7 +143,7 @@ createPage({
           { loadingTitle: '获取成绩详情...' }
         );
         const data = resp2 && resp2.data ? resp2.data : resp2;
-        this.setData({ detail: data, loading: false });
+        this.setData({ detail: normalize(data), loading: false });
       } catch (err2) {
         this.setData({ loading: false });
         this.showError(err2.message || err2.msg || '获取成绩详情失败');

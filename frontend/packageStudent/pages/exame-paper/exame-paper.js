@@ -26,6 +26,9 @@ createPage({
     submitting: false,
     showCardPanel: false,
     answeredCount: 0,
+    autoNext: true,
+    _autoNextTimer: null,
+    autoNextTip: false,
   },
 
   async onLoad(options) {
@@ -34,7 +37,12 @@ createPage({
       this.showError('缺少参数');
       return;
     }
-    this.setData({ examId });
+    let autoNext = true;
+    try {
+      const v = wx.getStorageSync('exame_auto_next');
+      if (v === 0 || v === false) autoNext = false;
+    } catch (err) {}
+    this.setData({ examId, autoNext });
 
     if (options.record_id) {
       // 继续答题：根据 record_id 拉题目
@@ -49,6 +57,10 @@ createPage({
   onUnload() {
     if (this.data._timer) {
       clearInterval(this.data._timer);
+    }
+    if (this.data._autoNextTimer) {
+      clearTimeout(this.data._autoNextTimer);
+      this.data._autoNextTimer = null;
     }
   },
 
@@ -158,7 +170,10 @@ createPage({
     this.setData({
       [key]: options,
       [`questions[${qindex}].answered`]: true,
-    }, () => this._updateAnsweredCount());
+    }, () => {
+      this._updateAnsweredCount();
+      this._scheduleAutoNext();
+    });
   },
 
   // 多选：toggle
@@ -188,26 +203,50 @@ createPage({
     this.setData({ answeredCount: n });
   },
 
+  toggleAutoNext(e) {
+    const checked = !!(e && e.detail !== undefined ? e.detail : !this.data.autoNext);
+    this.setData({ autoNext: checked });
+    try { wx.setStorageSync('exame_auto_next', checked ? 1 : 0); } catch (err) {}
+    this.showSuccess(checked ? '已开启答题后自动下一题' : '已关闭自动下一题');
+  },
+
+  _scheduleAutoNext() {
+    if (!this.data.autoNext) return;
+    if (this.data._autoNextTimer) clearTimeout(this.data._autoNextTimer);
+    // 最后一题不自动跳，提示去答题卡检查
+    if (this.data.currentIndex >= this.data.questions.length - 1) return;
+    this.setData({ autoNextTip: true });
+    this.data._autoNextTimer = setTimeout(() => {
+      this.data._autoNextTimer = null;
+      this.setData({ autoNextTip: false });
+      const next = Math.min(this.data.currentIndex + 1, this.data.questions.length - 1);
+      this.setData({ currentIndex: next });
+    }, 600);
+  },
+
   openCard() { this.setData({ showCardPanel: true }); },
   closeCard() { this.setData({ showCardPanel: false }); },
   noop() {},
 
   prevQuestion() {
+    if (this.data._autoNextTimer) { clearTimeout(this.data._autoNextTimer); this.data._autoNextTimer = null; }
     if (this.data.currentIndex > 0) {
-      this.setData({ currentIndex: this.data.currentIndex - 1 });
+      this.setData({ currentIndex: this.data.currentIndex - 1, autoNextTip: false });
     }
   },
 
   nextQuestion() {
+    if (this.data._autoNextTimer) { clearTimeout(this.data._autoNextTimer); this.data._autoNextTimer = null; }
     if (this.data.currentIndex < this.data.questions.length - 1) {
-      this.setData({ currentIndex: this.data.currentIndex + 1 });
+      this.setData({ currentIndex: this.data.currentIndex + 1, autoNextTip: false });
     }
   },
 
   goToQuestion(e) {
+    if (this.data._autoNextTimer) { clearTimeout(this.data._autoNextTimer); this.data._autoNextTimer = null; }
     const idx = Number(e.currentTarget.dataset.index);
     if (idx >= 0 && idx < this.data.questions.length) {
-      this.setData({ currentIndex: idx, showCardPanel: false });
+      this.setData({ currentIndex: idx, showCardPanel: false, autoNextTip: false });
     } else if (e.currentTarget.dataset.index === undefined) {
       // 答题卡按钮兜底（无 index 时仅关闭浮层）
       this.setData({ showCardPanel: false });
