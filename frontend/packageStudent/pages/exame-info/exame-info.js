@@ -3,7 +3,7 @@ const { tokenGet } = require('../../../utils/request');
 const { API } = require('../../../utils/api');
 
 /**
- * 考试详情页（exame 考试系统）
+ * 考试详情页（exame 考试系统，中职学生专用）
  *
  * 从列表跳过来，单一考试视图：
  *  - 显示考试元信息（时长/及格分/总分/起止时间/次数限制）
@@ -100,5 +100,5 @@ createPage({
   },
 }, {
   requireAuth: true,
-  userType: 'open_student'
+  userType: 'vocational_student'
 })

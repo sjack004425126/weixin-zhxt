@@ -1,0 +1,38 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view wx:if="{{loading}}" class="loading-tip"><van-icon name="loading" size="36rpx" color="#1890FF" /><text>加载中...</text></view>
+<block wx:else>
+  <view class="exam-topbar">
+    <view class="topbar-left"><text class="topbar-title">{{kcName || '自测答题'}}</text></view>
+    <view class="topbar-mid"><text class="topbar-progress">{{currentIndex + 1}}/{{questions.length}}</text></view>
+  </view>
+  <view wx:if="{{questions[currentIndex]}}" class="question-card">
+    <view class="q-header">
+      <text class="q-type">{{questions[currentIndex].tx}}</text>
+      <text class="q-order">第 {{questions[currentIndex].order}} 题</text>
+    </view>
+    <view class="q-content"><text>{{questions[currentIndex].tg}}</text></view>
+    <block wx:if="{{questions[currentIndex].tx === '单选题' || questions[currentIndex].tx === '判断题'}}">
+      <view wx:for="{{questions[currentIndex].options}}" wx:key="label" class="q-option {{item.selected ? 'option-selected' : ''}}" data-qindex="{{currentIndex}}" data-oindex="{{index}}" bindtap="selectOption">
+        <text class="option-label">{{item.label}}</text>
+        <text class="option-content">{{item.content}}</text>
+      </view>
+    </block>
+    <block wx:elif="{{questions[currentIndex].tx === '多选题'}}">
+      <view wx:for="{{questions[currentIndex].options}}" wx:key="label" class="q-option {{item.selected ? 'option-selected' : ''}}" data-qindex="{{currentIndex}}" data-oindex="{{index}}" bindtap="toggleMultiOption">
+        <text class="option-label">{{item.label}}</text>
+        <text class="option-content">{{item.content}}</text>
+        <text wx:if="{{item.selected}}" class="option-mark">✓</text>
+      </view>
+    </block>
+    <block wx:else>
+      <textarea class="q-textarea" placeholder="请输入答案" value="{{questions[currentIndex].answerText}}" data-qindex="{{currentIndex}}" bindinput="onTextInput" maxlength="-1" />
+    </block>
+  </view>
+  <view class="exam-bottom">
+    <view class="btn-nav" bindtap="prevQuestion">上一题</view>
+    <view class="btn-nav" bindtap="nextQuestion">下一题</view>
+    <view class="btn-nav" bindtap="saveProgress">保存</view>
+    <view class="btn-nav btn-submit" bindtap="submitPaper">交卷</view>
+  </view>
+</block>

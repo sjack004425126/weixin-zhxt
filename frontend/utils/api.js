@@ -61,8 +61,8 @@ const API = {
 
   // 成绩页面接口
   SCORE: {
-    // 获取成绩列表
-    GET_LIST: '/student/scores',
+    // 获取成绩列表（自研：controllers/student_info.py /student/get_scores）
+    GET_LIST: '/student/get_scores',
     REVIEW: '/student/score/review'
   },
 
@@ -176,22 +176,25 @@ const API = {
   },
 
   EXAM_LIST: {
-    GET_EXAM_LIST: '/exame/subjectsList',
-    // 新接入：exame 考试系统（中职学生）
+    // 自研考试（开放学生）：后端 controllers/student_exam.py，prefix /student_exam
+    GET_EXAM_LIST: '/student_exam/subjectsList',
+    // exame 考试系统（中职学生，经 /exame 代理到 102:8086）
     GET_EXAME_EXAMS: '/exame/exams'
   },
 
 
   EXAM_INFO: {
-    GET_SJ_LIST: '/exame/get_sj_list',
-    // 新接入：exame 考试详情
+    // 自研：取某科目试卷列表
+    GET_SJ_LIST: '/student_exam/get_sj_list',
+    // exame 考试详情（中职）
     GET_EXAME_DETAIL: (id) => `/exame/exams/${id}`
   },
 
   EXAME_PAPER: {
-    GET_EXAM_PAPER: '/exame/get_exame_paper',
-    SUBMIT_EXAM: '/exame/submit_exam',
-    // 新接入：exame 开始考试 / 提交
+    // 自研：取卷 / 交卷
+    GET_EXAM_PAPER: '/student_exam/get_exame_paper',
+    SUBMIT_EXAM: '/student_exam/submit_exam',
+    // exame 开始考试 / 提交（中职）
     START_EXAME: '/exame/exams/start',
     SUBMIT_EXAME: '/exame/exams/submit'
   },
@@ -200,6 +203,13 @@ const API = {
     LIST: '/exame/exams/records',
     DETAIL: (id) => `/exame/exams/records/${id}`,
     PAPER: (id) => `/exame/exams/records/${id}/paper`
+  },
+
+  // 自研自测考试（开放学生）：后端 controllers/student_exam.py，prefix /student_exam
+  SELF_EXAM: {
+    CREATE_RECORD: '/student_exam/create_exam_record',
+    SAVE_ANSWERS: '/student_exam/save_exam_answers',
+    GET_RECORDS: '/student_exam/get_exam_records'
   }
 
 

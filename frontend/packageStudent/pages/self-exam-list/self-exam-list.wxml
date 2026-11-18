@@ -1,0 +1,41 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-icon"><van-icon name="records" size="40rpx" /></view>
+      <view class="header-text">
+        <view class="header-title">自测科目</view>
+        <view class="header-subtitle">Self Test</view>
+      </view>
+      <view class="header-action"><van-icon name="home-o" size="32rpx" bindtap="goToMy" /></view>
+    </view>
+  </view>
+
+  <view wx:if="{{deadline}}" class="deadline-tip">⏰ 自测截止时间：{{deadline}}</view>
+
+  <view wx:if="{{loading}}" class="loading-tip">
+    <van-icon name="loading" size="36rpx" color="#1890FF" /><text>加载中...</text>
+  </view>
+
+  <view wx:else class="exam-list">
+    <block wx:for="{{subjects}}" wx:key="kc_id">
+      <view class="exam-item" bindtap="goToPapers" data-kcid="{{item.kc_id}}" data-kcmc="{{item.kcmc}}">
+        <view class="exam-card-top">
+          <view class="exam-title">{{item.kcmc}}</view>
+          <view class="status-tag">{{item.subject_type || ''}}</view>
+        </view>
+        <view class="exam-card-info">
+          <view class="info-row"><text class="info-label">课程号：</text><text class="info-value">{{item.kcid}}</text></view>
+          <view class="info-row"><text class="info-label">层次：</text><text class="info-value">{{item.kccc}}</text><text class="info-label" style="margin-left:24rpx;">单位：</text><text class="info-value">{{item.ksdw}}</text></view>
+          <view class="info-row" wx:if="{{item.ctjs}}"><text class="info-label">出题教师：</text><text class="info-value">{{item.ctjs}}</text></view>
+        </view>
+        <view class="exam-card-bottom">
+          <view class="btn-start">进入试卷</view>
+          <van-icon name="arrow" />
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{!loading && subjects.length === 0}}" class="empty-tip">暂无自测科目</view>
+  </view>
+</view>

@@ -4,9 +4,11 @@ const { API } = require('../../../utils/api');
 const app = getApp();
 
 /**
- * 考试列表页（exame 考试系统）
+ * 考试列表页（exame 考试系统，中职学生专用）
  *
- * 数据源：exame 后端 /api/v1/student/exams（由 zhpt-new /exame/exams 代理）
+ * 数据源：exame 后端 /api/v1/student/exams（由 zhpt-new /exame/exams 代理到 102:8086）
+ * 入口：packageVocational/pages/vocational-my（考试管理 → 在线考试）
+ * 开放学生不走这里（开放走自研 /student_exam/*），my 页已隐藏该入口。
  * 适配：每个 exam → 一张卡片，显示标题/时长/及格分/状态
  *
  * 兼容：保留原"形考/终考"老系统入口的视觉风格，但数据全走 exame 新接口。
@@ -73,7 +75,7 @@ createPage({
 
   goToRecords() {
     wx.redirectTo({
-      url: '/packageStudent/pages/score/score'
+      url: '/packageStudent/pages/score/score?source=exame'
     });
   },
 
@@ -84,5 +86,5 @@ createPage({
   },
 }, {
   requireAuth: true,
-  userType: 'open_student'
+  userType: 'vocational_student'
 })

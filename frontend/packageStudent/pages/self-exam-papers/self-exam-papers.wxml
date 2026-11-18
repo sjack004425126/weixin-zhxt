@@ -1,0 +1,36 @@
+<!-- 顶部消息提示组件 -->
+<include src="/utils/common-components.wxml" />
+<view class="container">
+  <view class="page-header">
+    <view class="header-content">
+      <view class="back-button" bindtap="goBack"><van-icon name="arrow-left" size="32rpx" /></view>
+      <view class="header-text">
+        <view class="header-title">{{kcmc || '试卷列表'}}</view>
+        <view class="header-subtitle">Papers</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-tip"><van-icon name="loading" size="36rpx" color="#1890FF" /><text>加载中...</text></view>
+
+  <view wx:else class="exam-list">
+    <block wx:for="{{papers}}" wx:key="sj_id">
+      <view class="exam-item">
+        <view class="exam-card-top">
+          <view class="exam-title">{{item.sj_type_mc}}</view>
+          <view class="status-tag">{{item.status_text || (item.sj_zt == 1 ? '已开启' : '未开启')}}</view>
+        </view>
+        <view class="exam-card-info">
+          <view class="info-row"><text class="info-label">已答次数：</text><text class="info-value">{{item.dt_num || 0}}</text></view>
+          <block wx:if="{{item.sj_dt && item.sj_dt.length}}">
+            <view class="info-row"><text class="info-label">最近成绩：</text><text class="info-value">{{item.sj_dt[0].total_score}} 分（第{{item.sj_dt[0].cs}}次）</text></view>
+          </block>
+        </view>
+        <view class="exam-card-bottom">
+          <view class="btn-start" data-sjid="{{item.sj_id}}" data-sjzt="{{item.sj_zt}}" bindtap="goToAnswer">开始答题</view>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{!loading && papers.length === 0}}" class="empty-tip">暂无试卷</view>
+  </view>
+</view>

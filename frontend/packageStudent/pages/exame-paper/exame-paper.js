@@ -251,5 +251,5 @@ createPage({
   },
 }, {
   requireAuth: true,
-  userType: 'open_student'
+  userType: 'vocational_student'
 })

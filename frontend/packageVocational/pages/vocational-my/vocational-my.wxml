@@ -142,6 +142,29 @@
       </van-cell-group>
     </view>
 
+    <!-- 考试管理 -->
+    <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
+      <view class="section-title">
+        <text class="title-text">考试管理</text>
+      </view>
+      <van-cell-group inset>
+        <van-cell
+          title="在线考试"
+          icon="records-o"
+          is-link
+          data-url="/packageStudent/pages/exame-list/exame-list"
+          bind:click="navigateTo"
+        />
+        <van-cell
+          title="我的成绩"
+          icon="bar-chart-o"
+          is-link
+          data-url="/packageStudent/pages/score/score?source=exame"
+          bind:click="navigateTo"
+        />
+      </van-cell-group>
+    </view>
+
     <!-- 心理咨询 -->
     <view class="section {{userInfo && userInfo.xs_xjzt != 1 ? 'section-disabled' : ''}}">
       <view class="section-title">

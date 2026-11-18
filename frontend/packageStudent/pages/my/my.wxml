@@ -81,13 +81,14 @@
       </van-cell-group>
     </view>
 
+
+    <!-- 自研自测考试（开放学生，不走 102 exame） -->
     <view class="section">
       <view class="section-title">
         <text class="title-text">考试相关</text>
       </view>
       <van-cell-group inset>
-        <van-cell title="自测考试" icon="orders-o" is-link data-url="/packageStudent/pages/exame-list/exame-list" bindtap="navigateTo" />
-
+        <van-cell title="自测考试" icon="orders-o" is-link data-url="/packageStudent/pages/self-exam-list/self-exam-list" bindtap="navigateTo" />
       </van-cell-group>
     </view>
 
